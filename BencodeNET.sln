@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30723.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BencodeNET", "BencodeNET\BencodeNET.csproj", "{A267EADE-6093-41DF-AB20-53CB9661B47B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BencodeNET.Console", "BencodeNET.Console\BencodeNET.Console.csproj", "{5B637B4C-2C4A-4F8A-AB18-329E40704B41}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BencodeNET.Tests", "BencodeNET.Tests\BencodeNET.Tests.csproj", "{EEEE6947-258B-4E6E-AE99-F72B7A29D96F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A267EADE-6093-41DF-AB20-53CB9661B47B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A267EADE-6093-41DF-AB20-53CB9661B47B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A267EADE-6093-41DF-AB20-53CB9661B47B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A267EADE-6093-41DF-AB20-53CB9661B47B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B637B4C-2C4A-4F8A-AB18-329E40704B41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B637B4C-2C4A-4F8A-AB18-329E40704B41}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B637B4C-2C4A-4F8A-AB18-329E40704B41}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B637B4C-2C4A-4F8A-AB18-329E40704B41}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEEE6947-258B-4E6E-AE99-F72B7A29D96F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEEE6947-258B-4E6E-AE99-F72B7A29D96F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEEE6947-258B-4E6E-AE99-F72B7A29D96F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEEE6947-258B-4E6E-AE99-F72B7A29D96F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
