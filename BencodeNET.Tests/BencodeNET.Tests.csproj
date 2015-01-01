@@ -55,12 +55,16 @@
     <Compile Include="BStringTests.cs" />
     <Compile Include="BNumberTests.cs" />
     <Compile Include="BDictionaryTests.cs" />
+    <Compile Include="BencodeTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BencodeNET\BencodeNET.csproj">
       <Project>{A267EADE-6093-41DF-AB20-53CB9661B47B}</Project>
       <Name>BencodeNET</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Files\ubuntu-14.10-desktop-amd64.iso.torrent" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
