@@ -19,6 +19,11 @@ namespace BencodeNET
             stream.WriteByte((byte)c);
         }
 
+        public static void WriteAsString(this BinaryWriter stream, int integer)
+        {
+            stream.Write(integer.ToString().ToCharArray());
+        }
+
         public static string AsString(this IEnumerable<char> chars)
         {
             if (chars == null)

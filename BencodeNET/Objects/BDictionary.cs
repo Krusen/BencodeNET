@@ -85,19 +85,21 @@ namespace BencodeNET.Objects
                 // Loop until next character is the end character 'e' or the end of stream
                 while (reader.PeekChar() != 'e' && reader.PeekChar() != -1)
                 {
-                    // Decode next object in stream as the key
-                    var key = Bencode.Decode(stream, encoding);
-                    if (key == null)
-                        throw InvalidException(string.Format("Invalid object beginning with '{0}'.", reader.PeekChar()), startPosition);
-
-                    // Keys can only be strings
-                    if (!(key is BString))
-                        throw InvalidException("Keys can only be strings.", startPosition);
+                    // Decode next string in stream as the key
+                    BString key;
+                    try
+                    {
+                        key = BString.Decode(stream, encoding);
+                    }
+                    catch (InvalidBencodeException ex)
+                    {
+                        throw InvalidException("Dictionary keys must be strings.", stream.Position);
+                    }
 
                     // Decode next object in stream as the value
                     var value = Bencode.Decode(stream, encoding);
                     if (value == null)
-                        throw InvalidException("All keys must have a corresponding value.", startPosition);
+                        throw InvalidException("All keys must have a corresponding value.", stream.Position);
 
                     dictionary.Add(key, value);
                 }

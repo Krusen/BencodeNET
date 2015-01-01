@@ -54,7 +54,7 @@ namespace BencodeNET.Exceptions
                 if (!message.EndsWith("."))
                     message += ".";
 
-                message += " Object decoding began at position " + streamPosition;
+                message += " Decoding failed at position " + streamPosition;
             }
 
             return new InvalidBencodeException(message, streamPosition);
