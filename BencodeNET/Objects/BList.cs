@@ -26,10 +26,10 @@ namespace BencodeNET.Objects
 
         public override T EncodeToStream<T>(T stream, Encoding encoding)
         {
-            stream.WriteChar('l');
+            stream.Write('l');
             foreach (var item in this)
                 item.EncodeToStream(stream, encoding);
-            stream.WriteChar('e');
+            stream.Write('e');
             return stream;
         }
 

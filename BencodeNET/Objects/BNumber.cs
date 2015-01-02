@@ -17,11 +17,11 @@ namespace BencodeNET.Objects
 
         public override T EncodeToStream<T>(T stream, Encoding encoding)
         {
-            using (var writer = new StreamWriter(stream, encoding, 32, leaveOpen:true))
+            using (var bstream = new BencodeStream(stream, leaveOpen:true))
             {
-                writer.Write('i');
-                writer.Write(Value);
-                writer.Write('e');
+                bstream.Write('i');
+                bstream.Write(Value);
+                bstream.Write('e');
                 return stream;
             }
         }

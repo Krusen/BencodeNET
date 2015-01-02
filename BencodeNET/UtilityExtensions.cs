@@ -11,10 +11,10 @@ namespace BencodeNET
     {
         public static bool EndOfStream(this Stream stream)
         {
-            return stream.Position == stream.Length;
+            return stream.Position >= stream.Length;
         }
 
-        public static void WriteChar(this Stream stream, char c)
+        public static void Write(this Stream stream, char c)
         {
             stream.WriteByte((byte)c);
         }

@@ -33,13 +33,13 @@ namespace BencodeNET.Objects
 
         public override T EncodeToStream<T>(T stream, Encoding encoding)
         {
-            stream.WriteChar('d');
+            stream.Write('d');
             foreach (var kvPair in this)
             {
                 kvPair.Key.EncodeToStream(stream, encoding);
                 kvPair.Value.EncodeToStream(stream, encoding);
             }
-            stream.WriteChar('e');
+            stream.Write('e');
             return stream;
         }
 

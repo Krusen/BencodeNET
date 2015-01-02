@@ -44,11 +44,11 @@ namespace BencodeNET.Objects
 
         public override T EncodeToStream<T>(T stream, Encoding encoding)
         {
-            using (var writer = new BinaryWriter(stream, encoding, leaveOpen:true))
+            using (var bstream = new BencodeStream(stream, leaveOpen:true))
             {
-                writer.WriteAsString(Length);
-                writer.Write(':');
-                writer.Write(Value);
+                bstream.Write(Length);
+                bstream.Write(':');
+                bstream.Write(Value);
                 return stream;
             }
         }
