@@ -8,14 +8,21 @@ namespace BencodeNET.IO
     {
         private readonly byte[] _emptyByteArray = new byte[0];
 
+        private Stream _stream;
         private readonly bool _leaveOpen;
 
         private bool _hasPeeked;
+        private long _peekPosition;
         private int _peekedByte;
 
-        public Stream BaseStream { get; protected set; }
+        public Stream BaseStream { get { return _stream; } }
 
         public bool EndOfStream { get { return Position >= Length; } }
+
+        private bool HasValidPeek
+        {
+            get { return _hasPeeked && _peekPosition == _stream.Position; }
+        }
 
         public BencodeStream(string str) : this(Bencode.DefaultEncoding.GetBytes(str))
         { }
@@ -33,18 +40,19 @@ namespace BencodeNET.IO
         {
             if (stream == null) throw new ArgumentNullException("stream");
 
-            BaseStream = stream;
+            _stream = stream;
             _leaveOpen = leaveOpen;
         }
 
         public int Peek()
         {
-            if (_hasPeeked)
+            if (HasValidPeek)
                 return _peekedByte;
 
             _peekedByte = Read();
+            _stream.Position -= 1;
+            _peekPosition = _stream.Position;
             _hasPeeked = true;
-            Position -= 1;
             return _peekedByte;
         }
 
@@ -57,19 +65,19 @@ namespace BencodeNET.IO
 
         public int Read()
         {
-            if (_hasPeeked)
+            if (HasValidPeek)
             {
                 if (_peekedByte == -1)
                     return _peekedByte;
 
                 _hasPeeked = false;
-                Position += 1;
+                _stream.Position += 1;
                 return _peekedByte;
             }
 
             var bytes = new byte[1];
 
-            var readBytes = BaseStream.Read(bytes, 0, 1);
+            var readBytes = _stream.Read(bytes, 0, 1);
             if (readBytes == 0)
                 return -1;
 
@@ -91,7 +99,7 @@ namespace BencodeNET.IO
 
             var bytes = new byte[bytesToRead];
 
-            if (_hasPeeked)
+            if (HasValidPeek)
             {
                 if (_peekedByte == -1)
                     return _emptyByteArray;
@@ -99,7 +107,7 @@ namespace BencodeNET.IO
                 _hasPeeked = false;
             }
 
-            var readBytes = BaseStream.Read(bytes, 0, bytesToRead);
+            var readBytes = _stream.Read(bytes, 0, bytesToRead);
             if (readBytes == bytesToRead)
                 return bytes;
 
@@ -110,14 +118,14 @@ namespace BencodeNET.IO
 
         public int ReadPrevious()
         {
-            if (Position == 0)
+            if (_stream.Position == 0)
                 return -1;
 
-            Position -= 1;
+            _stream.Position -= 1;
 
             var bytes = new byte[1];
 
-            var readBytes = BaseStream.Read(bytes, 0, 1);
+            var readBytes = _stream.Read(bytes, 0, 1);
             if (readBytes == 0)
                 return -1;
 
@@ -146,48 +154,48 @@ namespace BencodeNET.IO
 
         public void Write(char c)
         {
-            BaseStream.WriteByte((byte)c);
+            _stream.WriteByte((byte)c);
         }
 
         public void Write(byte[] bytes)
         {
-            BaseStream.Write(bytes, 0, bytes.Length);
+            _stream.Write(bytes, 0, bytes.Length);
         }
 
         public void Flush()
         {
-            BaseStream.Flush();   
+            _stream.Flush();   
         }
 
         public long Seek(long offset, SeekOrigin origin)
         {
-            return BaseStream.Seek(offset, origin);
+            return _stream.Seek(offset, origin);
         }
 
         public bool CanRead
         {
-            get { return BaseStream.CanRead; }
+            get { return _stream.CanRead; }
         }
 
         public bool CanSeek
         {
-            get { return BaseStream.CanSeek; }
+            get { return _stream.CanSeek; }
         }
 
         public bool CanWrite
         {
-            get { return BaseStream.CanWrite; }
+            get { return _stream.CanWrite; }
         }
 
         public long Length
         {
-            get { return BaseStream.Length; }
+            get { return _stream.Length; }
         }
 
         public long Position
         {
-            get { return BaseStream.Position; }
-            set { BaseStream.Position = value; }
+            get { return _stream.Position; }
+            set { _stream.Position = value; }
         }
 
         public virtual void Close()
@@ -204,9 +212,9 @@ namespace BencodeNET.IO
         {
             if (disposing)
             {
-                if (BaseStream != null && !_leaveOpen)
-                    BaseStream.Close();
-                BaseStream = null;
+                if (_stream != null && !_leaveOpen)
+                    _stream.Close();
+                _stream = null;
             }
         }
     }

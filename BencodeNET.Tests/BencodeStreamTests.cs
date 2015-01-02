@@ -321,6 +321,66 @@ namespace BencodeNET.Tests
         }
 
         [TestMethod]
+        public void PeekAfterPositionChange()
+        {
+            var str = "abcdefghijkl";
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(str)))
+            using (var bs = new BencodeStream(ms))
+            {
+                Assert.AreEqual(0, bs.Position);
+                Assert.AreEqual('a', bs.PeekChar());
+                bs.Position = 1;
+                Assert.AreEqual(1, bs.Position);
+                Assert.AreEqual('b', bs.PeekChar());
+            }
+        }
+
+        [TestMethod]
+        public void PeekAfterPositionChangeOnBaseStream()
+        {
+            var str = "abcdefghijkl";
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(str)))
+            using (var bs = new BencodeStream(ms))
+            {
+                Assert.AreEqual(0, bs.Position);
+                Assert.AreEqual('a', bs.PeekChar());
+                bs.BaseStream.Position = 1;
+                Assert.AreEqual(1, bs.Position);
+                Assert.AreEqual('b', bs.PeekChar());
+            }
+        }
+
+        [TestMethod]
+        public void PeekAfterSeek()
+        {
+            var str = "abcdefghijkl";
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(str)))
+            using (var bs = new BencodeStream(ms))
+            {
+                Assert.AreEqual(0, bs.Position);
+                Assert.AreEqual('a', bs.PeekChar());
+                bs.Seek(1, SeekOrigin.Current);
+                Assert.AreEqual(1, bs.Position);
+                Assert.AreEqual('b', bs.PeekChar());
+            }
+        }
+
+        [TestMethod]
+        public void PeekAfterSeekOnBaseStream()
+        {
+            var str = "abcdefghijkl";
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(str)))
+            using (var bs = new BencodeStream(ms))
+            {
+                Assert.AreEqual(0, bs.Position);
+                Assert.AreEqual('a', bs.PeekChar());
+                bs.BaseStream.Seek(1, SeekOrigin.Current);
+                Assert.AreEqual(1, bs.Position);
+                Assert.AreEqual('b', bs.PeekChar());
+            }
+        }
+
+        [TestMethod]
         public void EndOfStream()
         {
             var str = "Hello World!";
