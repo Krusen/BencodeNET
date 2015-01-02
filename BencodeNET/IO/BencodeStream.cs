@@ -100,12 +100,12 @@ namespace BencodeNET.IO
             }
 
             var readBytes = BaseStream.Read(bytes, 0, bytesToRead);
-            if (readBytes != bytesToRead)
-            {
-                Array.Resize(ref bytes, readBytes);
-            }
+            if (readBytes == bytesToRead)
+                return bytes;
 
-            return bytes;
+            var newBytes = new byte[readBytes];
+            Array.Copy(bytes, newBytes, readBytes);
+            return newBytes;
         }
 
         public int ReadPrevious()
