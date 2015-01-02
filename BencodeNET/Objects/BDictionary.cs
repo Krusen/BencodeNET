@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using BencodeNET.Exceptions;
+using BencodeNET.IO;
 
 namespace BencodeNET.Objects
 {
