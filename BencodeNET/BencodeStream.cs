@@ -19,12 +19,19 @@ namespace BencodeNET
 
         public Stream BaseStream { get; protected set; }
 
-        public bool EndOfStream { get { return BaseStream.Position >= BaseStream.Length; } }
+        public bool EndOfStream { get { return Position >= Length; } }
+
+        public BencodeStream(string str) : this(Bencode.DefaultEncoding.GetBytes(str))
+        { }
+
+        public BencodeStream(string str, Encoding encoding) : this(encoding.GetBytes(str))
+        { }
+
+        public BencodeStream(byte[] bytes) : this(new MemoryStream(bytes), false)
+        { }
 
         public BencodeStream(Stream stream) : this(stream, false)
-        {
-            
-        }
+        { }
 
         public BencodeStream(Stream stream, bool leaveOpen)
         {
@@ -41,8 +48,15 @@ namespace BencodeNET
 
             _peekedByte = Read();
             _hasPeeked = true;
-            BaseStream.Position -= 1;
+            Position -= 1;
             return _peekedByte;
+        }
+
+        public char PeekChar()
+        {
+            if (Peek() == -1)
+                return default(char);
+            return (char) Peek();
         }
 
         public int Read()
@@ -53,7 +67,7 @@ namespace BencodeNET
                     return _peekedByte;
 
                 _hasPeeked = false;
-                BaseStream.Position += 1;
+                Position += 1;
                 return _peekedByte;
             }
 
@@ -64,6 +78,14 @@ namespace BencodeNET
                 return -1;
 
             return bytes[0];
+        }
+
+        public char ReadChar()
+        {
+            var value = Read();
+            if (value == -1)
+                return default(char);
+            return (char) value;
         }
 
         public byte[] Read(int bytesToRead)
@@ -88,6 +110,30 @@ namespace BencodeNET
             }
 
             return bytes;
+        }
+
+        public int ReadPrevious()
+        {
+            if (Position == 0)
+                return -1;
+
+            Position -= 1;
+
+            var bytes = new byte[1];
+
+            var readBytes = BaseStream.Read(bytes, 0, 1);
+            if (readBytes == 0)
+                return -1;
+
+            return bytes[0];
+        }
+
+        public char ReadPreviousChar()
+        {
+            var value = ReadPrevious();
+            if (value == -1)
+                return default(char);
+            return (char)value;
         }
 
         public void Write(int number)

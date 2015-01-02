@@ -66,6 +66,11 @@ namespace BencodeNET.Objects
 
         public static BDictionary Decode(Stream stream, Encoding encoding)
         {
+            return Decode(new BencodeStream(stream, leaveOpen: true), encoding);
+        }
+
+        public static BDictionary Decode(BencodeStream stream, Encoding encoding)
+        {
             if (stream == null) throw new ArgumentNullException("stream");
             if (encoding == null) throw new ArgumentNullException("encoding");
 
@@ -74,44 +79,37 @@ namespace BencodeNET.Objects
             if (stream.Length < 2)
                 throw InvalidException("Minimum valid length is 2 (an empty dictionary: 'de')", startPosition);
 
-            using (var reader = new BinaryReader(stream, encoding, leaveOpen: true))
+            // Dictionaries must start with 'd'
+            if (stream.ReadChar() != 'd')
+                throw InvalidException(string.Format("Must begin with 'd' but began with '{0}'", stream.ReadPreviousChar()), startPosition);
+
+            var dictionary = new BDictionary();
+            // Loop until next character is the end character 'e' or end of stream
+            while (stream.PeekChar() != 'e' && !stream.EndOfStream)
             {
-                // Dictionaries must start with 'd'
-                var firstChar = reader.ReadCharOrDefault();
-                if (firstChar != 'd')
-                    throw InvalidException(string.Format("Must begin with 'd' but began with '{0}'", firstChar), startPosition);
-
-                var dictionary = new BDictionary();
-                // Loop until next character is the end character 'e' or the end of stream
-                while (reader.PeekChar() != 'e' && reader.PeekChar() != -1)
+                // Decode next string in stream as the key
+                BString key;
+                try
                 {
-                    // Decode next string in stream as the key
-                    BString key;
-                    try
-                    {
-                        key = BString.Decode(stream, encoding);
-                    }
-                    catch (InvalidBencodeException ex)
-                    {
-                        throw InvalidException("Dictionary keys must be strings.", stream.Position);
-                    }
-
-                    // Decode next object in stream as the value
-                    var value = Bencode.Decode(stream, encoding);
-                    if (value == null)
-                        throw InvalidException("All keys must have a corresponding value.", stream.Position);
-
-                    dictionary.Add(key, value);
+                    key = BString.Decode(stream, encoding);
+                }
+                catch (InvalidBencodeException ex)
+                {
+                    throw InvalidException("Dictionary keys must be strings.", stream.Position);
                 }
 
-                if (stream.EndOfStream())
-                    throw InvalidException("Reached end of stream/string and did not find the required end character 'e'.", startPosition);
+                // Decode next object in stream as the value
+                var value = Bencode.Decode(stream, encoding);
+                if (value == null)
+                    throw InvalidException("All keys must have a corresponding value.", stream.Position);
 
-                // Advance past end character 'e'
-                stream.Position += 1;
-
-                return dictionary;
+                dictionary.Add(key, value);
             }
+
+            if (stream.ReadChar() != 'e')
+                throw InvalidException("Missing end character 'e'.", stream.Position);
+
+            return dictionary;
         }
 
         private static InvalidBencodeException InvalidException(string message, long streamPosition)

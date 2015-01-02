@@ -16,7 +16,12 @@ namespace BencodeNET.Objects
 
         public void Add(string value)
         {
-            Add((IBObject) new BString(value));
+            Add(new BString(value));
+        }
+
+        public void Add(int value)
+        {
+            Add((IBObject) new BNumber(value));
         }
 
         public void Add(long value)
@@ -56,43 +61,37 @@ namespace BencodeNET.Objects
 
         public static BList Decode(Stream stream, Encoding encoding)
         {
+            return Decode(new BencodeStream(stream, leaveOpen: true), encoding);
+        }
+
+        public static BList Decode(BencodeStream stream, Encoding encoding)
+        {
             if (stream == null) throw new ArgumentNullException("stream");
             if (encoding == null) throw new ArgumentNullException("encoding");
 
-            var startPosition = stream.Position;
-
             if (stream.Length < 2)
-                throw InvalidException("Minimum valid length is 2 (an empty list: 'le')", startPosition);
+                throw InvalidException("Minimum valid length is 2 (an empty list: 'le')", stream.Position);
 
-            using (var reader = new BinaryReader(stream, encoding, leaveOpen:true))
+            // Lists must start with 'l'
+            if (stream.ReadChar() != 'l')
+                throw InvalidException(string.Format("Must begin with 'l' but began with '{0}'.", stream.ReadPreviousChar()), stream.Position);
+
+            var list = new BList();
+            // Loop until next character is the end character 'e' or end of stream
+            while (stream.Peek() != 'e' && !stream.EndOfStream)
             {
-                // Lists must start with 'l'
-                var firstChar = reader.ReadCharOrDefault();
-                if (firstChar != 'l')
-                    throw InvalidException(string.Format("Must begin with 'l' but began with '{0}'.", firstChar), startPosition);
+                // Decode next object in stream
+                var bObject = Bencode.Decode(stream, encoding);
+                if (bObject == null)
+                    throw InvalidException(string.Format("Invalid object beginning with '{0}'", stream.PeekChar()), stream.Position);
 
-                var list = new BList();
-                var nextChar = reader.PeekChar();
-                // Loop until next character is the end character 'e' or the end of stream
-                while (nextChar != 'e' && nextChar != -1)
-                {
-                    // Decode next object in stream
-                    var bObject = Bencode.Decode(stream, encoding);
-                    if (bObject == null)
-                        throw InvalidException(string.Format("Invalid object beginning with '{0}'", nextChar), startPosition);
-
-                    list.Add(bObject);
-                    nextChar = reader.PeekChar();
-                }
-
-                if (stream.EndOfStream())
-                    throw InvalidException("Reached end of stream/string and did not find the required end character 'e'.", startPosition);
-
-                // Advance past end character 'e'
-                stream.Position += 1;
-
-                return list;
+                list.Add(bObject);
             }
+
+            if (stream.ReadChar() != 'e')
+                throw InvalidException("Missing end character 'e'.", stream.Position);
+
+            return list;
         }
 
         private static InvalidBencodeException InvalidException(string message, long streamPosition)

@@ -97,6 +97,95 @@ namespace BencodeNET.Tests
                 Assert.AreEqual('e', bs.Read());
             }
         }
+
+        [TestMethod]
+        public void ReadPrevious()
+        {
+            var str = "Hello World!";
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(str)))
+            using (var bs = new BencodeStream(ms))
+            {
+                Assert.AreEqual(-1, bs.ReadPrevious());
+                Assert.AreEqual('H', bs.Read());
+                Assert.AreEqual('H', bs.ReadPrevious());
+                Assert.AreEqual('e', bs.Read());
+                Assert.AreEqual('e', bs.ReadPrevious());
+
+                bs.Position = 20;
+
+                Assert.AreEqual(-1, bs.ReadPrevious());
+            }
+        }
+
+        [TestMethod]
+        public void ReadPreviousAtStartOfStream()
+        {
+            var str = "Hello World!";
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(str)))
+            using (var bs = new BencodeStream(ms))
+            {
+                Assert.AreEqual(-1, bs.ReadPrevious());
+            }
+        }
+
+        [TestMethod]
+        public void ReadPreviousUnaffectedByPeek()
+        {
+            var str = "Hello World!";
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(str)))
+            using (var bs = new BencodeStream(ms))
+            {
+                bs.Read(1);
+                Assert.AreEqual('H', bs.ReadPrevious());
+                Assert.AreEqual('e', bs.Peek());
+                Assert.AreEqual('H', bs.ReadPrevious());
+            }
+        }
+
+        [TestMethod]
+        public void ReadPreviousChar()
+        {
+            var str = "Hello World!";
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(str)))
+            using (var bs = new BencodeStream(ms))
+            {
+                Assert.AreEqual(default(char), bs.ReadPreviousChar());
+                bs.Read(1);
+                Assert.AreEqual('H', bs.ReadPreviousChar());
+            }
+        }
+
+        [TestMethod]
+        public void PeekUnnaffectedByReadPrevious()
+        {
+            var str = "abcdefghijkl";
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(str)))
+            using (var bs = new BencodeStream(ms))
+            {
+                bs.Read(0);
+                Assert.AreEqual('a', bs.Peek());
+                bs.ReadPrevious();
+                Assert.AreEqual('a', bs.Peek());
+
+                bs.Read(1);
+                Assert.AreEqual('b', bs.Peek());
+                bs.ReadPrevious();
+                Assert.AreEqual('b', bs.Peek());
+            }
+        }
+
+        [TestMethod]
+        public void ReadUnnaffectedByReadPrevious()
+        {
+            var str = "abcdefghijkl";
+            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(str)))
+            using (var bs = new BencodeStream(ms))
+            {
+                Assert.AreEqual('a', bs.Read());
+                bs.ReadPrevious();
+                Assert.AreEqual('b', bs.Read());
+            }
+        }
         
         [TestMethod]
         public void Peek()

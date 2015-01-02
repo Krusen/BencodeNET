@@ -28,6 +28,8 @@ namespace BencodeNET.Objects
 
         public static BNumber Decode(string bencodedString)
         {
+            if (bencodedString == null) throw new ArgumentNullException("bencodedString");
+
             return Decode(bencodedString, Bencode.DefaultEncoding);
         }
 
@@ -44,6 +46,8 @@ namespace BencodeNET.Objects
 
         public static BNumber Decode(Stream stream)
         {
+            if (stream == null) throw new ArgumentNullException("stream");
+
             return Decode(stream, Bencode.DefaultEncoding);
         }
 
@@ -52,75 +56,79 @@ namespace BencodeNET.Objects
             if (stream == null) throw new ArgumentNullException("stream");
             if (encoding == null) throw new ArgumentNullException("encoding");
 
-            var startPosition = stream.Position;
+            return Decode(new BencodeStream(stream, leaveOpen: true), encoding);
+        }
+
+        public static BNumber Decode(BencodeStream stream, Encoding encoding)
+        {
+            if (stream == null) throw new ArgumentNullException("stream");
+            if (encoding == null) throw new ArgumentNullException("encoding");
 
             if (stream.Length < 3)
-                throw InvalidBencodeException.New("Minimum valid length of stream is 3 ('i0e').", startPosition);
+                throw InvalidBencodeException.New("Minimum valid length of stream is 3 ('i0e').", stream.Position);
 
             var isNegative = false;
             var endCharFound = false;
 
             var digits = new List<char>();
-            using (var reader = new BinaryReader(stream, encoding, leaveOpen: true))
+
+            // Numbers must start with 'i'
+            var firstChar = stream.ReadChar();
+            if (firstChar != 'i')
+                throw InvalidException(string.Format("Must begin with 'i' but began with '{0}'.", firstChar), stream.Position);
+
+            while (!stream.EndOfStream)
             {
-                // Numbers must start with 'i'
-                var firstChar = reader.ReadCharOrDefault();
-                if (firstChar != 'i')
-                    throw InvalidException(string.Format("Must begin with 'i' but began with '{0}'.", firstChar), startPosition);
+                var c = stream.ReadChar();
 
-                while (!stream.EndOfStream())
+                if (c == 'e')
                 {
-                    var c = reader.ReadChar();
-
-                    if (c == 'e')
-                    {
-                        endCharFound = true;
-                        break;
-                    }
-
-                    // We do not support numbers that cannot be stored as a long (Int64)
-                    if (digits.Count >= MaxDigits)
-                    {
-                        throw UnsupportedBencodeException.New(
-                            string.Format(
-                                "The number '{0}' has more than 19 digits and cannot be stored as a long (Int64) and therefore is not supported.",
-                                digits.AsString()),
-                            startPosition);
-                    }
-
-                    // There may be only one '-'
-                    if (c == '-' && !isNegative)
-                    {
-                        // '-' must be the first char after the beginning 'i'
-                        if (digits.Count > 0)
-                            throw InvalidException("A '-' must be before any digits.", startPosition);
-
-                        isNegative = true;
-                        continue;
-                    }
-
-                    // If it is not 'e', not '-' and not a digit then it is invalid
-                    if (!char.IsDigit(c))
-                        throw InvalidException("Must only contain digits and a single prefixed '-'.", startPosition);
-
-                    digits.Add(c);
+                    endCharFound = true;
+                    break;
                 }
+
+                // We do not support numbers that cannot be stored as a long (Int64)
+                if (digits.Count >= MaxDigits)
+                {
+                    throw UnsupportedBencodeException.New(
+                        string.Format(
+                            "The number '{0}' has more than 19 digits and cannot be stored as a long (Int64) and therefore is not supported.",
+                            digits.AsString()),
+                        stream.Position);
+                }
+
+                // There may be only one '-'
+                if (c == '-' && !isNegative)
+                {
+                    // '-' must be the first char after the beginning 'i'
+                    if (digits.Count > 0)
+                        throw InvalidException("A '-' must be before any digits.", stream.Position);
+
+                    isNegative = true;
+                    continue;
+                }
+
+                // If it is not 'e', not '-' and not a digit then it is invalid
+                if (!char.IsDigit(c))
+                    throw InvalidException("Must only contain digits and a single prefixed '-'.", stream.Position);
+
+                digits.Add(c);
             }
 
             // We need at least one digit
             if (digits.Count < 1)
-                throw InvalidException("It contains no digits.", startPosition);
+                throw InvalidException("It contains no digits.", stream.Position);
 
             if (!endCharFound)
-                throw InvalidException("Missing end character 'e'.", startPosition);
+                throw InvalidException("Missing end character 'e'.", stream.Position);
 
             // Leading zeros are not valid
             if (digits[0] == '0' && digits.Count > 1)
-                throw InvalidException("Leading '0's are not valid.", startPosition);
+                throw InvalidException("Leading '0's are not valid.", stream.Position);
 
             // '-0' is not valid either
             if (digits[0] == '0' && digits.Count == 1 && isNegative)
-                throw InvalidException("'-0' is not a valid number.", startPosition);
+                throw InvalidException("'-0' is not a valid number.", stream.Position);
 
             if (isNegative)
                 digits.Insert(0, '-');
@@ -133,7 +141,7 @@ namespace BencodeNET.Objects
                     string.Format(
                         "The value {0} cannot be stored as a long (Int64) and is therefore not supported. The supported values range from {1:N0} to {2:N0}",
                         digits.AsString(), long.MinValue, long.MaxValue),
-                    startPosition);
+                    stream.Position);
             }
 
             return new BNumber(number);

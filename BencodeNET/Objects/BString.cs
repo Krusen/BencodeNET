@@ -55,6 +55,8 @@ namespace BencodeNET.Objects
 
         public static BString Decode(string bencodedString)
         {
+            if (bencodedString == null) throw new ArgumentNullException("bencodedString");
+
             return Decode(bencodedString, Bencode.DefaultEncoding);
         }
 
@@ -71,10 +73,20 @@ namespace BencodeNET.Objects
 
         public static BString Decode(Stream stream)
         {
+            if (stream == null) throw new ArgumentNullException("stream");
+
             return Decode(stream, Bencode.DefaultEncoding);
         }
 
         public static BString Decode(Stream stream, Encoding encoding)
+        {
+            if (stream == null) throw new ArgumentNullException("stream");
+            if (encoding == null) throw new ArgumentNullException("encoding");
+
+            return Decode(new BencodeStream(stream, leaveOpen: true), encoding);
+        }
+
+        public static BString Decode(BencodeStream stream, Encoding encoding)
         {
             if (stream == null) throw new ArgumentNullException("stream");
             if (encoding == null) throw new ArgumentNullException("encoding");
@@ -85,9 +97,9 @@ namespace BencodeNET.Objects
 
             var lengthChars = new List<char>();
 
-            while (!stream.EndOfStream())
+            while (!stream.EndOfStream)
             {
-                var c = (char)stream.ReadByte();
+                var c = stream.ReadChar();
 
                 // Break when we reach ':' if it is not the first character found
                 if (lengthChars.Count > 0 && c == ':')
@@ -124,18 +136,14 @@ namespace BencodeNET.Objects
                     stream.Position);
             }
 
-            // TODO: Catch possible OutOfMemoryException when stringLength is close to Int32.MaxValue ?
-            var bytes = new List<byte>();
-            while (bytes.Count < stringLength && !stream.EndOfStream())
-            {
-                bytes.Add((byte)stream.ReadByte());
-            }
+            // TODO: Catch possible OutOfMemoryException when stringLength is close Int32.MaxValue ?
+            var bytes = stream.Read((int)stringLength);
 
             // If the two don't match we've reached the end of the stream before reading the expected number of chars
-            if (bytes.Count != stringLength)
+            if (bytes.Length != stringLength)
             {
                 throw InvalidException(
-                    string.Format("Expected string to be {0:N0} characters long but could only read {1:N0} characters.", stringLength, bytes.Count),
+                    string.Format("Expected string to be {0:N0} bytes long but could only read {1:N0} bytes.", stringLength, bytes.Length),
                     stream.Position);
             }
 
