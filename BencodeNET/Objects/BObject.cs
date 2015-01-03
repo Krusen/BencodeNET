@@ -5,6 +5,9 @@ namespace BencodeNET.Objects
 {
     public abstract class BObject<TY> : IBObject
     {
+        internal BObject()
+        { }
+
         public TY Value { get; protected set; }
 
         public string Encode()

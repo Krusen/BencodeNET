@@ -9,7 +9,6 @@ namespace BencodeNET.Exceptions
         public long StreamPosition { get; set; }
 
         public UnsupportedBencodeException() 
-            : base()
         { }
 
         public UnsupportedBencodeException(string message)
@@ -17,14 +16,23 @@ namespace BencodeNET.Exceptions
         { }
 
         public UnsupportedBencodeException(string message, long streamPosition) 
-            : base(message)
+            : base(CreateMessage(message, streamPosition))
         {
             StreamPosition = streamPosition;
         }
 
-        public UnsupportedBencodeException(string message, Exception innerException)
-            : base(message, innerException)
-        { }
+        private static string CreateMessage(string message, long streamPosition)
+        {
+            if (streamPosition > -1)
+            {
+                if (!message.EndsWith("."))
+                    message += ".";
+
+                message += " Object decoding began at position " + streamPosition;
+            }
+
+            return message;
+        }
 
         protected UnsupportedBencodeException(SerializationInfo info, StreamingContext context)
             : base(info, context)
@@ -40,24 +48,6 @@ namespace BencodeNET.Exceptions
             base.GetObjectData(info, context);
 
             info.AddValue("StreamPosition", StreamPosition);
-        }
-
-        public static UnsupportedBencodeException New(string message)
-        {
-            return New(message, -1);
-        }
-
-        public static UnsupportedBencodeException New(string message, long streamPosition)
-        {
-            if (streamPosition > -1)
-            {
-                if (!message.EndsWith("."))
-                    message += ".";
-
-                message += " Object decoding began at position " + streamPosition;
-            }
-
-            return new UnsupportedBencodeException(message, streamPosition);
         }
     }
 }

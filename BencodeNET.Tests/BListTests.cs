@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using BencodeNET.Exceptions;
 using BencodeNET.Objects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -73,76 +71,6 @@ namespace BencodeNET.Tests
             var actual = blist.Encode();
 
             Assert.AreEqual(expected, actual);
-        }
-
-        [TestMethod]
-        public void Decode_Simple()
-        {
-            var blist = BList.Decode("l4:spam3:fooi42ee");
-            Assert.AreEqual(3, blist.Count);
-
-            Assert.IsInstanceOfType(blist[0], typeof(BString));
-            Assert.IsTrue(blist[0] as BString == "spam");
-
-            Assert.IsInstanceOfType(blist[1], typeof(BString));
-            Assert.IsTrue(blist[1] as BString == "foo");
-
-            Assert.IsInstanceOfType(blist[2], typeof(BNumber));
-            Assert.IsTrue(blist[2] as BNumber == 42);
-        }
-
-        [TestMethod]
-        public void Decode_Complex()
-        {
-            var blist = BList.Decode("ll4:spami1ei2ei3eed3:foo3:barei42e6:foobare");
-            Assert.AreEqual(4, blist.Count);
-
-            Assert.IsInstanceOfType(blist[0], typeof(BList));
-            Assert.AreEqual(4, (blist[0] as BList).Count);
-
-            Assert.IsInstanceOfType(blist[1], typeof(BDictionary));
-            Assert.AreEqual(1, (blist[1] as BDictionary).Count);
-
-            Assert.IsInstanceOfType(blist[2], typeof(BNumber));
-            Assert.IsTrue(blist[2] as BNumber == 42);
-
-            Assert.IsInstanceOfType(blist[3], typeof(BString));
-            Assert.IsTrue(blist[3] as BString == "foobar");
-        }
-
-        [TestMethod]
-        public void Decode_EmptyList()
-        {
-            var blist = BList.Decode("le");
-            Assert.AreEqual(0, blist.Count);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(InvalidBencodeException))]
-        public void Decode_Invalid_InputMinimumLength2()
-        {
-            BList.Decode("l");
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(InvalidBencodeException))]
-        public void Decode_Invalid_WrongBeginChar()
-        {
-            BList.Decode("4:spam3:fooi42ee");
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(InvalidBencodeException))]
-        public void Decode_Invalid_MissingEndChar()
-        {
-            BList.Decode("l4:spam3:fooi42e");
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(InvalidBencodeException))]
-        public void Decode_Invalid_InvalidObjectInList()
-        {
-            BList.Decode("l4:spamse");
         }
     }
 }

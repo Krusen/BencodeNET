@@ -57,6 +57,10 @@
     <Compile Include="BDictionaryTests.cs" />
     <Compile Include="BencodeTests.cs" />
     <Compile Include="BencodeStreamTests.cs" />
+    <Compile Include="BencodeDecodeStringTests.cs" />
+    <Compile Include="BencodeDecodeNumberTests.cs" />
+    <Compile Include="BencodeDecodeListTests.cs" />
+    <Compile Include="BencodeDecodeDictionaryTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BencodeNET\BencodeNET.csproj">

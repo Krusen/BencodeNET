@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using BencodeNET.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

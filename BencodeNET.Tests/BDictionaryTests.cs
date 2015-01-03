@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading;
-using BencodeNET.Exceptions;
 using BencodeNET.Objects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -103,107 +99,5 @@ namespace BencodeNET.Tests
             
             Assert.AreEqual(expected, actual);
         }
-
-        [TestMethod]
-        public void Decode_Simple()
-        {
-            var bdict = BDictionary.Decode("d4:spam3:egg3:fooi42ee");
-            Assert.AreEqual(2, bdict.Count);
-            
-            Assert.IsInstanceOfType(bdict["spam"], typeof(BString));
-            Assert.IsTrue(bdict["spam"] as BString == "egg");
-
-            Assert.IsInstanceOfType(bdict["foo"], typeof(BNumber));
-            Assert.IsTrue(bdict["foo"] as BNumber == 42);
-        } 
-        
-        [TestMethod]
-        public void Decode_Complex()
-        {
-            var bdict = BDictionary.Decode("d6:A Listl3:foo3:bari123ed9:more spam9:more eggsee6:foobard7:numbersli1ei2ei3eee4:spam3:egge");
-
-            var bdictExpected = new BDictionary
-            {
-                {"spam", "egg"},
-                {
-                    "A List", new BList
-                    {
-                        "foo",
-                        "bar",
-                        123,
-                        new BDictionary
-                        {
-                            {"more spam", "more eggs"}
-                        }
-                    }
-                },
-                {
-                    "foobar", new BDictionary
-                    {
-                        {"numbers", new BList {1, 2, 3}}
-                    }
-                }
-            };
-
-            Assert.AreEqual(3, bdict.Count);
-            Assert.AreEqual(bdictExpected.Count, bdict.Count);
-            Assert.AreEqual(bdictExpected.Encode(), bdict.Encode());
-            Assert.IsInstanceOfType(bdict["spam"], typeof(BString));
-            Assert.IsInstanceOfType(bdict["A List"], typeof(BList));
-            Assert.IsInstanceOfType(bdict["foobar"], typeof(BDictionary));
-        }
-
-        [TestMethod]
-        public void Decode_EmptyDictionary()
-        {
-            var bdict = BDictionary.Decode("de");
-            Assert.AreEqual(0, bdict.Count);
-        }
-
-        #region Decode: Invalid Exceptions
-
-        [TestMethod]
-        [ExpectedException(typeof(InvalidBencodeException))]
-        public void Decode_Invalid_InputMinimumLength2()
-        {
-            BDictionary.Decode("d");
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(InvalidBencodeException))]
-        public void Decode_Invalid_NonStringKey()
-        {
-            BDictionary.Decode("di42e4:spame");
-        }
-        
-        [TestMethod]
-        [ExpectedException(typeof(InvalidBencodeException))]
-        public void Decode_Invalid_InvalidKeyObject()
-        {
-            BDictionary.Decode("da:spam3:egge");
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(InvalidBencodeException))]
-        public void Decode_Invalid_WrongBeginChar()
-        {
-            BDictionary.Decode("l4:spam3:egg3:fooi42ee");
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(InvalidBencodeException))]
-        public void Decode_Invalid_MissingEndChar()
-        {
-            BDictionary.Decode("d4:spam3:egg3:fooi42e");
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(InvalidBencodeException))]
-        public void Decode_Invalid_MissingKeyValueOrInvalidValueObject()
-        {
-            BDictionary.Decode("d4:spame");
-        }
-
-        #endregion
     }
 }

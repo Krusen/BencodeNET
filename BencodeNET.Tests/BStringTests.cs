@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text;
-using BencodeNET.Exceptions;
 using BencodeNET.Objects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -98,75 +97,5 @@ namespace BencodeNET.Tests
             var bstring = new BString("123:?!#{}'|<>");
             Assert.AreEqual("13:123:?!#{}'|<>", bstring.Encode());
         }
-
-        [TestMethod]
-        public void Decode_Simple()
-        {
-            var bstring = BString.Decode("4:spam");
-            Assert.AreEqual("spam", bstring.ToString());
-        }
-
-        [TestMethod]
-        public void Decode_UTF8()
-        {
-            var bstring = BString.Decode("12:æøåéöñ", Encoding.UTF8);
-            Assert.AreEqual("æøåéöñ", bstring.ToString(Encoding.UTF8));
-        }
-
-        [TestMethod]
-        public void Decode_EmptyString()
-        {
-            var bstring = BString.Decode("0:");
-            Assert.AreEqual("", bstring.ToString());
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(InvalidBencodeException))]
-        public void Decode_Invalid_LessCharsThanSpecified()
-        {
-            BString.Decode("5:spam");
-        } 
-
-        [TestMethod]
-        [ExpectedException(typeof(InvalidBencodeException))]
-        public void Decode_Invalid_NoDelimiter()
-        {
-            BString.Decode("4spam");
-        } 
-
-        [TestMethod]
-        [ExpectedException(typeof(InvalidBencodeException))]
-        public void Decode_Invalid_NonDigitFirstChar()
-        {
-            BString.Decode("spam");
-        } 
-
-        [TestMethod]
-        [ExpectedException(typeof(InvalidBencodeException))]
-        public void Decode_Invalid_InputMinimumLength2()
-        {
-            BString.Decode("4");
-        } 
-
-        [TestMethod]
-        [ExpectedException(typeof(InvalidBencodeException))]
-        public void Decode_Invalid_MissingStringLength()
-        {
-            BString.Decode(":spam");
-        } 
-
-        [TestMethod]
-        [ExpectedException(typeof(UnsupportedBencodeException))]
-        public void Decode_Unsupported_StringLengthAboveMaxDigits10()
-        {
-            BString.Decode("12345678901:spam");
-        } 
-
-        [TestMethod]
-        [ExpectedException(typeof(UnsupportedBencodeException))]
-        public void Decode_Unsupported_StringLengthAboveInt32MaxValue()
-        {
-            BString.Decode("2147483648:spam");
-        } 
     }
 }

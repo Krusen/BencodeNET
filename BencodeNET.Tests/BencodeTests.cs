@@ -7,10 +7,10 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace BencodeNET.Tests
 {
     [TestClass]
-    [DeploymentItem("BencodeNET.Tests\\Files\\", "Files")]
     public class BencodeTests
     {
         [TestMethod]
+        [DeploymentItem("BencodeNET.Tests\\Files\\ubuntu-14.10-desktop-amd64.iso.torrent", "Files")]
         public void TorrentFileDecodeEncodeIsEqual()
         {
             const string originalFile = @"Files\ubuntu-14.10-desktop-amd64.iso.torrent";
