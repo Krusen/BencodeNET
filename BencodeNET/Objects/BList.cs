@@ -79,7 +79,7 @@ namespace BencodeNET.Objects
 
             var list = new BList();
             // Loop until next character is the end character 'e' or end of stream
-            while (stream.Peek() != 'e' && !stream.EndOfStream)
+            while (stream.Peek() != 'e' && stream.Peek() != -1)
             {
                 // Decode next object in stream
                 var bObject = Bencode.Decode(stream, encoding);

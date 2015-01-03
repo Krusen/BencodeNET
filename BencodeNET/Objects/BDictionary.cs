@@ -86,7 +86,7 @@ namespace BencodeNET.Objects
 
             var dictionary = new BDictionary();
             // Loop until next character is the end character 'e' or end of stream
-            while (stream.PeekChar() != 'e' && !stream.EndOfStream)
+            while (stream.Peek() != 'e' && stream.Peek() != -1)
             {
                 // Decode next string in stream as the key
                 BString key;

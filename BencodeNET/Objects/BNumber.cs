@@ -68,26 +68,14 @@ namespace BencodeNET.Objects
             if (stream.Length < 3)
                 throw InvalidBencodeException.New("Minimum valid length of stream is 3 ('i0e').", stream.Position);
 
-            var isNegative = false;
-            var endCharFound = false;
-
-            var digits = new List<char>();
-
             // Numbers must start with 'i'
-            var firstChar = stream.ReadChar();
-            if (firstChar != 'i')
-                throw InvalidException(string.Format("Must begin with 'i' but began with '{0}'.", firstChar), stream.Position);
+            if (stream.ReadChar() != 'i')
+                throw InvalidException(string.Format("Must begin with 'i' but began with '{0}'.", stream.ReadPreviousChar()), stream.Position);
 
-            while (!stream.EndOfStream)
+            var isNegative = false;
+            var digits = new List<char>();
+            while (stream.Peek() != 'e' && stream.Peek() != -1)
             {
-                var c = stream.ReadChar();
-
-                if (c == 'e')
-                {
-                    endCharFound = true;
-                    break;
-                }
-
                 // We do not support numbers that cannot be stored as a long (Int64)
                 if (digits.Count >= MaxDigits)
                 {
@@ -98,20 +86,22 @@ namespace BencodeNET.Objects
                         stream.Position);
                 }
 
+                var c = stream.ReadChar();
+
                 // There may be only one '-'
                 if (c == '-' && !isNegative)
                 {
                     // '-' must be the first char after the beginning 'i'
                     if (digits.Count > 0)
-                        throw InvalidException("A '-' must be before any digits.", stream.Position);
+                        throw InvalidException("A '-' must be directly after 'i' and before any digits.", stream.Position);
 
                     isNegative = true;
                     continue;
                 }
 
-                // If it is not 'e', not '-' and not a digit then it is invalid
+                // If it is not a digit at this point it is invalid
                 if (!char.IsDigit(c))
-                    throw InvalidException("Must only contain digits and a single prefixed '-'.", stream.Position);
+                    throw InvalidException(string.Format("Must only contain digits and a single prefixed '-'. Invalid character '{0}'", c), stream.Position);
 
                 digits.Add(c);
             }
@@ -120,9 +110,6 @@ namespace BencodeNET.Objects
             if (digits.Count < 1)
                 throw InvalidException("It contains no digits.", stream.Position);
 
-            if (!endCharFound)
-                throw InvalidException("Missing end character 'e'.", stream.Position);
-
             // Leading zeros are not valid
             if (digits[0] == '0' && digits.Count > 1)
                 throw InvalidException("Leading '0's are not valid.", stream.Position);
@@ -130,6 +117,9 @@ namespace BencodeNET.Objects
             // '-0' is not valid either
             if (digits[0] == '0' && digits.Count == 1 && isNegative)
                 throw InvalidException("'-0' is not a valid number.", stream.Position);
+
+            if (stream.ReadChar() != 'e')
+                throw InvalidException("Missing end character 'e'.", stream.Position);
 
             if (isNegative)
                 digits.Insert(0, '-');
