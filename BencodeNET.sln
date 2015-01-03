@@ -1,13 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BencodeNET", "BencodeNET\BencodeNET.csproj", "{A267EADE-6093-41DF-AB20-53CB9661B47B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BencodeNET.Console", "BencodeNET.Console\BencodeNET.Console.csproj", "{5B637B4C-2C4A-4F8A-AB18-329E40704B41}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BencodeNET.Tests", "BencodeNET.Tests\BencodeNET.Tests.csproj", "{EEEE6947-258B-4E6E-AE99-F72B7A29D96F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{65E984B8-653C-4BCD-AE37-4E21497B5B87}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
