@@ -82,7 +82,7 @@ namespace BencodeNET
                 case 'd': return DecodeDictionary(stream, encoding);
             }
 
-            // TODO: Throw BencodeDecodingException because next char is not a valid BObject?
+            // TODO: Throw BencodeDecodingException because next char was not a valid start of a BObject?
             return null;
         }
 
@@ -126,7 +126,7 @@ namespace BencodeNET
 
             // Minimum valid bencode string is '0:' meaning an empty string
             if (stream.Length < 2)
-                throw new BencodeDecodingException<BString>("Minimum valid length is 2 (an empty string: '0:')", stream.Position);
+                throw new BencodeDecodingException<BString>("Minimum valid stream length is 2 (an empty string: '0:')", stream.Position);
 
             var lengthChars = new List<char>();
 
