@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Text;
 using BencodeNET.Objects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -83,12 +84,30 @@ namespace BencodeNET.Tests
         [TestMethod]
         public void Encode_UTF8()
         {
-            var bstring = new BString("æøåéöñ");
+            var bstring = new BString("æøå äö èéê ñ");
+            Assert.AreEqual("21:æøå äö èéê ñ", bstring.Encode());
+            Assert.AreEqual("21:æøå äö èéê ñ", bstring.Encode(Encoding.UTF8));
+        }
 
-            var expected = string.Format("{0}:æøåéöñ", Encoding.UTF8.GetByteCount("æøåéöñ"));
-            var actual = bstring.Encode(Encoding.UTF8);
+        [TestMethod]
+        public void Encode_ISO88591()
+        {
+            var encoding = Encoding.GetEncoding("ISO-8859-1");
+            var bstring = new BString("æøå äö èéê ñ", encoding);
+            Assert.AreEqual("12:æøå äö èéê ñ", bstring.Encode());
+            Assert.AreEqual("12:æøå äö èéê ñ", bstring.Encode(encoding));
+            Assert.AreEqual(bstring.Encode(), bstring.Encode(encoding));
+        }
 
-            Assert.AreEqual(expected, actual);
+        [TestMethod]
+        public void Encode_ISO88591_WithoutSpecifyingEncoding()
+        {
+            var encoding = Encoding.GetEncoding("ISO-8859-1");
+            var bytes = encoding.GetBytes("æøå äö èéê ñ");
+            var bstring = new BString(bytes);
+            Assert.AreNotEqual("12:æøå äö èéê ñ", bstring.Encode());
+            Assert.AreEqual("12:æøå äö èéê ñ", bstring.Encode(encoding));
+            Assert.AreNotEqual(bstring.Encode(), bstring.Encode(encoding));
         }
 
         [TestMethod]
@@ -96,6 +115,52 @@ namespace BencodeNET.Tests
         {
             var bstring = new BString("123:?!#{}'|<>");
             Assert.AreEqual("13:123:?!#{}'|<>", bstring.Encode());
+        }
+
+        [TestMethod]
+        public void ToString_UTF8()
+        {
+            var bstring = Bencode.DecodeString("21:æøå äö èéê ñ", Encoding.UTF8);
+            Assert.AreEqual("æøå äö èéê ñ", bstring.ToString());
+            Assert.AreEqual("æøå äö èéê ñ", bstring.ToString(Encoding.UTF8));
+            Assert.AreEqual(bstring.ToString(), bstring.ToString(Encoding.UTF8));
+        }
+
+        [TestMethod]
+        public void ToString_ISO88591()
+        {
+            var bstring = Bencode.DecodeString("12:æøå äö èéê ñ", Encoding.GetEncoding("ISO-8859-1"));
+            Assert.AreEqual("æøå äö èéê ñ", bstring.ToString());
+            Assert.AreEqual("æøå äö èéê ñ", bstring.ToString(Encoding.GetEncoding("ISO-8859-1")));
+            Assert.AreEqual(bstring.ToString(), bstring.ToString(Encoding.GetEncoding("ISO-8859-1")));
+        }
+
+        [TestMethod]
+        public void ToString_FromNonUTF8StreamWithoutEncoding()
+        {
+            var encoding = Encoding.GetEncoding("ISO-8859-1");
+            var bytes = encoding.GetBytes("12:æøå äö èéê ñ");
+            using (var ms = new MemoryStream(bytes))
+            {
+                var bstring = Bencode.DecodeString(ms);
+                Assert.AreNotEqual("æøå äö èéê ñ", bstring.ToString());
+                Assert.AreEqual("æøå äö èéê ñ", bstring.ToString(encoding));
+                Assert.AreNotEqual(bstring.ToString(), bstring.ToString(encoding));
+            }
+        }
+
+        [TestMethod]
+        public void ToString_FromNonUTF8StreamWithEncoding()
+        {
+            var encoding = Encoding.GetEncoding("ISO-8859-1");
+            var bytes = encoding.GetBytes("12:æøå äö èéê ñ");
+            using (var ms = new MemoryStream(bytes))
+            {
+                var bstring = Bencode.DecodeString(ms, encoding);
+                Assert.AreEqual("æøå äö èéê ñ", bstring.ToString());
+                Assert.AreEqual("æøå äö èéê ñ", bstring.ToString(encoding));
+                Assert.AreEqual(bstring.ToString(), bstring.ToString(encoding));
+            }
         }
     }
 }

@@ -16,13 +16,6 @@ namespace BencodeNET.Tests
         }
 
         [TestMethod]
-        public void DecodeString_UTF8()
-        {
-            var bstring = Bencode.DecodeString("12:æøåéöñ", Encoding.UTF8);
-            Assert.AreEqual("æøåéöñ", bstring.ToString(Encoding.UTF8));
-        }
-
-        [TestMethod]
         public void DecodeString_EmptyString()
         {
             var bstring = Bencode.DecodeString("0:");

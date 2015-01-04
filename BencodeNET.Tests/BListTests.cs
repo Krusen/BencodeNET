@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using BencodeNET.Objects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -40,6 +41,26 @@ namespace BencodeNET.Tests
         {
             var blist = new BList();
             Assert.AreEqual("le", blist.Encode());
+        }
+
+        [TestMethod]
+        public void Encode_UTF8()
+        {
+            var blist = new BList { "æøå äö èéê ñ" };
+            Assert.AreEqual("l21:æøå äö èéê ñe", blist.Encode());
+            Assert.AreEqual("l21:æøå äö èéê ñe", blist.Encode(Encoding.UTF8));
+            Assert.AreEqual(blist.Encode(), blist.Encode(Encoding.UTF8));
+        }
+
+        [TestMethod]
+        public void Encode_ISO88591()
+        {
+            var encoding = Encoding.GetEncoding("ISO-8859-1");
+            var blist = new BList { new BString("æøå äö èéê ñ", encoding) };
+
+            Assert.AreNotEqual("l12:æøå äö èéê ñe", blist.Encode());
+            Assert.AreEqual("l12:æøå äö èéê ñe", blist.Encode(encoding));
+            Assert.AreNotEqual(blist.Encode(), blist.Encode(encoding));
         }
 
         [TestMethod]
