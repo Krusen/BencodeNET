@@ -22,13 +22,13 @@ namespace BencodeNET.Objects
             Add(new BString(key), new BNumber(value));
         }
 
-        public override T EncodeToStream<T>(T stream, Encoding encoding)
+        public override T EncodeToStream<T>(T stream)
         {
             stream.Write('d');
             foreach (var kvPair in this)
             {
-                kvPair.Key.EncodeToStream(stream, encoding);
-                kvPair.Value.EncodeToStream(stream, encoding);
+                kvPair.Key.EncodeToStream(stream);
+                kvPair.Value.EncodeToStream(stream);
             }
             stream.Write('e');
             return stream;

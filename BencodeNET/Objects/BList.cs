@@ -27,11 +27,11 @@ namespace BencodeNET.Objects
             Add((IBObject) new BNumber(value));
         }
 
-        public override T EncodeToStream<T>(T stream, Encoding encoding)
+        public override T EncodeToStream<T>(T stream)
         {
             stream.Write('l');
             foreach (var item in this)
-                item.EncodeToStream(stream, encoding);
+                item.EncodeToStream(stream);
             stream.Write('e');
             return stream;
         }

@@ -90,7 +90,7 @@ namespace BencodeNET.Objects
             return Value.ToString(format, formatProvider);
         }
 
-        public override T EncodeToStream<T>(T stream, Encoding encoding)
+        public override T EncodeToStream<T>(T stream)
         {
             using (var bstream = new BencodeStream(stream, leaveOpen:true))
             {

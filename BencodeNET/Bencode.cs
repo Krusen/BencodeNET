@@ -18,7 +18,6 @@ namespace BencodeNET
             {
                 if (value == null)
                     throw new ArgumentNullException("value", "DefaultEncoding may not be set to null");
-
                 _defaultEncoding = value;
             }
         }
@@ -78,7 +77,7 @@ namespace BencodeNET
                 case '7':
                 case '8':
                 case '9': return DecodeString(stream, encoding);
-                case 'i': return DecodeNumber(stream, encoding);
+                case 'i': return DecodeNumber(stream);
                 case 'l': return DecodeList(stream, encoding);
                 case 'd': return DecodeDictionary(stream, encoding);
             }
@@ -188,17 +187,9 @@ namespace BencodeNET
         {
             if (bencodedString == null) throw new ArgumentNullException("bencodedString");
 
-            return DecodeNumber(bencodedString, DefaultEncoding);
-        }
-
-        public static BNumber DecodeNumber(string bencodedString, Encoding encoding)
-        {
-            if (bencodedString == null) throw new ArgumentNullException("bencodedString");
-            if (encoding == null) throw new ArgumentNullException("encoding");
-
-            using (var ms = new MemoryStream(encoding.GetBytes(bencodedString)))
+            using (var ms = new MemoryStream(DefaultEncoding.GetBytes(bencodedString)))
             {
-                return DecodeNumber(ms, encoding);
+                return DecodeNumber(ms);
             }
         }
 
@@ -206,21 +197,12 @@ namespace BencodeNET
         {
             if (stream == null) throw new ArgumentNullException("stream");
 
-            return DecodeNumber(stream, DefaultEncoding);
+            return DecodeNumber(new BencodeStream(stream, leaveOpen: true));
         }
 
-        public static BNumber DecodeNumber(Stream stream, Encoding encoding)
+        public static BNumber DecodeNumber(BencodeStream stream)
         {
             if (stream == null) throw new ArgumentNullException("stream");
-            if (encoding == null) throw new ArgumentNullException("encoding");
-
-            return DecodeNumber(new BencodeStream(stream, leaveOpen: true), encoding);
-        }
-
-        public static BNumber DecodeNumber(BencodeStream stream, Encoding encoding)
-        {
-            if (stream == null) throw new ArgumentNullException("stream");
-            if (encoding == null) throw new ArgumentNullException("encoding");
 
             if (stream.Length < 3)
                 throw new BencodeDecodingException<BNumber>("Minimum valid length of stream is 3 ('i0e').", stream.Position);

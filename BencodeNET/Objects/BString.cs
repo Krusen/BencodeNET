@@ -10,7 +10,18 @@ namespace BencodeNET.Objects
     {
         internal const int LengthMaxDigits = 10;
 
-        private readonly Encoding _encoding;
+        private Encoding _encoding;
+
+        public Encoding Encoding
+        {
+            get { return _encoding; }
+            set
+            {
+                if (value == null)
+                    throw new ArgumentNullException("value", "Encoding may not be set to null");
+                _encoding = value;
+            }
+        }
 
         public BString(IEnumerable<byte> bytes)
             : this(bytes, Bencode.DefaultEncoding)
@@ -123,7 +134,12 @@ namespace BencodeNET.Objects
             return encoding.GetString(Value.ToArray());
         }
 
-        public override T EncodeToStream<T>(T stream, Encoding encoding)
+        public override string Encode()
+        {
+            return Encode(_encoding);
+        }
+
+        public override T EncodeToStream<T>(T stream)
         {
             using (var bstream = new BencodeStream(stream, leaveOpen:true))
             {
