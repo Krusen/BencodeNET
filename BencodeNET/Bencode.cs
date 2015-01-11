@@ -171,7 +171,7 @@ namespace BencodeNET
                     break;
 
                 // Character then must be a digit
-                if (!char.IsDigit(c))
+                if (!c.IsDigit())
                 {
                     if (lengthChars.Count == 0)
                         throw new BencodeDecodingException<BString>(string.Format("Must begin with an integer but began with '{0}'", c), stream.Position);
@@ -271,7 +271,7 @@ namespace BencodeNET
                 }
 
                 // If it is not a digit at this point it is invalid
-                if (!char.IsDigit(c))
+                if (!c.IsDigit())
                     throw new BencodeDecodingException<BNumber>(string.Format("Must only contain digits and a single prefixed '-'. Invalid character '{0}'", c), stream.Position);
 
                 digits.Add(c);
