@@ -8,10 +8,16 @@ namespace BencodeNET.Objects
 {
     public sealed class BString : BObject<byte[]>, IComparable<BString>
     {
+        /// <summary>
+        /// The maximum number of digits that can be handled as the length part of a bencoded string.
+        /// </summary>
         internal const int LengthMaxDigits = 10;
 
         private Encoding _encoding;
-
+        /// <summary>
+        /// Gets or sets the encoding used as the default with <c>ToString()</c>.
+        /// </summary>
+        /// <exception cref="ArgumentNullException"></exception>
         public Encoding Encoding
         {
             get { return _encoding; }
@@ -36,10 +42,23 @@ namespace BencodeNET.Objects
             Value = bytes.ToArray();
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BString"/> class using
+        /// the default encoding from <c>Bencode.DefaultEncoding</c> to convert the string to bytes.
+        /// </summary>
+        /// <param name="str"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public BString(string str)
             : this(str, Bencode.DefaultEncoding)
         { }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BString"/> class using
+        /// the specified encoding to convert the string to bytes.
+        /// </summary>
+        /// <param name="str">The string.</param>
+        /// <param name="encoding">The encoding used to convert the string to bytes.</param>
+        /// <exception cref="ArgumentNullException"></exception>
         public BString(string str, Encoding encoding)
         {
             if (str == null) throw new ArgumentNullException("str");
@@ -49,6 +68,9 @@ namespace BencodeNET.Objects
             Value = encoding.GetBytes(str);
         }
 
+        /// <summary>
+        /// Gets the length in bytes of the string.
+        /// </summary>
         public int Length
         {
             get { return Value.Length; }
@@ -124,22 +146,49 @@ namespace BencodeNET.Objects
             return 0;
         }
 
+        /// <summary>
+        /// Converts the underlying bytes to a string representation using the current value of the Encoding property.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
+        /// </returns>
         public override string ToString()
         {
             return _encoding.GetString(Value.ToArray());
         }
 
+        /// <summary>
+        /// Converts the underlying bytes to a string representation using the specified encoding.
+        /// </summary>
+        /// <param name="encoding">The encoding to use to convert the underlying byte array to a <see cref="System.String" />.</param>
+        /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
+        /// </returns>
         public string ToString(Encoding encoding)
         {
             return encoding.GetString(Value.ToArray());
         }
 
+        /// <summary>
+        /// Encodes the object and returns the result as a string using
+        /// the current value of the Encoding property.
+        /// </summary>
+        /// <returns>
+        /// The object bencoded and converted to a string using
+        /// the current value of the Encoding property.
+        /// </returns>
         public override string Encode()
         {
             return Encode(_encoding);
         }
 
-        public override T EncodeToStream<T>(T stream)
+        /// <summary>
+        /// Encodes the object to the specified stream and returns a reference to the stream.
+        /// </summary>
+        /// <typeparam name="TStream">The type of stream.</typeparam>
+        /// <param name="stream">The stream to encode the object to.</param>
+        /// <returns>The supplied stream.</returns>
+        public override TStream EncodeToStream<TStream>(TStream stream)
         {
             using (var bstream = new BencodeStream(stream, leaveOpen:true))
             {

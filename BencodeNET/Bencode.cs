@@ -10,7 +10,11 @@ namespace BencodeNET
 {
     public static class Bencode
     {
-        private static Encoding _defaultEncoding;
+        private static Encoding _defaultEncoding = Encoding.UTF8;
+        /// <summary>
+        /// Gets or sets the default encoding used to convert strings to and from bytes
+        /// when encoding/decoding bencode and no encoding is explicitly specified.
+        /// </summary>
         public static Encoding DefaultEncoding
         {
             get { return _defaultEncoding; }
@@ -22,11 +26,12 @@ namespace BencodeNET
             }
         }
 
-        static Bencode()
-        {
-            DefaultEncoding = Encoding.UTF8;
-        }
-
+        /// <summary>
+        /// Decodes the specified bencoded string using the default encoding.
+        /// </summary>
+        /// <param name="bencodedString">The bencoded string.</param>
+        /// <returns>An <see cref="IBObject"/> representing the bencoded string.</returns>
+        /// <exception cref="ArgumentNullException"></exception>
         public static IBObject Decode(string bencodedString)
         {
             if (bencodedString == null) throw new ArgumentNullException("bencodedString");
@@ -34,6 +39,13 @@ namespace BencodeNET
             return Decode(bencodedString, DefaultEncoding);
         }
 
+        /// <summary>
+        /// Decodes the specified bencoded string using the specified encoding.
+        /// </summary>
+        /// <param name="bencodedString">The bencoded string.</param>
+        /// <param name="encoding">The encoding used to convert the string to bytes.</param>
+        /// <returns>An <see cref="IBObject"/> representing the bencoded string.</returns>
+        /// <exception cref="ArgumentNullException"></exception>
         public static IBObject Decode(string bencodedString, Encoding encoding)
         {
             if (bencodedString == null) throw new ArgumentNullException("bencodedString");
@@ -45,6 +57,12 @@ namespace BencodeNET
             }
         }
 
+        /// <summary>
+        /// Decodes the specified stream using the default encoding.
+        /// </summary>
+        /// <param name="stream">The stream to decode.</param>
+        /// <returns>An <see cref="IBObject"/> representing the bencoded stream.</returns>
+        /// <exception cref="ArgumentNullException">stream</exception>
         public static IBObject Decode(Stream stream)
         {
             if (stream == null) throw new ArgumentNullException("stream");
@@ -52,6 +70,13 @@ namespace BencodeNET
             return Decode(stream, DefaultEncoding);
         }
 
+        /// <summary>
+        /// Decodes the specified stream using the specified encoding.
+        /// </summary>
+        /// <param name="stream">The stream to decode.</param>
+        /// /// <param name="encoding">The encoding used by <see cref="BString"/> when calling <c>ToString()</c> with no arguments.</param>
+        /// <returns>An <see cref="IBObject"/> representing the bencoded stream.</returns>
+        /// <exception cref="ArgumentNullException">stream</exception>
         public static IBObject Decode(Stream stream, Encoding encoding)
         {
             if (stream == null) throw new ArgumentNullException("stream");
@@ -60,6 +85,13 @@ namespace BencodeNET
             return Decode(new BencodeStream(stream, leaveOpen: true), encoding);
         }
 
+        /// <summary>
+        /// Decodes the specified stream using the specified encoding.
+        /// </summary>
+        /// <param name="stream">The stream to decode.</param>
+        /// /// <param name="encoding">The encoding used by <see cref="BString"/> when calling <c>ToString()</c> with no arguments.</param>
+        /// <returns>An <see cref="IBObject"/> representing the bencoded stream.</returns>
+        /// <exception cref="ArgumentNullException">stream</exception>
         public static IBObject Decode(BencodeStream stream, Encoding encoding)
         {
             if (stream == null) throw new ArgumentNullException("stream");
