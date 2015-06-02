@@ -11,7 +11,8 @@ Usage
 Simple decoding of a bencoded string:
 
 ```C#
-BString bstring = Bencode.DecodeString("12:Hello World!");// "Hello World!"
+BString bstring = Bencode.DecodeString("12:Hello World!");
+// "Hello World!"
 
 BNumber bnumber = Bencode.DecodeNumber("i42e");
 // 42
@@ -55,7 +56,7 @@ bnumber.Encode();    // "i42e"
 var blist = new BList { "foo", 42, "bar" };
 blist.Encode();      // "l3:fooi42e3:bare"
 
-var bdictionary = new BDictionary { { "foo", 42 }, { "Hello", "World" } };
+var bdictionary = new BDictionary { { "foo", 42 }, { "Hello", "World!" } };
 bdictionary.Encode() // "d3:fooi42e5:Hello6:World!e"
 ```
 
@@ -78,20 +79,20 @@ If no encoding is passed to `ToString` it will use the encoding the `BString` wa
 
 ```C#
 // Using the default encoding from Bencode.DefaultEncoding (UTF8)
-var bstring = Bencode.DecodeString("21:æøå äö èéê ñ");
-bstring.ToString()              // "æøå äö èéê ñ"
-bstring.ToString(Encoding.UTF8) // "æøå äö èéê ñ"
+var bstring = Bencode.DecodeString("21:Ã¦Ã¸Ã¥ Ã¤Ã¶ Ã¨Ã©Ãª Ã±");
+bstring.ToString()              // "Ã¦Ã¸Ã¥ Ã¤Ã¶ Ã¨Ã©Ãª Ã±"
+bstring.ToString(Encoding.UTF8) // "Ã¦Ã¸Ã¥ Ã¤Ã¶ Ã¨Ã©Ãª Ã±"
 
 // Using ISO-8859-1
-bstring = Bencode.DecodeString("12:æøå äö èéê ñ", Encoding.GetEncoding("ISO-8859-1"));
-bstring.ToString();              // "æøå äö èéê ñ"
+bstring = Bencode.DecodeString("12:Ã¦Ã¸Ã¥ Ã¤Ã¶ Ã¨Ã©Ãª Ã±", Encoding.GetEncoding("ISO-8859-1"));
+bstring.ToString();              // "Ã¦Ã¸Ã¥ Ã¤Ã¶ Ã¨Ã©Ãª Ã±"
 bstring.ToString(Encoding.UTF8); // "??? ?? ??? ?"
 ```
 
 If you decode a bencoded stream that is not using UTF8 and you don't specify the encoding, then `ToString` without parameters will use `Encoding.UTF8` to try to render the `BString` and you will not get the expected result.
 
 ```C#
-var bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes("12:æøå äö èéê ñ");
+var bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes("12:Ã¦Ã¸Ã¥ Ã¤Ã¶ Ã¨Ã©Ãª Ã±");
 using (var ms = new MemoryStream(bytes))
 {
     // When not specifying an encoding, ToString will use Bencode.DefaultEncoding (UTF8)
@@ -101,12 +102,12 @@ using (var ms = new MemoryStream(bytes))
     
     // Pass your desired encoding to ToString to override the encoding used to render the string
     bstring.ToString(Encoding.GetEncoding("ISO-8859-1"));
-    // "æøå äö èéê ñ"
+    // "Ã¦Ã¸Ã¥ Ã¤Ã¶ Ã¨Ã©Ãª Ã±"
 
     // If you specify an encoding when decoding, ToString will use that as the default when rendering the string
     bstring = Bencode.DecodeString(ms, Encoding.GetEncoding("ISO-8859-1"));
     bstring.ToString();
-    // "æøå äö èéê ñ"
+    // "Ã¦Ã¸Ã¥ Ã¤Ã¶ Ã¨Ã©Ãª Ã±"
 }
 ```
 
@@ -118,10 +119,10 @@ However, when encoding to a string (`IBObject.Encode`) you can specify the encod
 
 ```C#
 var blist = new BList();
-blist.Add(new BString("æøå äö èéê ñ", Encoding.GetEncoding("ISO-8859-1")));
+blist.Add(new BString("Ã¦Ã¸Ã¥ Ã¤Ã¶ Ã¨Ã©Ãª Ã±", Encoding.GetEncoding("ISO-8859-1")));
 blist.Encode();                                   // "l12:??? ?? ??? ?e"
 blist.Encode(Encoding.UTF8);                      // "l12:??? ?? ??? ?e
-blist.Encode(Encoding.GetEncoding("ISO-8859-1")); // "l12:æøå äö èéê ñe""
+blist.Encode(Encoding.GetEncoding("ISO-8859-1")); // "l12:Ã¦Ã¸Ã¥ Ã¤Ã¶ Ã¨Ã©Ãª Ã±e""
 ```
 
 If you want to use another encoding than UTF8 as the default encoding you can set `Bencode.DefaultEncoding` to your desired encoding.
