@@ -15,6 +15,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BencodeNET.Net40", "BencodeNET.Net40\BencodeNET.Net40.csproj", "{B72053C7-01F2-47EC-AAF3-8A4FC078AF1D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BencodeNET.Net35", "BencodeNET.Net35\BencodeNET.Net35.csproj", "{7BAC8D29-CAED-4940-BC0B-3E4F8EDB74F1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +37,14 @@ Global
 		{EEEE6947-258B-4E6E-AE99-F72B7A29D96F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EEEE6947-258B-4E6E-AE99-F72B7A29D96F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EEEE6947-258B-4E6E-AE99-F72B7A29D96F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B72053C7-01F2-47EC-AAF3-8A4FC078AF1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B72053C7-01F2-47EC-AAF3-8A4FC078AF1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B72053C7-01F2-47EC-AAF3-8A4FC078AF1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B72053C7-01F2-47EC-AAF3-8A4FC078AF1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BAC8D29-CAED-4940-BC0B-3E4F8EDB74F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BAC8D29-CAED-4940-BC0B-3E4F8EDB74F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BAC8D29-CAED-4940-BC0B-3E4F8EDB74F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BAC8D29-CAED-4940-BC0B-3E4F8EDB74F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
