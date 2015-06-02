@@ -111,7 +111,7 @@ using (var ms = new MemoryStream(bytes))
 }
 ```
 
-When you encode an object directly to a stream ()`IBObject.EncodeToStream`) the encoding is irrelevant.
+When you encode an object directly to a stream (`IBObject.EncodeToStream`) the encoding is irrelevant.
 
 However, when encoding to a string (`IBObject.Encode`) you can specify the encoding used to render the string. `BString.Encode` without specifying an encoding will use the encoding the `BString` was created with. For all the other types `Bencode.DefaultEncoding` will be used.
 
