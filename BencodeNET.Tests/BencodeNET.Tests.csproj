@@ -63,13 +63,13 @@
     <Compile Include="BencodeDecodeDictionaryTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BencodeNET.Net45\BencodeNET.Net45.csproj">
-      <Project>{A267EADE-6093-41DF-AB20-53CB9661B47B}</Project>
-      <Name>BencodeNET</Name>
-    </ProjectReference>
+    <None Include="Files\ubuntu-14.10-desktop-amd64.iso.torrent" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Files\ubuntu-14.10-desktop-amd64.iso.torrent" />
+    <ProjectReference Include="..\BencodeNET.Net45\BencodeNET.Net45.csproj">
+      <Project>{a267eade-6093-41df-ab20-53cb9661b47b}</Project>
+      <Name>BencodeNET.Net45</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

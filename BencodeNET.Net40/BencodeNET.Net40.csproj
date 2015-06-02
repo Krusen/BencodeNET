@@ -39,37 +39,37 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\BencodeNET\Bencode.cs">
+    <Compile Include="..\BencodeNET.Net45\Bencode.cs">
       <Link>Bencode.cs</Link>
     </Compile>
-    <Compile Include="..\BencodeNET\Exceptions\BencodeDecodingException.cs">
+    <Compile Include="..\BencodeNET.Net45\Exceptions\BencodeDecodingException.cs">
       <Link>Exceptions\BencodeDecodingException.cs</Link>
     </Compile>
-    <Compile Include="..\BencodeNET\Exceptions\UnsupportedBencodeException.cs">
+    <Compile Include="..\BencodeNET.Net45\Exceptions\UnsupportedBencodeException.cs">
       <Link>Exceptions\UnsupportedBencodeException.cs</Link>
     </Compile>
-    <Compile Include="..\BencodeNET\IO\BencodeStream.cs">
+    <Compile Include="..\BencodeNET.Net45\IO\BencodeStream.cs">
       <Link>IO\BencodeStream.cs</Link>
     </Compile>
-    <Compile Include="..\BencodeNET\Objects\BDictionary.cs">
+    <Compile Include="..\BencodeNET.Net45\Objects\BDictionary.cs">
       <Link>Objects\BDictionary.cs</Link>
     </Compile>
-    <Compile Include="..\BencodeNET\Objects\BList.cs">
+    <Compile Include="..\BencodeNET.Net45\Objects\BList.cs">
       <Link>Objects\BList.cs</Link>
     </Compile>
-    <Compile Include="..\BencodeNET\Objects\BNumber.cs">
+    <Compile Include="..\BencodeNET.Net45\Objects\BNumber.cs">
       <Link>Objects\BNumber.cs</Link>
     </Compile>
-    <Compile Include="..\BencodeNET\Objects\BObject.cs">
+    <Compile Include="..\BencodeNET.Net45\Objects\BObject.cs">
       <Link>Objects\BObject.cs</Link>
     </Compile>
-    <Compile Include="..\BencodeNET\Objects\BString.cs">
+    <Compile Include="..\BencodeNET.Net45\Objects\BString.cs">
       <Link>Objects\BString.cs</Link>
     </Compile>
-    <Compile Include="..\BencodeNET\Objects\IBObject.cs">
+    <Compile Include="..\BencodeNET.Net45\Objects\IBObject.cs">
       <Link>Objects\IBObject.cs</Link>
     </Compile>
-    <Compile Include="..\BencodeNET\UtilityExtensions.cs">
+    <Compile Include="..\BencodeNET.Net45\UtilityExtensions.cs">
       <Link>UtilityExtensions.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
