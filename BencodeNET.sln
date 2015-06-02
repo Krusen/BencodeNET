@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BencodeNET", "BencodeNET\BencodeNET.csproj", "{A267EADE-6093-41DF-AB20-53CB9661B47B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BencodeNET.Net45", "BencodeNET.Net45\BencodeNET.Net45.csproj", "{A267EADE-6093-41DF-AB20-53CB9661B47B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BencodeNET.Console", "BencodeNET.Console\BencodeNET.Console.csproj", "{5B637B4C-2C4A-4F8A-AB18-329E40704B41}"
 EndProject

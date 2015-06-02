@@ -63,7 +63,7 @@
     <Compile Include="BencodeDecodeDictionaryTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BencodeNET\BencodeNET.csproj">
+    <ProjectReference Include="..\BencodeNET.Net45\BencodeNET.Net45.csproj">
       <Project>{A267EADE-6093-41DF-AB20-53CB9661B47B}</Project>
       <Name>BencodeNET</Name>
     </ProjectReference>
