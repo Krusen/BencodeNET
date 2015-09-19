@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace BencodeNET.Objects
 {
@@ -33,6 +35,34 @@ namespace BencodeNET.Objects
                 item.EncodeToStream(stream);
             stream.Write('e');
             return stream;
+        }
+
+        public override int GetHashCode()
+        {
+            long hashValue = 269;
+
+            for (var i = 0; i < Value.Count; i++)
+            {
+                var bObject = Value[i];
+
+                var factor = 1;
+
+                if (bObject is BList)
+                    factor = 2;
+
+                if (bObject is BString)
+                    factor = 3;
+
+                if (bObject is BNumber)
+                    factor = 4;
+
+                if (bObject is BDictionary)
+                    factor = 5;
+
+                hashValue = (hashValue + 37*factor*(i + 2))%int.MaxValue;
+            }
+
+            return (int)hashValue;
         }
 
         #region IList<IBObject> Members
