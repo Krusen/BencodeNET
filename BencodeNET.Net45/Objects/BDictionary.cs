@@ -43,9 +43,17 @@ namespace BencodeNET.Objects
 
         public bool IsReadOnly { get { return Value.IsReadOnly; } }
 
+        /// <summary>
+        /// Returns the value associated with the key or null if the key doesn't exist.
+        /// </summary>
         public IBObject this[BString key]
         {
-            get { return Value[key]; }
+            get
+            {
+                if (!ContainsKey(key))
+                    return null;
+                return Value[key];
+            }
             set
             {
                 if (value == null) throw new ArgumentNullException("value");
