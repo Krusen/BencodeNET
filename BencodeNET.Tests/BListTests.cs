@@ -26,6 +26,94 @@ namespace BencodeNET.Tests
         }
 
         [TestMethod]
+        public void EqualsBList()
+        {
+            var blist1 = new BList
+            {
+                "asdf",
+                "qwer"
+            };
+            var blist2 = new BList()
+            {
+                "asdf",
+                "qwer"
+            };
+            var blist3 = new BList()
+            {
+                "qwer",
+                "asdf"
+            };
+
+            Assert.AreEqual(blist1, blist2);
+            Assert.AreNotEqual(blist1, blist3);
+            Assert.AreNotEqual(blist2, blist3);
+        }
+
+        [TestMethod]
+        public void EqualsBListWithEqualsOperator()
+        {
+            var blist1 = new BList
+            {
+                "asdf",
+                "qwer"
+            };
+            var blist2 = new BList()
+            {
+                "asdf",
+                "qwer"
+            };
+            var blist3 = new BList()
+            {
+                "qwer",
+                "asdf"
+            };
+
+            Assert.IsTrue(blist1 == blist2);
+            Assert.IsTrue(blist1 != blist3);
+            Assert.IsTrue(blist2 != blist3);
+        }
+
+        [TestMethod]
+        public void HashCodesAreEqual()
+        {
+            var blist1 = new BList
+            {
+                "asdf",
+                "qwer"
+            };
+            var blist2 = new BList()
+            {
+                "asdf",
+                "qwer"
+            };
+
+            var expected = blist1.GetHashCode();
+            var actual = blist2.GetHashCode();
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void HashCodesAreNotEqual()
+        {
+            var blist1 = new BList
+            {
+                "asdf",
+                "qwer"
+            };
+            var blist2 = new BList()
+            {
+                "asdf",
+                666
+            };
+
+            var expected = blist1.GetHashCode();
+            var actual = blist2.GetHashCode();
+
+            Assert.AreNotEqual(expected, actual);
+        }
+
+        [TestMethod]
         public void Encode_Simple()
         {
             var blist = new BList {"hello world", 987, "foobar"};

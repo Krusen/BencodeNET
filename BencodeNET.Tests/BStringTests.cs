@@ -21,7 +21,11 @@ namespace BencodeNET.Tests
         {
             var bstring1 = new BString("Test String");
             var bstring2 = new BString("Test String");
+            var bstring3 = new BString("Another string");
+
             Assert.AreEqual(bstring1, bstring2);
+            Assert.AreNotEqual(bstring1, bstring3);
+            Assert.AreNotEqual(bstring2, bstring3);
         }
 
         [TestMethod]
@@ -29,7 +33,11 @@ namespace BencodeNET.Tests
         {
             var bstring1 = new BString("Test String");
             var bstring2 = new BString("Test String");
+            var bstring3 = new BString("Another string");
+
             Assert.IsTrue(bstring1 == bstring2);
+            Assert.IsTrue(bstring1 != bstring3);
+            Assert.IsTrue(bstring2 != bstring3);
         }
 
         [TestMethod]

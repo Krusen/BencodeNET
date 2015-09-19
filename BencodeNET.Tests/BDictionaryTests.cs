@@ -44,6 +44,86 @@ namespace BencodeNET.Tests
         }
 
         [TestMethod]
+        public void EqualsBDictionary()
+        {
+            var bdict1 = new BDictionary
+            {
+                {"foobar", "Hello World!"},
+                {"number", 747},
+                {"key", "value"}
+            };
+
+            var bdict2 = new BDictionary
+            {
+                {"foobar", "Hello World!"},
+                {"number", 747},
+                {"key", "value"}
+            };
+
+            // Different order, but keys are sorted alphabetically so it is still equal
+            var bdict3 = new BDictionary
+            {
+                {"number", 747},
+                {"foobar", "Hello World!"},
+                {"key", "value"}
+            };
+
+            var bdict4 = new BDictionary
+            {
+                {"foobar", "Hello World!"},
+                {"number", 666},
+                {"key", "value"}
+            };
+
+            Assert.AreEqual(bdict1, bdict2);
+            Assert.AreEqual(bdict1, bdict3);
+            Assert.AreEqual(bdict2, bdict3);
+            Assert.AreNotEqual(bdict1, bdict4);
+            Assert.AreNotEqual(bdict2, bdict4);
+            Assert.AreNotEqual(bdict3, bdict4);
+        }
+
+        [TestMethod]
+        public void EqualsBDictionaryWithEqualsOperator()
+        {
+            var bdict1 = new BDictionary
+            {
+                {"foobar", "Hello World!"},
+                {"number", 747},
+                {"key", "value"}
+            };
+
+            var bdict2 = new BDictionary
+            {
+                {"foobar", "Hello World!"},
+                {"number", 747},
+                {"key", "value"}
+            };
+
+            // Different order, but keys are sorted alphabetically so it is still equal
+            var bdict3 = new BDictionary
+            {
+                {"number", 747},
+                {"foobar", "Hello World!"},
+                {"key", "value"}
+            };
+
+            var bdict4 = new BDictionary
+            {
+                {"foobar", "Hello World!"},
+                {"number", 666},
+                {"key", "value"}
+            };
+
+            Assert.IsTrue(bdict1 == bdict2);
+            Assert.IsTrue(bdict1 == bdict3);
+            Assert.IsTrue(bdict2 == bdict3);
+            Assert.IsTrue(bdict1 != bdict4);
+            Assert.IsTrue(bdict2 != bdict4);
+            Assert.IsTrue(bdict3 != bdict4);
+        }
+
+        [TestMethod]
         public void Encode_Simple()
         {
             var bdict = new BDictionary

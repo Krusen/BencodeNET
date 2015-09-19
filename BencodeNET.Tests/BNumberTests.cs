@@ -11,7 +11,11 @@ namespace BencodeNET.Tests
         {
             var bnumber1 = new BNumber(42);
             var bnumber2 = new BNumber(42);
+            var bnumber3 = new BNumber(666);
+
             Assert.AreEqual(bnumber1, bnumber2);
+            Assert.AreNotEqual(bnumber1, bnumber3);
+            Assert.AreNotEqual(bnumber2, bnumber3);
         }
 
         [TestMethod]
@@ -19,7 +23,11 @@ namespace BencodeNET.Tests
         {
             var bnumber1 = new BNumber(42);
             var bnumber2 = new BNumber(42);
+            var bnumber3 = new BNumber(666);
+
             Assert.IsTrue(bnumber1 == bnumber2);
+            Assert.IsTrue(bnumber1 != bnumber3);
+            Assert.IsTrue(bnumber2 != bnumber3);
         }
 
         [TestMethod]
