@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using BencodeNET.Objects;
@@ -29,6 +30,43 @@ namespace BencodeNET.Tests
             var newBytes = File.ReadAllBytes(newFile);
 
             Assert.IsTrue(originalBytes.SequenceEqual(newBytes));
+        }
+
+        [TestMethod]
+        [DeploymentItem("BencodeNET.Tests\\Files\\ubuntu-14.10-desktop-amd64.iso.torrent", "Files")]
+        public void Decode_TorrentFile_FromPath()
+        {
+            const string path = @"Files\ubuntu-14.10-desktop-amd64.iso.torrent";
+
+            TorrentFile actual;
+            TorrentFile expected;
+
+            using (var stream = File.OpenRead(path))
+            {
+                actual = Bencode.DecodeTorrentFile(path);
+                expected = new TorrentFile(Bencode.DecodeDictionary(stream));
+            }
+
+            Assert.AreEqual(actual, expected);
+        }
+
+        [TestMethod]
+        [DeploymentItem("BencodeNET.Tests\\Files\\ubuntu-14.10-desktop-amd64.iso.torrent", "Files")]
+        public void Decode_TorrentFile_FromStream()
+        {
+            const string path = @"Files\ubuntu-14.10-desktop-amd64.iso.torrent";
+
+            TorrentFile actual;
+            TorrentFile expected;
+
+            using (var stream = File.OpenRead(path))
+            {
+                actual = Bencode.DecodeTorrentFile(stream);
+                stream.Position = 0;
+                expected = new TorrentFile(Bencode.DecodeDictionary(stream));
+            }
+
+            Assert.AreEqual(actual, expected);
         }
 
         [TestMethod]
