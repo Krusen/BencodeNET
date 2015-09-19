@@ -1,5 +1,7 @@
-BencodeNET [![NuGet Version](http://img.shields.io/nuget/v/BencodeNET.svg)](https://www.nuget.org/packages/BencodeNET/) [![NuGet Downloads](http://img.shields.io/nuget/dt/BencodeNET.svg)](https://www.nuget.org/packages/BencodeNET/)
+BencodeNET 
 ==========
+[![Travis](https://img.shields.io/travis/Krusen/BencodeNET.svg)](https://travis-ci.org/Krusen/BencodeNET) [![NuGet Version](http://img.shields.io/nuget/v/BencodeNET.svg)](https://www.nuget.org/packages/BencodeNET/) [![NuGet Downloads](http://img.shields.io/nuget/dt/BencodeNET.svg)](https://www.nuget.org/packages/BencodeNET/)
+
 A .NET library for encoding and decoding bencode.
 
 - http://en.wikipedia.org/wiki/Bencode
