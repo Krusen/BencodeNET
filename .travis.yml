@@ -2,9 +2,9 @@ language: csharp
 solution: BencodeNET.sln
 install:
   - nuget restore BencodeNET.sln
-  - nuget install xunit.runner.console -Version 2.1.0-rc1-build3168 -OutputDirectory xunit
+  - nuget install xunit.runners -Version 1.9.2 -OutputDirectory xunit
 script:
   - xbuild /p:Configuration=Release BencodeNET.sln
-  - mono ./xunit/xunit.runner.console.2.1.0-rc1-build3168/tools/xunit.console.exe ./BencodeNET.Tests/bin/Release/BencodeNET.Tests.dll
+  - mono ./xunit/xunit.runners.1.9.2/tools/xunit.console.clr4.exe ./BencodeNET.Tests/bin/Release/BencodeNET.Tests.dll
   
   
