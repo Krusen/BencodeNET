@@ -65,6 +65,9 @@
     <Compile Include="..\BencodeNET.Net45\Objects\IBObject.cs">
       <Link>Objects\IBObject.cs</Link>
     </Compile>
+    <Compile Include="..\BencodeNET.Net45\Objects\TorrentFile.cs">
+      <Link>Objects\TorrentFile.cs</Link>
+    </Compile>
     <Compile Include="..\BencodeNET.Net45\UtilityExtensions.cs">
       <Link>UtilityExtensions.cs</Link>
     </Compile>
