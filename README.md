@@ -7,6 +7,48 @@ A .NET library for encoding and decoding bencode.
 
 Usage
 -----
+### Torrents
+Working with torrent files:
+
+```C#
+// Decode torrent by specifying the file path
+TorrentFile torrent = Bencode.DecodeTorrentFile("C:\ubuntu.torrent");
+
+// Alternatively, handle the stream yourself
+using (var stream = File.OpenRead("C:\ubuntu.torrent"))
+{
+    torrent = Bencode.DecodeTorrentFile(stream);
+}
+
+// Calculate the info hash
+string infoHash = torrent.CalculateInfoHash();
+// "B415C913643E5FF49FE37D304BBB5E6E11AD5101"
+
+// You can also calculate the info hash with this static method
+TorrentFile.CalculateInfoHash(BDictionary info)
+```
+
+The following fields are available directly on the `TorrentFile` itself and parsed to a default .NET type where applicable:
+
+- Announce : `string`
+- AnnounceList : `BList`
+- Comment : `string`
+- CreatedBy : `string`
+- CreationDate : `DateTime`
+- Encoding : `string`
+- Info : `BDictionary`
+
+If you need to access other fields you can access them by their key:
+
+```C#
+BString keyWithStringValue = torrent["key with string value"];
+
+// The default fields are also accessible here
+BDictionary info = torrent["info"];
+BString announce = torrent["announce"]
+BList announceList = torrent["announce-list"]
+```
+
 ### Decoding
 Simple decoding of a bencoded string:
 
