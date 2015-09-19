@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BencodeNET.Net45", "BencodeNET.Net45\BencodeNET.Net45.csproj", "{A267EADE-6093-41DF-AB20-53CB9661B47B}"
 EndProject
@@ -11,6 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BencodeNET.Tests", "Bencode
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{65E984B8-653C-4BCD-AE37-4E21497B5B87}"
 	ProjectSection(SolutionItems) = preProject
+		Default.testsettings = Default.testsettings
 		LICENSE.md = LICENSE.md
 		README.md = README.md
 	EndProjectSection
