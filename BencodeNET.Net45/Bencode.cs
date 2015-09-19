@@ -11,6 +11,7 @@ namespace BencodeNET
     public static class Bencode
     {
         private static Encoding _defaultEncoding = Encoding.UTF8;
+
         /// <summary>
         /// Gets or sets the default encoding used to convert strings to and from bytes
         /// when encoding/decoding bencode and no encoding is explicitly specified.
@@ -432,6 +433,30 @@ namespace BencodeNET
                 throw new BencodeDecodingException<BDictionary>("Missing end character 'e'.", stream.Position);
 
             return dictionary;
+        }
+
+        public static TorrentFile DecodeTorrentFile(string path)
+        {
+            using (var stream = File.OpenRead(path))
+            {
+                return DecodeTorrentFile(stream);
+            }
+        }
+
+        public static TorrentFile DecodeTorrentFile(Stream stream)
+        {
+            return DecodeTorrentFile(stream, DefaultEncoding);
+        }
+
+        public static TorrentFile DecodeTorrentFile(Stream stream, Encoding encoding)
+        {
+            return DecodeTorrentFile(new BencodeStream(stream, leaveOpen: true), encoding);
+        }
+
+        public static TorrentFile DecodeTorrentFile(BencodeStream stream, Encoding encoding)
+        {
+            var bdictionary = DecodeDictionary(stream, encoding);
+            return new TorrentFile(bdictionary);
         }
     }
 }
