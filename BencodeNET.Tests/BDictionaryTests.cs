@@ -1,49 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
 using BencodeNET.Objects;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
+using Assert = Xunit.Assert;
 
 namespace BencodeNET.Tests
 {
-    [TestClass]
     public class BDictionaryTests
     {
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void AddNullValue()
         {
             var dict = new BDictionary();
-            dict.Add("key", null);
+            Assert.Throws<ArgumentNullException>(() => dict.Add("key", null));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void AddNullObjectValue()
         {
             var dict = new BDictionary();
-            dict.Add("key", (IBObject)null);
-
+            Assert.Throws<ArgumentNullException>(() => dict.Add("key", (IBObject)null));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [Fact]
         public void AddKeyValuePairWithNullValue()
         {
             var dict = new BDictionary();
-            dict.Add(new KeyValuePair<BString, IBObject>("key", null));
-
+            Assert.Throws<ArgumentException>(() => dict.Add(new KeyValuePair<BString, IBObject>("key", null)));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void SetNullValue()
         {
             var dict = new BDictionary();
             dict.Add("key", "value");
-            dict["key"] = null;
+            Assert.Throws<ArgumentNullException>(() => dict["key"] = null);
         }
 
-        [TestMethod]
+        [Fact]
         public void EqualsBDictionary()
         {
             var bdict1 = new BDictionary
@@ -75,15 +69,15 @@ namespace BencodeNET.Tests
                 {"key", "value"}
             };
 
-            Assert.AreEqual(bdict1, bdict2);
-            Assert.AreEqual(bdict1, bdict3);
-            Assert.AreEqual(bdict2, bdict3);
-            Assert.AreNotEqual(bdict1, bdict4);
-            Assert.AreNotEqual(bdict2, bdict4);
-            Assert.AreNotEqual(bdict3, bdict4);
+            Assert.Equal(bdict1, bdict2);
+            Assert.Equal(bdict1, bdict3);
+            Assert.Equal(bdict2, bdict3);
+            Assert.NotEqual(bdict1, bdict4);
+            Assert.NotEqual(bdict2, bdict4);
+            Assert.NotEqual(bdict3, bdict4);
         }
 
-        [TestMethod]
+        [Fact]
         public void EqualsBDictionaryWithEqualsOperator()
         {
             var bdict1 = new BDictionary
@@ -115,15 +109,15 @@ namespace BencodeNET.Tests
                 {"key", "value"}
             };
 
-            Assert.IsTrue(bdict1 == bdict2);
-            Assert.IsTrue(bdict1 == bdict3);
-            Assert.IsTrue(bdict2 == bdict3);
-            Assert.IsTrue(bdict1 != bdict4);
-            Assert.IsTrue(bdict2 != bdict4);
-            Assert.IsTrue(bdict3 != bdict4);
+            Assert.True(bdict1 == bdict2);
+            Assert.True(bdict1 == bdict3);
+            Assert.True(bdict2 == bdict3);
+            Assert.True(bdict1 != bdict4);
+            Assert.True(bdict2 != bdict4);
+            Assert.True(bdict3 != bdict4);
         }
 
-        [TestMethod]
+        [Fact]
         public void Encode_Simple()
         {
             var bdict = new BDictionary
@@ -137,17 +131,17 @@ namespace BencodeNET.Tests
             var expected = "d6:foobar12:Hello World!3:key5:value6:numberi747ee";
             var actual = bdict.Encode();
             
-            Assert.AreEqual(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
-        [TestMethod]
+        [Fact]
         public void Encode_EmptyDictionary()
         {
             var bdict = new BDictionary();
-            Assert.AreEqual("de", bdict.Encode());
+            Assert.Equal("de", bdict.Encode());
         }
 
-        [TestMethod]
+        [Fact]
         public void Encode_Complex()
         {
             var bdict = new BDictionary
@@ -177,7 +171,7 @@ namespace BencodeNET.Tests
             var expected = "d6:A Listl3:foo3:bari123ed9:more spam9:more eggsee6:foobard7:numbersli1ei2ei3eee4:spam3:egge";
             var actual = bdict.Encode();
             
-            Assert.AreEqual(expected, actual);
+            Assert.Equal(expected, actual);
         }
     }
 }

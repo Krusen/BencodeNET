@@ -1,74 +1,66 @@
 ﻿using System.Text;
 using BencodeNET.Exceptions;
 using BencodeNET.Objects;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace BencodeNET.Tests
 {
-    [TestClass]
     public class BencodeDecodeStringTests
     {
-        [TestMethod]
+        [Fact]
         public void DecodeString_Simple()
         {
             var bstring = Bencode.DecodeString("4:spam");
-            Assert.AreEqual("spam", bstring.ToString());
+            Assert.Equal("spam", bstring.ToString());
         }
 
-        [TestMethod]
+        [Fact]
         public void DecodeString_EmptyString()
         {
             var bstring = Bencode.DecodeString("0:");
-            Assert.AreEqual("", bstring.ToString());
+            Assert.Equal("", bstring.ToString());
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(BencodeDecodingException<BString>))]
+        [Fact]
         public void DecodeString_Invalid_LessCharsThanSpecified()
         {
-            Bencode.DecodeString("5:spam");
+            Assert.Throws<BencodeDecodingException<BString>>(() => Bencode.DecodeString("5:spam"));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(BencodeDecodingException<BString>))]
+        [Fact]
         public void DecodeString_Invalid_NoDelimiter()
         {
-            Bencode.DecodeString("4spam");
+            Assert.Throws<BencodeDecodingException<BString>>(() => Bencode.DecodeString("4spam"));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(BencodeDecodingException<BString>))]
+        [Fact]
         public void DecodeString_Invalid_NonDigitFirstChar()
         {
-            Bencode.DecodeString("spam");
+            Assert.Throws<BencodeDecodingException<BString>>(() => Bencode.DecodeString("spam"));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(BencodeDecodingException<BString>))]
+        [Fact]
         public void DecodeString_Invalid_InputMinimumLength2()
         {
-            Bencode.DecodeString("4");
+            Assert.Throws<BencodeDecodingException<BString>>(() => Bencode.DecodeString("4"));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(BencodeDecodingException<BString>))]
+        [Fact]
         public void DecodeString_Invalid_MissingStringLength()
         {
-            Bencode.DecodeString(":spam");
+            Assert.Throws<BencodeDecodingException<BString>>(() => Bencode.DecodeString(":spam"));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(UnsupportedBencodeException))]
+        [Fact]
         public void DecodeString_Unsupported_StringLengthAboveMaxDigits10()
         {
-            Bencode.DecodeString("12345678901:spam");
+            Assert.Throws<UnsupportedBencodeException>(() => Bencode.DecodeString("12345678901:spam"));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(UnsupportedBencodeException))]
+        [Fact]
         public void DecodeString_Unsupported_StringLengthAboveInt32MaxValue()
         {
-            Bencode.DecodeString("2147483648:spam");
+            Assert.Throws<UnsupportedBencodeException>(() => Bencode.DecodeString("2147483648:spam"));
         }
     }
 }
