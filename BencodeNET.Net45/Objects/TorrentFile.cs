@@ -72,17 +72,27 @@ namespace BencodeNET.Objects
 
         public string CalculateInfoHash()
         {
-            var hashBytes = CalculateInfoHashBytes();
-
-            return BitConverter.ToString(hashBytes).Replace("-", "");
+            return CalculateInfoHash((BDictionary)_data["info"]);
         }
 
         public byte[] CalculateInfoHashBytes()
         {
+            return CalculateInfoHashBytes((BDictionary)_data["info"]);
+        }
+
+        public static string CalculateInfoHash(BDictionary info)
+        {
+            var hashBytes = CalculateInfoHashBytes(info);
+
+            return BitConverter.ToString(hashBytes).Replace("-", "");
+        }
+
+        public static byte[] CalculateInfoHashBytes(BDictionary info)
+        {
             using (var sha1 = new SHA1Managed())
             using (var ms = new MemoryStream())
             {
-                _data["info"].EncodeToStream(ms);
+                info.EncodeToStream(ms);
                 ms.Position = 0;
 
                 return sha1.ComputeHash(ms);
