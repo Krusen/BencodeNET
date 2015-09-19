@@ -1,7 +1,7 @@
 language: csharp
 solution: BencodeNET.sln
 mono:
-    - 4.2
+    - alpha
 install:
   - nuget restore BencodeNET.sln
   - nuget install xunit.runner.console -Version 2.0.0 -OutputDirectory xunit
