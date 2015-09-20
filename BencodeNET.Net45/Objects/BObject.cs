@@ -17,7 +17,7 @@ namespace BencodeNET.Objects
 
 
         /// <summary>
-        /// Encodes the object and returns the result as a string using 
+        /// Encodes the object and returns the result as a string using
         /// the default encoding from <c>Bencode.DefaultEncoding</c>.
         /// </summary>
         /// <returns>
@@ -38,9 +38,11 @@ namespace BencodeNET.Objects
         /// </returns>
         public virtual string Encode(Encoding encoding)
         {
-            var ms = new MemoryStream();
-            EncodeToStream(ms).Position = 0;
-            return new StreamReader(ms, encoding).ReadToEnd();
+            using (var ms = new MemoryStream())
+            using (var sr = new StreamReader(EncodeToStream(ms), encoding))
+            {
+                return sr.ReadToEnd();
+            }
         }
 
         /// <summary>
