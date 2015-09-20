@@ -11,8 +11,8 @@ namespace BencodeNET.Tests
         [Fact]
         public void TorrentFileDecodeEncodeIsEqual()
         {
-            const string originalFile = @"Files\ubuntu-14.10-desktop-amd64.iso.torrent";
-            const string newFile = @"Files\ubuntu-14.10-desktop-amd64.iso.test.torrent";
+            const string originalFile = @"Files/ubuntu-14.10-desktop-amd64.iso.torrent";
+            const string newFile = @"Files/ubuntu-14.10-desktop-amd64.iso.test.torrent";
 
             using (var streamRead = File.OpenRead(originalFile))
             {
@@ -32,7 +32,7 @@ namespace BencodeNET.Tests
         [Fact]
         public void Decode_TorrentFile_FromPath()
         {
-            const string path = @"Files\ubuntu-14.10-desktop-amd64.iso.torrent";
+            const string path = @"Files/ubuntu-14.10-desktop-amd64.iso.torrent";
 
             TorrentFile actual;
             TorrentFile expected;
@@ -49,7 +49,7 @@ namespace BencodeNET.Tests
         [Fact]
         public void Decode_TorrentFile_FromStream()
         {
-            const string path = @"Files\ubuntu-14.10-desktop-amd64.iso.torrent";
+            const string path = @"Files/ubuntu-14.10-desktop-amd64.iso.torrent";
 
             TorrentFile actual;
             TorrentFile expected;

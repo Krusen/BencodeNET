@@ -10,7 +10,7 @@ namespace BencodeNET.Tests
 
         public TorrentFileTests()
         {
-            const string path = @"Files\ubuntu-14.10-desktop-amd64.iso.torrent";
+            const string path = @"Files/ubuntu-14.10-desktop-amd64.iso.torrent";
 
             torrent = Bencode.DecodeTorrentFile(path);
         }
