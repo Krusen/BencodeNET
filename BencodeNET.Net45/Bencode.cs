@@ -161,7 +161,7 @@ namespace BencodeNET
             if (stream.Length < 2)
                 throw new BencodeDecodingException<BString>("Minimum valid stream length is 2 (an empty string: '0:')", stream.Position);
 
-            var lengthString = "";
+            var lengthString = new StringBuilder();
 
             while (!stream.EndOfStream)
             {
@@ -189,10 +189,10 @@ namespace BencodeNET
                         stream.Position);
                 }
 
-                lengthString += c;
+                lengthString.Append(c);
             }
 
-            var stringLength = long.Parse(lengthString);
+            var stringLength = long.Parse(lengthString.ToString());
 
             // Int32.MaxValue is ~2GB and is the absolute maximum that can be handled in memory
             if (stringLength > int.MaxValue)
@@ -245,7 +245,7 @@ namespace BencodeNET
                 throw new BencodeDecodingException<BNumber>(string.Format("Must begin with 'i' but began with '{0}'.", stream.ReadPreviousChar()), stream.Position);
 
             var isNegative = false;
-            var digits = "";
+            var digits = new StringBuilder();
             while (stream.Peek() != 'e' && stream.Peek() != -1)
             {
                 // We do not support numbers that cannot be stored as a long (Int64)
@@ -275,7 +275,7 @@ namespace BencodeNET
                 if (!c.IsDigit())
                     throw new BencodeDecodingException<BNumber>(string.Format("Must only contain digits and a single prefixed '-'. Invalid character '{0}'", c), stream.Position);
 
-                digits += c;
+                digits.Append(c);
             }
 
             // We need at least one digit
@@ -294,10 +294,10 @@ namespace BencodeNET
                 throw new BencodeDecodingException<BNumber>("Missing end character 'e'.", stream.Position);
 
             if (isNegative)
-                digits = "-" + digits;
+                digits.Insert(0, '-');
 
             long number;
-            if (!long.TryParse(digits, out number))
+            if (!long.TryParse(digits.ToString(), out number))
             {
                 // This should only happen if the number is bigger than 9,223,372,036,854,775,807 (or smaller than the negative version)
                 throw new UnsupportedBencodeException(
