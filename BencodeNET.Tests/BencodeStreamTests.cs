@@ -51,11 +51,11 @@ namespace BencodeNET.Tests
             using (var bs = new BencodeStream(ms))
             {
                 Assert.Equal(0, bs.Position);
-                
+
                 var bytes = bs.Read(str.Length);
                 Assert.Equal(12, bytes.Length);
                 Assert.Equal(str, Encoding.UTF8.GetString(bytes));
-                
+
                 Assert.Equal(12, bs.Position);
             }
         }
@@ -185,7 +185,7 @@ namespace BencodeNET.Tests
                 Assert.Equal('b', bs.Read());
             }
         }
-        
+
         [Fact]
         public void Peek()
         {
@@ -196,7 +196,7 @@ namespace BencodeNET.Tests
                 Assert.Equal('H', bs.Peek());
             }
         }
-        
+
         [Fact]
         public void PeekDoesNotAdvanceStreamPosition()
         {
@@ -211,7 +211,7 @@ namespace BencodeNET.Tests
                 Assert.Equal(0, bs.Position);
             }
         }
-        
+
         [Fact]
         public void PeekAndReadEqual()
         {
@@ -223,7 +223,7 @@ namespace BencodeNET.Tests
                 Assert.Equal('H', bs.Read());
             }
         }
-        
+
         [Fact]
         public void PeekAreChangedAfterRead()
         {
@@ -247,7 +247,7 @@ namespace BencodeNET.Tests
                 Assert.Equal('e', bs.Read());
             }
         }
-        
+
         [Fact]
         public void PeekAreChangedAfterReadSingleByte()
         {
@@ -256,7 +256,7 @@ namespace BencodeNET.Tests
             using (var bs = new BencodeStream(ms))
             {
                 byte[] bytes;
-                
+
                 Assert.Equal('a', bs.Peek());
 
                 bytes = bs.Read(1);
@@ -268,7 +268,7 @@ namespace BencodeNET.Tests
                 Assert.Equal('c', bs.Peek());
             }
         }
-        
+
         [Fact]
         public void PeekAreChangedAfterReadMutipleBytes()
         {
@@ -291,7 +291,7 @@ namespace BencodeNET.Tests
                 Assert.Equal('e', bs.Peek());
             }
         }
-        
+
         [Fact]
         public void PeekAtEndOfStreamThenReadSingleByte()
         {
@@ -304,7 +304,7 @@ namespace BencodeNET.Tests
                 Assert.Equal(-1, bs.Read());
             }
         }
-        
+
         [Fact]
         public void PeekAtEndOfStreamThenReadBytes()
         {
@@ -334,21 +334,6 @@ namespace BencodeNET.Tests
         }
 
         [Fact]
-        public void PeekAfterPositionChangeOnBaseStream()
-        {
-            var str = "abcdefghijkl";
-            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(str)))
-            using (var bs = new BencodeStream(ms))
-            {
-                Assert.Equal(0, bs.Position);
-                Assert.Equal('a', bs.PeekChar());
-                bs.BaseStream.Position = 1;
-                Assert.Equal(1, bs.Position);
-                Assert.Equal('b', bs.PeekChar());
-            }
-        }
-
-        [Fact]
         public void PeekAfterSeek()
         {
             var str = "abcdefghijkl";
@@ -358,21 +343,6 @@ namespace BencodeNET.Tests
                 Assert.Equal(0, bs.Position);
                 Assert.Equal('a', bs.PeekChar());
                 bs.Seek(1, SeekOrigin.Current);
-                Assert.Equal(1, bs.Position);
-                Assert.Equal('b', bs.PeekChar());
-            }
-        }
-
-        [Fact]
-        public void PeekAfterSeekOnBaseStream()
-        {
-            var str = "abcdefghijkl";
-            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(str)))
-            using (var bs = new BencodeStream(ms))
-            {
-                Assert.Equal(0, bs.Position);
-                Assert.Equal('a', bs.PeekChar());
-                bs.BaseStream.Seek(1, SeekOrigin.Current);
                 Assert.Equal(1, bs.Position);
                 Assert.Equal('b', bs.PeekChar());
             }

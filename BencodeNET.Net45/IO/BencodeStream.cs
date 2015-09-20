@@ -12,17 +12,9 @@ namespace BencodeNET.IO
         private readonly bool _leaveOpen;
 
         private bool _hasPeeked;
-        private long _peekPosition;
         private int _peekedByte;
 
-        public Stream BaseStream { get { return _stream; } }
-
         public bool EndOfStream { get { return Position >= Length; } }
-
-        private bool HasValidPeek
-        {
-            get { return _hasPeeked && _peekPosition == _stream.Position; }
-        }
 
         public BencodeStream(string str) : this(Bencode.DefaultEncoding.GetBytes(str))
         { }
@@ -46,12 +38,11 @@ namespace BencodeNET.IO
 
         public int Peek()
         {
-            if (HasValidPeek)
+            if (_hasPeeked)
                 return _peekedByte;
 
-            _peekedByte = Read();
-            _stream.Position -= 1;
-            _peekPosition = _stream.Position;
+            _peekedByte = _stream.ReadByte();
+            _stream.Seek(-1, SeekOrigin.Current);
             _hasPeeked = true;
             return _peekedByte;
         }
@@ -65,23 +56,19 @@ namespace BencodeNET.IO
 
         public int Read()
         {
-            if (HasValidPeek)
+            if (_hasPeeked)
             {
                 if (_peekedByte == -1)
                     return _peekedByte;
 
                 _hasPeeked = false;
-                _stream.Position += 1;
+                _stream.Seek(1, SeekOrigin.Current);
                 return _peekedByte;
             }
 
-            var bytes = new byte[1];
+            _hasPeeked = false;
 
-            var readBytes = _stream.Read(bytes, 0, 1);
-            if (readBytes == 0)
-                return -1;
-
-            return bytes[0];
+            return _stream.ReadByte();
         }
 
         public char ReadChar()
@@ -99,15 +86,23 @@ namespace BencodeNET.IO
 
             var bytes = new byte[bytesToRead];
 
-            if (HasValidPeek)
+            var offset = 0;
+
+            if (_hasPeeked)
             {
                 if (_peekedByte == -1)
                     return _emptyByteArray;
 
-                _hasPeeked = false;
+                bytes[0] = (byte)_peekedByte;
+                offset = 1;
             }
 
-            var readBytes = _stream.Read(bytes, 0, bytesToRead);
+            _hasPeeked = false;
+
+            if (offset > 0)
+                _stream.Seek(offset, SeekOrigin.Current);
+
+            var readBytes = _stream.Read(bytes, offset, bytesToRead-offset) + offset;
             if (readBytes != bytesToRead)
                 Array.Resize(ref bytes, readBytes);
 
@@ -118,6 +113,8 @@ namespace BencodeNET.IO
         {
             if (_stream.Position == 0)
                 return -1;
+
+            _hasPeeked = false;
 
             _stream.Position -= 1;
 
@@ -167,6 +164,7 @@ namespace BencodeNET.IO
 
         public long Seek(long offset, SeekOrigin origin)
         {
+            _hasPeeked = false;
             return _stream.Seek(offset, origin);
         }
 
@@ -193,7 +191,11 @@ namespace BencodeNET.IO
         public long Position
         {
             get { return _stream.Position; }
-            set { _stream.Position = value; }
+            set
+            {
+                _hasPeeked = false;
+                _stream.Position = value;
+            }
         }
 
         public virtual void Close()
