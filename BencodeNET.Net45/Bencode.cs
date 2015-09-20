@@ -161,38 +161,30 @@ namespace BencodeNET
             if (stream.Length < 2)
                 throw new BencodeDecodingException<BString>("Minimum valid stream length is 2 (an empty string: '0:')", stream.Position);
 
+            var startPosition = stream.Position;
+
             var lengthString = new StringBuilder();
-
-            while (!stream.EndOfStream)
+            while (stream.Peek() != ':' && stream.Peek() != -1)
             {
-                var c = stream.ReadChar();
-
-                // Break when we reach ':' if it is not the first character found
-                if (lengthString.Length > 0 && c == ':')
-                    break;
-
-                // Character then must be a digit
-                if (!c.IsDigit())
-                {
-                    if (lengthString.Length == 0)
-                        throw new BencodeDecodingException<BString>(string.Format("Must begin with an integer but began with '{0}'", c), stream.Position);
-
-                    // We have found some digits but this is neither a digit nor a ':' as expected
-                    throw new BencodeDecodingException<BString>("Delimiter ':' was not found.", stream.Position);
-                }
-
-                // Because of memory limitations (~1-2 GB) we know for certain we cannot handle more than 10 digits (10GB)
-                if (lengthString.Length >= BString.LengthMaxDigits)
-                {
-                    throw new UnsupportedBencodeException(
-                        string.Format("Length of string is more than {0} digits (>10GB) and is not supported (max is ~1-2GB).", BString.LengthMaxDigits),
-                        stream.Position);
-                }
-
-                lengthString.Append(c);
+                lengthString.Append(stream.ReadChar());
             }
 
-            var stringLength = long.Parse(lengthString.ToString());
+            // Skip ':'
+            stream.Skip(1);
+
+            // Because of memory limitations (~1-2 GB) we know for certain we cannot handle more than 10 digits (10GB)
+            if (lengthString.Length >= BString.LengthMaxDigits)
+            {
+                throw new UnsupportedBencodeException(
+                    string.Format("Length of string is more than {0} digits (>10GB) and is not supported (max is ~1-2GB).", BString.LengthMaxDigits),
+                    stream.Position);
+            }
+
+            long stringLength;
+            if (!long.TryParse(lengthString.ToString(), out stringLength))
+            {
+                throw new BencodeDecodingException<BString>(string.Format("Invalid length of string '{0}'", lengthString), startPosition);
+            }
 
             // Int32.MaxValue is ~2GB and is the absolute maximum that can be handled in memory
             if (stringLength > int.MaxValue)
