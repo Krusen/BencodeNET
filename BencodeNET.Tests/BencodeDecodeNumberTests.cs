@@ -96,21 +96,21 @@ namespace BencodeNET.Tests
         }
 
         [Fact]
+        public void DecodeNumber_Invalid_BiggerThanInt64MaxValue()
+        {
+            Assert.Throws<BencodeDecodingException<BNumber>>(() => Bencode.DecodeNumber("i9223372036854775808e"));
+        }
+
+        [Fact]
+        public void DecodeNumber_Invalid_SmallerThanInt64MinValue()
+        {
+            Assert.Throws<BencodeDecodingException<BNumber>>(() => Bencode.DecodeNumber("i-9223372036854775809e"));
+        }
+
+        [Fact]
         public void DecodeNumber_Unsupported_GreaterThanMaxDigits19()
         {
             Assert.Throws<UnsupportedBencodeException>(() => Bencode.DecodeNumber("i12345678901234567890e"));
-        }
-
-        [Fact]
-        public void DecodeNumber_Unsupported_BiggerThanInt64MaxValue()
-        {
-            Assert.Throws<UnsupportedBencodeException>(() => Bencode.DecodeNumber("i9223372036854775808e"));
-        }
-
-        [Fact]
-        public void DecodeNumber_Unsupported_SmallerThanInt64MinValue()
-        {
-            Assert.Throws<UnsupportedBencodeException>(() => Bencode.DecodeNumber("i-9223372036854775809e"));
         }
     }
 }
