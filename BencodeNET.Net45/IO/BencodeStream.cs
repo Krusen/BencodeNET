@@ -108,12 +108,10 @@ namespace BencodeNET.IO
             }
 
             var readBytes = _stream.Read(bytes, 0, bytesToRead);
-            if (readBytes == bytesToRead)
-                return bytes;
+            if (readBytes != bytesToRead)
+                Array.Resize(ref bytes, readBytes);
 
-            var newBytes = new byte[readBytes];
-            Array.Copy(bytes, newBytes, readBytes);
-            return newBytes;
+            return bytes;
         }
 
         public int ReadPrevious()
@@ -164,7 +162,7 @@ namespace BencodeNET.IO
 
         public void Flush()
         {
-            _stream.Flush();   
+            _stream.Flush();
         }
 
         public long Seek(long offset, SeekOrigin origin)
