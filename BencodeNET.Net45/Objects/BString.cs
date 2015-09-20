@@ -39,7 +39,7 @@ namespace BencodeNET.Objects
             if (encoding == null) throw new ArgumentNullException("encoding");
 
             _encoding = encoding;
-            Value = bytes.ToArray();
+            Value = bytes as byte[] ?? bytes.ToArray();
         }
 
         /// <summary>
