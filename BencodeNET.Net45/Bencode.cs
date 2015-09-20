@@ -161,20 +161,20 @@ namespace BencodeNET
             if (stream.Length < 2)
                 throw new BencodeDecodingException<BString>("Minimum valid stream length is 2 (an empty string: '0:')", stream.Position);
 
-            var lengthChars = new List<char>();
+            var lengthString = "";
 
             while (!stream.EndOfStream)
             {
                 var c = stream.ReadChar();
 
                 // Break when we reach ':' if it is not the first character found
-                if (lengthChars.Count > 0 && c == ':')
+                if (lengthString.Length > 0 && c == ':')
                     break;
 
                 // Character then must be a digit
                 if (!c.IsDigit())
                 {
-                    if (lengthChars.Count == 0)
+                    if (lengthString.Length == 0)
                         throw new BencodeDecodingException<BString>(string.Format("Must begin with an integer but began with '{0}'", c), stream.Position);
 
                     // We have found some digits but this is neither a digit nor a ':' as expected
@@ -182,17 +182,17 @@ namespace BencodeNET
                 }
 
                 // Because of memory limitations (~1-2 GB) we know for certain we cannot handle more than 10 digits (10GB)
-                if (lengthChars.Count >= BString.LengthMaxDigits)
+                if (lengthString.Length >= BString.LengthMaxDigits)
                 {
                     throw new UnsupportedBencodeException(
                         string.Format("Length of string is more than {0} digits (>10GB) and is not supported (max is ~1-2GB).", BString.LengthMaxDigits),
                         stream.Position);
                 }
 
-                lengthChars.Add(c);
+                lengthString += c;
             }
 
-            var stringLength = long.Parse(lengthChars.AsString());
+            var stringLength = long.Parse(lengthString);
 
             // Int32.MaxValue is ~2GB and is the absolute maximum that can be handled in memory
             if (stringLength > int.MaxValue)
@@ -245,16 +245,16 @@ namespace BencodeNET
                 throw new BencodeDecodingException<BNumber>(string.Format("Must begin with 'i' but began with '{0}'.", stream.ReadPreviousChar()), stream.Position);
 
             var isNegative = false;
-            var digits = new List<char>();
+            var digits = "";
             while (stream.Peek() != 'e' && stream.Peek() != -1)
             {
                 // We do not support numbers that cannot be stored as a long (Int64)
-                if (digits.Count >= BNumber.MaxDigits)
+                if (digits.Length >= BNumber.MaxDigits)
                 {
                     throw new UnsupportedBencodeException(
                         string.Format(
                             "The number '{0}' has more than 19 digits and cannot be stored as a long (Int64) and therefore is not supported.",
-                            digits.AsString()),
+                            digits),
                         stream.Position);
                 }
 
@@ -264,7 +264,7 @@ namespace BencodeNET
                 if (c == '-' && !isNegative)
                 {
                     // '-' must be the first char after the beginning 'i'
-                    if (digits.Count > 0)
+                    if (digits.Length > 0)
                         throw new BencodeDecodingException<BNumber>("A '-' must be directly after 'i' and before any digits.", stream.Position);
 
                     isNegative = true;
@@ -275,35 +275,35 @@ namespace BencodeNET
                 if (!c.IsDigit())
                     throw new BencodeDecodingException<BNumber>(string.Format("Must only contain digits and a single prefixed '-'. Invalid character '{0}'", c), stream.Position);
 
-                digits.Add(c);
+                digits += c;
             }
 
             // We need at least one digit
-            if (digits.Count < 1)
+            if (digits.Length < 1)
                 throw new BencodeDecodingException<BNumber>("It contains no digits.", stream.Position);
 
             // Leading zeros are not valid
-            if (digits[0] == '0' && digits.Count > 1)
+            if (digits[0] == '0' && digits.Length > 1)
                 throw new BencodeDecodingException<BNumber>("Leading '0's are not valid.", stream.Position);
 
             // '-0' is not valid either
-            if (digits[0] == '0' && digits.Count == 1 && isNegative)
+            if (digits[0] == '0' && digits.Length == 1 && isNegative)
                 throw new BencodeDecodingException<BNumber>("'-0' is not a valid number.", stream.Position);
 
             if (stream.ReadChar() != 'e')
                 throw new BencodeDecodingException<BNumber>("Missing end character 'e'.", stream.Position);
 
             if (isNegative)
-                digits.Insert(0, '-');
+                digits = "-" + digits;
 
             long number;
-            if (!long.TryParse(digits.AsString(), out number))
+            if (!long.TryParse(digits, out number))
             {
                 // This should only happen if the number is bigger than 9,223,372,036,854,775,807 (or smaller than the negative version)
                 throw new UnsupportedBencodeException(
                     string.Format(
                         "The value {0} cannot be stored as a long (Int64) and is therefore not supported. The supported values range from {1:N0} to {2:N0}",
-                        digits.AsString(), long.MinValue, long.MaxValue),
+                        digits, long.MinValue, long.MaxValue),
                     stream.Position);
             }
 

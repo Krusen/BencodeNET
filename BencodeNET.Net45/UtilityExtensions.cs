@@ -15,16 +15,5 @@ namespace BencodeNET
         {
             stream.WriteByte((byte)c);
         }
-
-        public static string AsString(this IEnumerable<char> chars)
-        {
-            if (chars == null)
-                return null;
-
-            var sb = new StringBuilder();
-            foreach (var c in chars)
-                sb.Append(c);
-            return sb.ToString();
-        }
     }
 }
