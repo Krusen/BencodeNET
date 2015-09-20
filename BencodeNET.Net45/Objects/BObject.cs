@@ -38,10 +38,9 @@ namespace BencodeNET.Objects
         /// </returns>
         public virtual string Encode(Encoding encoding)
         {
-            using (var ms = new MemoryStream())
-            using (var sr = new StreamReader(EncodeToStream(ms), encoding))
+            using (var ms = EncodeToStream(new MemoryStream()))
             {
-                return sr.ReadToEnd();
+                return encoding.GetString(ms.ToArray());
             }
         }
 
