@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using BencodeNET.Exceptions;
@@ -11,6 +12,8 @@ namespace BencodeNET
     public static class Bencode
     {
         private static Encoding _defaultEncoding = Encoding.UTF8;
+
+        private static readonly NumberFormatInfo _invariantNumberFormat = CultureInfo.InvariantCulture.NumberFormat;
 
         /// <summary>
         /// Gets or sets the default encoding used to convert strings to and from bytes
@@ -181,7 +184,7 @@ namespace BencodeNET
             }
 
             long stringLength;
-            if (!long.TryParse(lengthString.ToString(), out stringLength))
+            if (!long.TryParse(lengthString.ToString(), NumberStyles.None, _invariantNumberFormat, out stringLength))
             {
                 throw new BencodeDecodingException<BString>(string.Format("Invalid length of string '{0}'", lengthString), startPosition);
             }
@@ -275,7 +278,7 @@ namespace BencodeNET
                 throw new BencodeDecodingException<BNumber>("Missing end character 'e'.", stream.Position);
 
             long number;
-            if (!long.TryParse(digits.ToString(), out number))
+            if (!long.TryParse(digits.ToString(), NumberStyles.AllowLeadingSign, _invariantNumberFormat, out number))
             {
                 throw new BencodeDecodingException<BNumber>(
                     string.Format("The value '{0}' is invalid. Supported values range from {1:N0} to {2:N0}",
