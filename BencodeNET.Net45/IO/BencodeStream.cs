@@ -36,6 +36,11 @@ namespace BencodeNET.IO
             _leaveOpen = leaveOpen;
         }
 
+        public void Skip(int offset)
+        {
+            Seek(offset, SeekOrigin.Current);
+        }
+
         public int Peek()
         {
             if (_hasPeeked)
