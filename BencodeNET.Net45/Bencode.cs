@@ -236,10 +236,15 @@ namespace BencodeNET
                 throw new BencodeDecodingException<BNumber>(string.Format("Must begin with 'i' but began with '{0}'.", stream.ReadPreviousChar()), stream.Position);
 
             var digits = new StringBuilder();
-            while (stream.Peek() != 'e' && stream.Peek() != -1)
+            char c;
+            for (c = stream.ReadChar(); c != 'e' && c != default(char); c = stream.ReadChar())
             {
-                digits.Append(stream.ReadChar());
+                digits.Append(c);
             }
+
+            // Last read character should be 'e'
+            if (c != 'e')
+                throw new BencodeDecodingException<BNumber>("Missing end character 'e'.", stream.Position);
 
             var isNegative = digits[0] == '-';
             var numberOfDigits = isNegative ? digits.Length - 1 : digits.Length;
@@ -268,14 +273,11 @@ namespace BencodeNET
             if (firstDigit == '0' && numberOfDigits == 1 && isNegative)
                 throw new BencodeDecodingException<BNumber>("'-0' is not a valid number.", startPosition);
 
-            if (stream.ReadChar() != 'e')
-                throw new BencodeDecodingException<BNumber>("Missing end character 'e'.", stream.Position);
-
             long number;
             if (!TryParseLongFast(digits.ToString(), out number))
             {
                 throw new BencodeDecodingException<BNumber>(
-                    string.Format("The value '{0}' is invalid. Supported values range from {1:N0} to {2:N0}",
+                    string.Format("The value '{0}' is not a valid long (Int64). Supported values range from '{1:N0}' to '{2:N0}'.",
                         digits, long.MinValue, long.MaxValue),
                     stream.Position);
             }
