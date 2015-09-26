@@ -451,19 +451,12 @@ namespace BencodeNET
             if (length == 0)
                 return false;
 
-            var startIndex = 0;
-            var isNegative = false;
+            var isNegative = value[0] == '-';
+            var startIndex = isNegative ? 1 : 0;
 
-            // Check if negative and set startIndex accordingly
-            if (value[0] == '-')
-            {
-                // Cannot parse just '-'
-                if (length == 1)
-                    return false;
-
-                isNegative = true;
-                startIndex = 1;
-            }
+            // Cannot parse just '-'
+            if (isNegative && length == 1)
+                return false;
 
             // Cannot parse string longer than long.MaxValue
             if (length - startIndex > Int64MaxDigits)
