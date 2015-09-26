@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Text;
 using BencodeNET.Exceptions;
@@ -11,9 +9,9 @@ namespace BencodeNET
 {
     public static class Bencode
     {
-        private static Encoding _defaultEncoding = Encoding.UTF8;
+        private const int Int64MaxDigits = 19;
 
-        private static readonly NumberFormatInfo _invariantNumberFormat = CultureInfo.InvariantCulture.NumberFormat;
+        private static Encoding _defaultEncoding = Encoding.UTF8;
 
         /// <summary>
         /// Gets or sets the default encoding used to convert strings to and from bytes
@@ -184,7 +182,7 @@ namespace BencodeNET
             }
 
             long stringLength;
-            if (!long.TryParse(lengthString.ToString(), NumberStyles.None, _invariantNumberFormat, out stringLength))
+            if (!TryParseLongFast(lengthString.ToString(), out stringLength))
             {
                 throw new BencodeDecodingException<BString>(string.Format("Invalid length of string '{0}'", lengthString), startPosition);
             }
@@ -278,7 +276,7 @@ namespace BencodeNET
                 throw new BencodeDecodingException<BNumber>("Missing end character 'e'.", stream.Position);
 
             long number;
-            if (!long.TryParse(digits.ToString(), NumberStyles.AllowLeadingSign, _invariantNumberFormat, out number))
+            if (!TryParseLongFast(digits.ToString(), out number))
             {
                 throw new BencodeDecodingException<BNumber>(
                     string.Format("The value '{0}' is invalid. Supported values range from {1:N0} to {2:N0}",
@@ -436,6 +434,68 @@ namespace BencodeNET
         {
             var bdictionary = DecodeDictionary(stream, encoding);
             return new TorrentFile(bdictionary);
+        }
+
+        /// <summary>
+        /// A faster implementation than <see cref="long.TryParse(string, out long)"/>
+        /// because we skip some checks that are not needed.
+        /// </summary>
+        private static bool TryParseLongFast(string value, out long result)
+        {
+            result = 0;
+
+            if (value == null)
+                return false;
+
+            var length = value.Length;
+
+            // Cannot parse empty string
+            if (length == 0)
+                return false;
+
+            var startIndex = 0;
+            var isNegative = false;
+
+            // Check if negative and set startIndex accordingly
+            if (value[0] == '-')
+            {
+                // Cannot parse just '-'
+                if (length == 1)
+                    return false;
+
+                isNegative = true;
+                startIndex = 1;
+            }
+
+            // Cannot parse string longer than long.MaxValue
+            if (length - startIndex > Int64MaxDigits)
+                return false;
+
+            long parsedLong = 0;
+            for (var i = startIndex; i < length; i++)
+            {
+                var character = value[i];
+                if (!character.IsDigit())
+                    return false;
+
+                var digit = character - '0';
+
+                if (isNegative)
+                    parsedLong = 10 * parsedLong - digit;
+                else
+                    parsedLong = 10 * parsedLong + digit;
+            }
+
+            // Negative - should be less than zero
+            if (isNegative && parsedLong >= 0)
+                return false;
+
+            // Positive - should be equal to or greater than zero
+            if (!isNegative && parsedLong < 0)
+                return false;
+
+            result = parsedLong;
+            return true;
         }
     }
 }
