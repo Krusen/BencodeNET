@@ -5,6 +5,9 @@ namespace BencodeNET.Objects
 {
     public sealed class BNumber : BObject<long>, IComparable<BNumber>
     {
+        /// <summary>
+        /// The string-length of long.MaxValue. Longer strings cannot be parsed.
+        /// </summary>
         internal const int MaxDigits = 19;
 
         public BNumber(long value)
