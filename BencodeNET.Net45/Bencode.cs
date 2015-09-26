@@ -165,20 +165,17 @@ namespace BencodeNET
             var startPosition = stream.Position;
 
             var lengthString = new StringBuilder();
-            while (stream.Peek() != ':' && stream.Peek() != -1)
+            for (var c = stream.ReadChar(); c != ':' && c != default(char); c = stream.ReadChar())
             {
-                lengthString.Append(stream.ReadChar());
-            }
+                // Because of memory limitations (~1-2 GB) we know for certain we cannot handle more than 10 digits (10GB)
+                if (lengthString.Length >= BString.LengthMaxDigits)
+                {
+                    throw new UnsupportedBencodeException(
+                        string.Format("Length of string is more than {0} digits (>10GB) and is not supported (max is ~1-2GB).", BString.LengthMaxDigits),
+                        stream.Position);
+                }
 
-            // Skip ':'
-            stream.Skip(1);
-
-            // Because of memory limitations (~1-2 GB) we know for certain we cannot handle more than 10 digits (10GB)
-            if (lengthString.Length >= BString.LengthMaxDigits)
-            {
-                throw new UnsupportedBencodeException(
-                    string.Format("Length of string is more than {0} digits (>10GB) and is not supported (max is ~1-2GB).", BString.LengthMaxDigits),
-                    stream.Position);
+                lengthString.Append(c);
             }
 
             long stringLength;
@@ -195,7 +192,6 @@ namespace BencodeNET
                     stream.Position);
             }
 
-            // TODO: Catch possible OutOfMemoryException when stringLength is close Int32.MaxValue ?
             var bytes = stream.Read((int)stringLength);
 
             // If the two don't match we've reached the end of the stream before reading the expected number of chars
