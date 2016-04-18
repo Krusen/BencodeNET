@@ -1,51 +1,48 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
 
 namespace BencodeNET.Objects
 {
-    public class TorrentFile
+    public class TorrentFile : BObject<BDictionary>
     {
         private readonly DateTime _epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-        private readonly BDictionary _data = new BDictionary();
-
         public BDictionary Info
         {
-            get { return (BDictionary) _data[Fields.Info]; }
-            set { _data[Fields.Info] = value; }
+            get { return (BDictionary) Value[Fields.Info]; }
+            set { Value[Fields.Info] = value; }
         }
 
         public string Announce
         {
             get
             {
-                if (!_data.ContainsKey(Fields.Announce))
+                if (!Value.ContainsKey(Fields.Announce))
                     return null;
-                return _data[Fields.Announce].ToString();
+                return Value[Fields.Announce].ToString();
             }
-            set { _data[Fields.Announce] = new BString(value); }
+            set { Value[Fields.Announce] = new BString(value); }
         }
 
         public BList AnnounceList
         {
-            get { return (BList) _data[Fields.AnnounceList] ?? new BList(); }
-            set { _data[Fields.AnnounceList] = value; }
+            get { return (BList) Value[Fields.AnnounceList] ?? new BList(); }
+            set { Value[Fields.AnnounceList] = value; }
         }
 
         public DateTime CreationDate
         {
             get
             {
-                var unixTime = (BNumber) _data[Fields.CreationDate];
+                var unixTime = (BNumber) Value[Fields.CreationDate];
                 return _epoch.AddSeconds(unixTime);
             }
             set
             {
                 var unixTime = value.Subtract(_epoch).TotalSeconds.ToString();
-                _data[Fields.CreationDate] = new BString(unixTime);
+                Value[Fields.CreationDate] = new BString(unixTime);
             }
         }
 
@@ -53,33 +50,33 @@ namespace BencodeNET.Objects
         {
             get
             {
-                if (!_data.ContainsKey(Fields.Comment))
+                if (!Value.ContainsKey(Fields.Comment))
                     return null;
-                return _data[Fields.Comment].ToString();
+                return Value[Fields.Comment].ToString();
             }
-            set { _data[Fields.Comment] = new BString(value); }
+            set { Value[Fields.Comment] = new BString(value); }
         }
 
         public string CreatedBy
         {
             get
             {
-                if (!_data.ContainsKey(Fields.CreatedBy))
+                if (!Value.ContainsKey(Fields.CreatedBy))
                     return null;
-                return _data[Fields.CreatedBy].ToString();
+                return Value[Fields.CreatedBy].ToString();
             }
-            set { _data[Fields.CreatedBy] = new BString(value); }
+            set { Value[Fields.CreatedBy] = new BString(value); }
         }
 
         public string Encoding
         {
             get
             {
-                if (!_data.ContainsKey(Fields.Encoding))
+                if (!Value.ContainsKey(Fields.Encoding))
                     return null;
-                return _data[Fields.Encoding].ToString();
+                return Value[Fields.Encoding].ToString();
             }
-            set { _data[Fields.Encoding] = new BString(value); }
+            set { Value[Fields.Encoding] = new BString(value); }
         }
 
         public string CalculateInfoHash()
@@ -113,8 +110,8 @@ namespace BencodeNET.Objects
 
         public IBObject this[BString key]
         {
-            get { return _data[key]; }
-            set { _data[key] = value; }
+            get { return Value[key]; }
+            set { Value[key] = value; }
         }
 
         public static bool operator ==(TorrentFile first, TorrentFile second)
@@ -128,6 +125,11 @@ namespace BencodeNET.Objects
         public static bool operator !=(TorrentFile first, TorrentFile second)
         {
             return !(first == second);
+        }
+
+        public override TStream EncodeToStream<TStream>(TStream stream)
+        {
+            return Value.EncodeToStream(stream);
         }
 
         public override bool Equals(object other)
@@ -156,12 +158,12 @@ namespace BencodeNET.Objects
             throw new NotImplementedException();
         }
 
-        public TorrentFile()
+        public TorrentFile() : this(new BDictionary())
         { }
 
         public TorrentFile(BDictionary torrent)
         {
-            _data = torrent;
+            Value = torrent;
         }
 
         private static class Fields
