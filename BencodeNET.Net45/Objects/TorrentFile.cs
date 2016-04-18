@@ -8,35 +8,44 @@ namespace BencodeNET.Objects
 {
     public class TorrentFile
     {
+        private readonly DateTime _epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
         private readonly BDictionary _data = new BDictionary();
 
         public BDictionary Info
         {
-            get { return (BDictionary) _data["info"]; }
+            get { return (BDictionary) _data[Fields.Info]; }
+            set { _data[Fields.Info] = value; }
         }
 
         public string Announce
         {
             get
             {
-                if (!_data.ContainsKey("announce"))
+                if (!_data.ContainsKey(Fields.Announce))
                     return null;
-                return _data["announce"].ToString();
+                return _data[Fields.Announce].ToString();
             }
+            set { _data[Fields.Announce] = new BString(value); }
         }
 
         public BList AnnounceList
         {
-            get { return (BList) _data["announce-list"]; }
+            get { return (BList) _data[Fields.AnnounceList]; }
+            set { _data[Fields.AnnounceList] = value; }
         }
 
         public DateTime CreationDate
         {
             get
             {
-                var unixTime = (BNumber) _data["creation date"];
-                var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-                return epoch.AddSeconds(unixTime);
+                var unixTime = (BNumber) _data[Fields.CreationDate];
+                return _epoch.AddSeconds(unixTime);
+            }
+            set
+            {
+                var unixTime = value.Subtract(_epoch).TotalSeconds.ToString();
+                _data[Fields.CreationDate] = new BString(unixTime);
             }
         }
 
@@ -44,40 +53,43 @@ namespace BencodeNET.Objects
         {
             get
             {
-                if (!_data.ContainsKey("comment"))
+                if (!_data.ContainsKey(Fields.Comment))
                     return null;
-                return _data["comment"].ToString();
+                return _data[Fields.Comment].ToString();
             }
+            set { _data[Fields.Comment] = new BString(value); }
         }
 
         public string CreatedBy
         {
             get
             {
-                if (!_data.ContainsKey("created by"))
+                if (!_data.ContainsKey(Fields.CreatedBy))
                     return null;
-                return _data["created by"].ToString();
+                return _data[Fields.CreatedBy].ToString();
             }
+            set { _data[Fields.CreatedBy] = new BString(value); }
         }
 
         public string Encoding
         {
             get
             {
-                if (!_data.ContainsKey("encoding"))
+                if (!_data.ContainsKey(Fields.Encoding))
                     return null;
-                return _data["encoding"].ToString();
+                return _data[Fields.Encoding].ToString();
             }
+            set { _data[Fields.Encoding] = new BString(value); }
         }
 
         public string CalculateInfoHash()
         {
-            return CalculateInfoHash((BDictionary)_data["info"]);
+            return CalculateInfoHash(Info);
         }
 
         public byte[] CalculateInfoHashBytes()
         {
-            return CalculateInfoHashBytes((BDictionary)_data["info"]);
+            return CalculateInfoHashBytes(Info);
         }
 
         public static string CalculateInfoHash(BDictionary info)
@@ -102,6 +114,7 @@ namespace BencodeNET.Objects
         public IBObject this[BString key]
         {
             get { return _data[key]; }
+            set { _data[key] = value; }
         }
 
         public static bool operator ==(TorrentFile first, TorrentFile second)
@@ -149,6 +162,17 @@ namespace BencodeNET.Objects
         public TorrentFile(BDictionary torrent)
         {
             _data = torrent;
+        }
+
+        private static class Fields
+        {
+            public const string Announce = "announce";
+            public const string AnnounceList = "announce-list";
+            public const string CreatedBy = "created by";
+            public const string CreationDate = "creation date";
+            public const string Comment = "comment";
+            public const string Encoding = "encoding";
+            public const string Info = "info";
         }
     }
 }
