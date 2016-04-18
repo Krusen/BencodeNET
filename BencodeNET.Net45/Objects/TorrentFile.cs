@@ -31,7 +31,7 @@ namespace BencodeNET.Objects
 
         public BList AnnounceList
         {
-            get { return (BList) _data[Fields.AnnounceList]; }
+            get { return (BList) _data[Fields.AnnounceList] ?? new BList(); }
             set { _data[Fields.AnnounceList] = value; }
         }
 
