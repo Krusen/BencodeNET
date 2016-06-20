@@ -41,7 +41,7 @@ namespace BencodeNET.Objects
             }
             set
             {
-                var unixTime = value.Subtract(_epoch).TotalSeconds.ToString();
+                var unixTime = (value.Subtract(_epoch).Ticks/TimeSpan.TicksPerSecond).ToString();
                 Value[Fields.CreationDate] = new BString(unixTime);
             }
         }
