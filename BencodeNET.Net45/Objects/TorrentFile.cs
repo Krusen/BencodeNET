@@ -36,7 +36,7 @@ namespace BencodeNET.Objects
         {
             get
             {
-                var unixTime = (BNumber) Value[Fields.CreationDate];
+                var unixTime = (BNumber) Value[Fields.CreationDate] ?? 0;
                 return _epoch.AddSeconds(unixTime);
             }
             set
