@@ -9,12 +9,18 @@ namespace BencodeNET.Objects
     {
         private readonly DateTime _epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
+        /// <summary>
+        /// The dictionary that describes the file(s) of the torrent
+        /// </summary>
         public BDictionary Info
         {
             get { return (BDictionary) Value[Fields.Info]; }
             set { Value[Fields.Info] = value; }
         }
 
+        /// <summary>
+        /// The announce URL of the tracker
+        /// </summary>
         public string Announce
         {
             get
@@ -26,26 +32,35 @@ namespace BencodeNET.Objects
             set { Value[Fields.Announce] = new BString(value); }
         }
 
+        /// <summary>
+        /// The announce URLs list of the tracker [optional]
+        /// </summary>
         public BList AnnounceList
         {
             get { return (BList) Value[Fields.AnnounceList] ?? new BList(); }
             set { Value[Fields.AnnounceList] = value; }
         }
 
+        /// <summary>
+        /// The creation date of the .torrent file [optional]
+        /// </summary>
         public DateTime CreationDate
         {
             get
             {
                 var unixTime = (BNumber) Value[Fields.CreationDate];
-                return _epoch.AddSeconds(unixTime);
+                return unixTime == null ? DateTime.MinValue : _epoch.AddSeconds(unixTime);
             }
             set
             {
-                var unixTime = value.Subtract(_epoch).TotalSeconds.ToString();
+                var unixTime = (value.Subtract(_epoch).Ticks/TimeSpan.TicksPerSecond).ToString();
                 Value[Fields.CreationDate] = new BString(unixTime);
             }
         }
 
+        /// <summary>
+        /// The comment of the .torrent file [optional]
+        /// </summary>
         public string Comment
         {
             get
@@ -57,6 +72,9 @@ namespace BencodeNET.Objects
             set { Value[Fields.Comment] = new BString(value); }
         }
 
+        /// <summary>
+        /// The name and version of the program used to create the .torrent [optional]
+        /// </summary>
         public string CreatedBy
         {
             get
@@ -68,6 +86,9 @@ namespace BencodeNET.Objects
             set { Value[Fields.CreatedBy] = new BString(value); }
         }
 
+        /// <summary>
+        /// The encoding used by the client that created the .torrent file [optional]
+        /// </summary>
         public string Encoding
         {
             get
