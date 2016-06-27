@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <title>BencodeNET</title>
+    <id>BencodeNET</id>
+    <version>1.3.1</version>
+    <authors>Søren Kruse</authors>
+    <licenseUrl>https://github.com/Krusen/BencodeNET/blob/master/LICENSE.md</licenseUrl>
+    <projectUrl>https://github.com/Krusen/BencodeNET</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A library for encoding and decoding bencode (e.g. torrent files)</description>
+    <releaseNotes>Better handling of CreationDate in torrent files. Added some XML documentation.</releaseNotes>
+    <copyright></copyright>
+    <tags>bencode torrent torrents</tags>
+  </metadata>
+  <files>
+    <file src="BencodeNET.Net35\bin\Release\BencodeNET.dll" target="lib\net35" />
+    <file src="BencodeNET.Net35\bin\Release\BencodeNET.pdb" target="lib\net35" />
+    <file src="BencodeNET.Net35\bin\Release\BencodeNET.xml" target="lib\net35" />
+
+    <file src="BencodeNET.Net40\bin\Release\BencodeNET.dll" target="lib\net40" />
+    <file src="BencodeNET.Net40\bin\Release\BencodeNET.pdb" target="lib\net40" />
+    <file src="BencodeNET.Net40\bin\Release\BencodeNET.xml" target="lib\net40" />
+
+    <file src="BencodeNET.Net45\bin\Release\BencodeNET.dll" target="lib\net45" />
+    <file src="BencodeNET.Net45\bin\Release\BencodeNET.pdb" target="lib\net45" />
+    <file src="BencodeNET.Net45\bin\Release\BencodeNET.xml" target="lib\net45" />
+  </files>
+</package>

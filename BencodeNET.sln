@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BencodeNET.Net45", "BencodeNET.Net45\BencodeNET.Net45.csproj", "{A267EADE-6093-41DF-AB20-53CB9661B47B}"
 EndProject
@@ -18,6 +18,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BencodeNET.Net40", "BencodeNET.Net40\BencodeNET.Net40.csproj", "{B72053C7-01F2-47EC-AAF3-8A4FC078AF1D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BencodeNET.Net35", "BencodeNET.Net35\BencodeNET.Net35.csproj", "{7BAC8D29-CAED-4940-BC0B-3E4F8EDB74F1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuGet", "NuGet", "{4EA69A14-7296-4812-9E80-B20E0C9747A2}"
+	ProjectSection(SolutionItems) = preProject
+		Package\BencodeNET.nuspec = Package\BencodeNET.nuspec
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
