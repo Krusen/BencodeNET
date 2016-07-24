@@ -33,15 +33,35 @@ namespace BencodeNET.Objects
             return stream;
         }
 
+        public BString GetBString(string key)
+        {
+            return this[key] as BString;
+        }
+
+        public BNumber GetBNumber(string key)
+        {
+            return this[key] as BNumber;
+        }
+
+        public BList GetBList(string key)
+        {
+            return this[key] as BList;
+        }
+
+        public BDictionary GetBDictionary(string key)
+        {
+            return this[key] as BDictionary;
+        }
+
         #region IDictionary<BString, IBObject> Members
 
-        public ICollection<BString> Keys { get { return Value.Keys; } }
+        public ICollection<BString> Keys => Value.Keys;
 
-        public ICollection<IBObject> Values { get { return Value.Values; } }
+        public ICollection<IBObject> Values => Value.Values;
 
-        public int Count { get { return Value.Count; } }
+        public int Count => Value.Count;
 
-        public bool IsReadOnly { get { return Value.IsReadOnly; } }
+        public bool IsReadOnly => Value.IsReadOnly;
 
         /// <summary>
         /// Returns the value associated with the key or null if the key doesn't exist.
@@ -56,20 +76,20 @@ namespace BencodeNET.Objects
             }
             set
             {
-                if (value == null) throw new ArgumentNullException("value");
+                if (value == null) throw new ArgumentNullException(nameof(value));
                 Value[key] = value;
             }
         }
 
         public void Add(KeyValuePair<BString, IBObject> item)
         {
-            if (item.Value == null) throw new ArgumentException("Must not contain a null value", "item");
+            if (item.Value == null) throw new ArgumentException("Must not contain a null value", nameof(item));
             Value.Add(item);
         }
 
         public void Add(BString key, IBObject value)
         {
-            if (value == null) throw new ArgumentNullException("value");
+            if (value == null) throw new ArgumentNullException(nameof(value));
             Value.Add(key, value);
         }
 

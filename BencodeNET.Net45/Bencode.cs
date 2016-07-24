@@ -4,6 +4,7 @@ using System.Text;
 using BencodeNET.Exceptions;
 using BencodeNET.IO;
 using BencodeNET.Objects;
+using BencodeNET.Torrents;
 
 namespace BencodeNET
 {
@@ -341,6 +342,19 @@ namespace BencodeNET
             return list;
         }
 
+        public static BDictionary DecodeDictionaryFromFile(string path)
+        {
+            return DecodeDictionaryFromFile(path, DefaultEncoding);
+        }
+
+        public static BDictionary DecodeDictionaryFromFile(string path, Encoding encoding)
+        {
+            using (var stream = File.OpenRead(path))
+            {
+                return DecodeDictionary(stream, encoding);
+            }
+        }
+
         public static BDictionary DecodeDictionary(string bencodedString)
         {
             return DecodeDictionary(bencodedString, DefaultEncoding);
@@ -408,6 +422,35 @@ namespace BencodeNET
                 throw new BencodeDecodingException<BDictionary>("Missing end character 'e'.", stream.Position);
 
             return dictionary;
+        }
+
+        public static Torrent DecodeTorrent(string path)
+        {
+            return DecodeTorrent(path, DefaultEncoding);
+        }
+
+        public static Torrent DecodeTorrent(string path, Encoding encoding)
+        {
+            using (var stream = File.OpenRead(path))
+            {
+                return DecodeTorrent(stream, encoding);
+            }
+        }
+
+        public static Torrent DecodeTorrent(Stream stream)
+        {
+            return DecodeTorrent(stream, DefaultEncoding);
+        }
+
+        public static Torrent DecodeTorrent(Stream stream, Encoding encoding)
+        {
+            return DecodeTorrent(new BencodeStream(stream, leaveOpen: true), encoding);
+        }
+
+        public static Torrent DecodeTorrent(BencodeStream stream, Encoding encoding)
+        {
+            var bdictionary = DecodeDictionary(stream, encoding);
+            return new Torrent(bdictionary);
         }
 
         public static TorrentFile DecodeTorrentFile(string path)

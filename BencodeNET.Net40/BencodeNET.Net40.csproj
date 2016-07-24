@@ -69,6 +69,21 @@
     <Compile Include="..\BencodeNET.Net45\Objects\TorrentFile.cs">
       <Link>Objects\TorrentFile.cs</Link>
     </Compile>
+    <Compile Include="..\BencodeNET.Net45\Torrents\Torrent.cs">
+      <Link>Torrents\Torrent.cs</Link>
+    </Compile>
+    <Compile Include="..\BencodeNET.Net45\Torrents\TorrentFileMode.cs">
+      <Link>Torrents\TorrentFileMode.cs</Link>
+    </Compile>
+    <Compile Include="..\BencodeNET.Net45\Torrents\TorrentMultiFileInfo.cs">
+      <Link>Torrents\TorrentMultiFileInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\BencodeNET.Net45\Torrents\TorrentMultiFileInfoList.cs">
+      <Link>Torrents\TorrentMultiFileInfoList.cs</Link>
+    </Compile>
+    <Compile Include="..\BencodeNET.Net45\Torrents\TorrentSingleFileInfo.cs">
+      <Link>Torrents\TorrentSingleFileInfo.cs</Link>
+    </Compile>
     <Compile Include="..\BencodeNET.Net45\UtilityExtensions.cs">
       <Link>UtilityExtensions.cs</Link>
     </Compile>

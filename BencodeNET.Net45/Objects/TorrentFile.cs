@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 
 namespace BencodeNET.Objects
 {
+    [Obsolete("Use Torrents.Torrent instead. Will be removed in a future version.")]
     public class TorrentFile : BObject<BDictionary>
     {
         private readonly DateTime _epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
