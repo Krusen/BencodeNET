@@ -24,7 +24,7 @@ namespace BencodeNET.Objects
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException("value", "Encoding may not be set to null");
+                    throw new ArgumentNullException(nameof(value), "Encoding may not be set to null");
                 _encoding = value;
             }
         }
@@ -35,8 +35,8 @@ namespace BencodeNET.Objects
 
         public BString(IEnumerable<byte> bytes, Encoding encoding)
         {
-            if (bytes == null) throw new ArgumentNullException("bytes");
-            if (encoding == null) throw new ArgumentNullException("encoding");
+            if (bytes == null) throw new ArgumentNullException(nameof(bytes));
+            if (encoding == null) throw new ArgumentNullException(nameof(encoding));
 
             _encoding = encoding;
             Value = bytes as byte[] ?? bytes.ToArray();
@@ -61,8 +61,8 @@ namespace BencodeNET.Objects
         /// <exception cref="ArgumentNullException"></exception>
         public BString(string str, Encoding encoding)
         {
-            if (str == null) throw new ArgumentNullException("str");
-            if (encoding == null) throw new ArgumentNullException("encoding");
+            if (str == null) throw new ArgumentNullException(nameof(str));
+            if (encoding == null) throw new ArgumentNullException(nameof(encoding));
 
             _encoding = encoding;
             Value = encoding.GetBytes(str);
@@ -71,10 +71,7 @@ namespace BencodeNET.Objects
         /// <summary>
         /// Gets the length in bytes of the string.
         /// </summary>
-        public int Length
-        {
-            get { return Value.Length; }
-        }
+        public int Length => Value.Length;
 
         public static implicit operator BString(string value)
         {

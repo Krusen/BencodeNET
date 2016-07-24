@@ -9,11 +9,11 @@ using System.Text;
 namespace BencodeNET.Torrents
 {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
+    // TODO: Equals comparison
     public class Torrent : IBObject
     {
         private readonly DateTime _epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-
-        // TODO: Torrent number of pieces (total size / piece size)
 
         public Torrent()
         { }
@@ -76,6 +76,8 @@ namespace BencodeNET.Torrents
                         Trackers.Add(tracker);
                     }
                 }
+
+                Trackers = Trackers.Distinct().ToList();
             }
 
             var unixTime = torrent.GetBNumber(Fields.CreationDate);
@@ -88,12 +90,12 @@ namespace BencodeNET.Torrents
 
             if (torrent.ContainsKey(Fields.CreatedBy))
             {
-                Comment = torrent.GetBString(Fields.CreatedBy).ToString(encoding);
+                CreatedBy = torrent.GetBString(Fields.CreatedBy).ToString(encoding);
             }
 
             if (torrent.ContainsKey(Fields.Encoding))
             {
-                Comment = torrent.GetBString(Fields.Encoding).ToString(encoding);
+                Encoding = torrent.GetBString(Fields.Encoding).ToString(encoding);
             }
         }
 
@@ -168,18 +170,23 @@ namespace BencodeNET.Torrents
             return EncodeToStream(stream, Bencode.DefaultEncoding);
         }
 
+        // TODO: EncodeToFile method, maybe add to IBObject or BObject
         // TODO: Split into smaller parts - maybe a TorrentFactory
         public T EncodeToStream<T>(T stream, Encoding encoding) where T : Stream
         {
             var torrent = new BDictionary();
 
-            if (Trackers?.Count == 1)
+            if (Trackers?.Count > 0)
             {
                 torrent[Fields.Announce] = new BString(Trackers.First(), encoding);
             }
-            else if (Trackers?.Count > 1)
+
+            if (Trackers?.Count > 1)
             {
-                torrent[Fields.AnnounceList] = new BList<BString>(Trackers.Select(x => (IBObject)new BString(x, encoding)));
+                torrent[Fields.AnnounceList] = new BList
+                {
+                    new BList<BString>(Trackers.Select(x => (IBObject) new BString(x, encoding)))
+                };
             }
 
             if (Encoding != null)
@@ -213,7 +220,7 @@ namespace BencodeNET.Torrents
             if (IsPrivate)
                 info[Fields.Private] = (BNumber)1;
 
-            if (FileMode != TorrentFileMode.Single)
+            if (FileMode == TorrentFileMode.Single)
             {
                 info[Fields.Name] = new BString(File.FileName, encoding);
                 info[Fields.Length] = (BNumber) File.FileSize;

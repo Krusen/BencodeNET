@@ -14,7 +14,7 @@ namespace BencodeNET.IO
         private bool _hasPeeked;
         private int _peekedByte;
 
-        public bool EndOfStream { get { return Position >= Length; } }
+        public bool EndOfStream => Position >= Length;
 
         public BencodeStream(string str) : this(Bencode.DefaultEncoding.GetBytes(str))
         { }
@@ -30,7 +30,7 @@ namespace BencodeNET.IO
 
         public BencodeStream(Stream stream, bool leaveOpen)
         {
-            if (stream == null) throw new ArgumentNullException("stream");
+            if (stream == null) throw new ArgumentNullException(nameof(stream));
 
             _stream = stream;
             _leaveOpen = leaveOpen;
@@ -86,7 +86,7 @@ namespace BencodeNET.IO
 
         public byte[] Read(int bytesToRead)
         {
-            if (bytesToRead < 0) throw new ArgumentOutOfRangeException("bytesToRead");
+            if (bytesToRead < 0) throw new ArgumentOutOfRangeException(nameof(bytesToRead));
             if (bytesToRead == 0) return _emptyByteArray;
 
             var bytes = new byte[bytesToRead];
@@ -173,25 +173,13 @@ namespace BencodeNET.IO
             return _stream.Seek(offset, origin);
         }
 
-        public bool CanRead
-        {
-            get { return _stream.CanRead; }
-        }
+        public bool CanRead => _stream.CanRead;
 
-        public bool CanSeek
-        {
-            get { return _stream.CanSeek; }
-        }
+        public bool CanSeek => _stream.CanSeek;
 
-        public bool CanWrite
-        {
-            get { return _stream.CanWrite; }
-        }
+        public bool CanWrite => _stream.CanWrite;
 
-        public long Length
-        {
-            get { return _stream.Length; }
-        }
+        public long Length => _stream.Length;
 
         public long Position
         {

@@ -18,6 +18,7 @@ namespace BencodeNET.Objects
         { }
 
         public BList(IEnumerable<string> strings, Encoding encoding)
+            : this()
         {
             foreach (var str in strings)
             {
