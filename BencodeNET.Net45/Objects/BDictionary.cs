@@ -33,26 +33,6 @@ namespace BencodeNET.Objects
             return stream;
         }
 
-        public BString GetBString(string key)
-        {
-            return this[key] as BString;
-        }
-
-        public BNumber GetBNumber(string key)
-        {
-            return this[key] as BNumber;
-        }
-
-        public BList GetBList(string key)
-        {
-            return this[key] as BList;
-        }
-
-        public BDictionary GetBDictionary(string key)
-        {
-            return this[key] as BDictionary;
-        }
-
         public T Get<T>(string key) where T : class, IBObject
         {
             return this[key] as T;

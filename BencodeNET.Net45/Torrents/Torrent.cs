@@ -82,17 +82,17 @@ namespace BencodeNET.Torrents
 
         public static Torrent FromBDictionary(BDictionary data)
         {
-            var info = data.GetBDictionary(Fields.Info);
+            var info = data.Get<BDictionary>(Fields.Info);
 
             var torrent = new Torrent
             {
-                IsPrivate = info.GetBNumber(Fields.Private) == 1,
-                PieceSize = info.GetBNumber(Fields.PieceLength),
-                Pieces = info.GetBString(Fields.Pieces),
+                IsPrivate = info.Get<BNumber>(Fields.Private) == 1,
+                PieceSize = info.Get<BNumber>(Fields.PieceLength),
+                Pieces = info.Get<BString>(Fields.Pieces),
 
-                Comment = data.GetBString(Fields.Comment)?.ToString(),
-                CreatedBy = data.GetBString(Fields.CreatedBy)?.ToString(),
-                Encoding = data.GetBString(Fields.Encoding)?.ToString(),
+                Comment = data.Get<BString>(Fields.Comment)?.ToString(),
+                CreatedBy = data.Get<BString>(Fields.CreatedBy)?.ToString(),
+                Encoding = data.Get<BString>(Fields.Encoding)?.ToString(),
                 CreationDate = data.Get<BNumber>(Fields.CreationDate),
 
                 // TODO: More foolproof detection, look at more keys
@@ -114,9 +114,9 @@ namespace BencodeNET.Torrents
         {
             return new TorrentSingleFileInfo
             {
-                FileName = info.GetBString(Fields.Name)?.ToString(),
-                FileSize = info.GetBNumber(Fields.Length),
-                Md5Sum = info.GetBString(Fields.Md5Sum)?.ToString()
+                FileName = info.Get<BString>(Fields.Name)?.ToString(),
+                FileSize = info.Get<BNumber>(Fields.Length),
+                Md5Sum = info.Get<BString>(Fields.Md5Sum)?.ToString()
             };
         }
 
@@ -124,15 +124,16 @@ namespace BencodeNET.Torrents
         {
             var list = new TorrentMultiFileInfoList
             {
-                DirectoryName = info.GetBString(Fields.Name).ToString(),
+                DirectoryName = info.Get<BString>(Fields.Name).ToString(),
             };
 
-            var fileInfos = info.GetBList(Fields.Files).Select(x => new TorrentMultiFileInfo
-            {
-                FileSize = ((BDictionary)x).GetBNumber(Fields.Length),
-                Path = ((BDictionary)x).GetBList(Fields.Path)?.AsStrings().ToList(),
-                Md5Sum = ((BDictionary)x).GetBString(Fields.Md5Sum)?.ToString()
-            });
+            var fileInfos = info.Get<BList>(Fields.Files).Cast<BDictionary>()
+                .Select(x => new TorrentMultiFileInfo
+                {
+                    FileSize = x.Get<BNumber>(Fields.Length),
+                    Path = x.Get<BList>(Fields.Path)?.AsStrings().ToList(),
+                    Md5Sum = x.Get<BString>(Fields.Md5Sum)?.ToString()
+                });
 
             list.AddRange(fileInfos);
 
@@ -142,13 +143,13 @@ namespace BencodeNET.Torrents
         private static IList<string> LoadTrackers(BDictionary data)
         {
             var trackers = new List<string>();
-            var announce = data.GetBString(Fields.Announce)?.ToString();
+            var announce = data.Get<BString>(Fields.Announce)?.ToString();
             if (!string.IsNullOrEmpty(announce))
             {
                 trackers.Add(announce);
             }
 
-            var announceLists = data.GetBList(Fields.AnnounceList)?.As<BList>();
+            var announceLists = data.Get<BList>(Fields.AnnounceList)?.As<BList>();
             if (announceLists != null)
             {
                 trackers.AddRange(announceLists.SelectMany(list => list.AsStrings()));
