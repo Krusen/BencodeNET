@@ -8,5 +8,6 @@ namespace BencodeNET.Objects
         string Encode();
         string Encode(Encoding encoding);
         T EncodeToStream<T>(T stream) where T : Stream;
+        void EncodeToFile(string path);
     }
 }

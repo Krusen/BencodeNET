@@ -5,18 +5,13 @@ using System.Text;
 
 namespace BencodeNET.Objects
 {
-    public abstract class BObject<TY> : IBObject
+    public abstract class BObject : IBObject
     {
+
         internal BObject()
         { }
 
-        /// <summary>
-        /// The underlying value of the BObject.
-        /// </summary>
-        public TY Value { get; protected set; }
-
-
-        /// <summary>
+        // <summary>
         /// Encodes the object and returns the result as a string using
         /// the default encoding from <c>Bencode.DefaultEncoding</c>.
         /// </summary>
@@ -52,7 +47,15 @@ namespace BencodeNET.Objects
         /// <returns>The supplied stream.</returns>
         public abstract TStream EncodeToStream<TStream>(TStream stream) where TStream : Stream;
 
-        public static bool operator ==(BObject<TY> first, BObject<TY> second)
+        public virtual void EncodeToFile(string path)
+        {
+            using (var stream = File.OpenWrite(path))
+            {
+                EncodeToStream(stream);
+            }
+        }
+
+        public static bool operator ==(BObject first, BObject second)
         {
             if (ReferenceEquals(first, null))
                 return ReferenceEquals(second, null);
@@ -60,14 +63,14 @@ namespace BencodeNET.Objects
             return first.Equals(second);
         }
 
-        public static bool operator !=(BObject<TY> first, BObject<TY> second)
+        public static bool operator !=(BObject first, BObject second)
         {
             return !(first == second);
         }
 
         public override bool Equals(object other)
         {
-            var obj = other as BObject<TY>;
+            var obj = other as BObject;
             if (obj == null)
                 return false;
 
@@ -85,5 +88,16 @@ namespace BencodeNET.Objects
         {
             throw new NotImplementedException();
         }
+    }
+
+    public abstract class BObject<TY> : BObject
+    {
+        internal BObject()
+        { }
+
+        /// <summary>
+        /// The underlying value of the BObject.
+        /// </summary>
+        public TY Value { get; protected set; }
     }
 }
