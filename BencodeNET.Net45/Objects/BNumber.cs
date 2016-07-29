@@ -5,7 +5,6 @@ namespace BencodeNET.Objects
 {
     public sealed class BNumber : BObject<long>, IComparable<BNumber>
     {
-        // TODO: Move to DateTimeUtil or something
         private static readonly DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         /// <summary>
