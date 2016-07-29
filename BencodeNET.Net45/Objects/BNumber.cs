@@ -5,6 +5,9 @@ namespace BencodeNET.Objects
 {
     public sealed class BNumber : BObject<long>, IComparable<BNumber>
     {
+        // TODO: Move to DateTimeUtil or something
+        private static readonly DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
         /// <summary>
         /// The string-length of long.MaxValue. Longer strings cannot be parsed.
         /// </summary>
@@ -13,6 +16,15 @@ namespace BencodeNET.Objects
         public BNumber(long value)
         {
             Value = value;
+        }
+
+        // TODO: Doc. about expecting a unix format
+        public BNumber(DateTime? datetime)
+        {
+            if (datetime == null)
+                Value = 0;
+
+            Value = datetime.Value.Subtract(Epoch).Ticks / TimeSpan.TicksPerSecond;
         }
 
         public static implicit operator int(BNumber bint)
@@ -25,6 +37,11 @@ namespace BencodeNET.Objects
             return bint.Value;
         }
 
+        public static implicit operator DateTime? (BNumber number)
+        {
+            return Epoch.AddSeconds(number);
+        }
+
         public static implicit operator BNumber(int value)
         {
             return new BNumber(value);
@@ -33,6 +50,11 @@ namespace BencodeNET.Objects
         public static implicit operator BNumber(long value)
         {
             return new BNumber(value);
+        }
+
+        public static implicit operator BNumber(DateTime? datetime)
+        {
+            return new BNumber(datetime);
         }
 
         public static bool operator ==(BNumber bnumber, BNumber other)
