@@ -53,6 +53,11 @@ namespace BencodeNET.Objects
             return this[key] as BDictionary;
         }
 
+        public T Get<T>(string key) where T : class, IBObject
+        {
+            return this[key] as T;
+        }
+
         #region IDictionary<BString, IBObject> Members
 
         public ICollection<BString> Keys => Value.Keys;

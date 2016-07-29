@@ -53,6 +53,7 @@
     <Compile Include="Torrents\TorrentMultiFileInfoList.cs" />
     <Compile Include="Torrents\TorrentFileMode.cs" />
     <Compile Include="Torrents\TorrentMultiFileInfo.cs" />
+    <Compile Include="Torrents\TorrentUtil.cs" />
     <Compile Include="UtilityExtensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

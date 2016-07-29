@@ -84,6 +84,9 @@
     <Compile Include="..\BencodeNET.Net45\Torrents\TorrentSingleFileInfo.cs">
       <Link>Torrents\TorrentSingleFileInfo.cs</Link>
     </Compile>
+    <Compile Include="..\BencodeNET.Net45\Torrents\TorrentUtil.cs">
+      <Link>Torrents\TorrentUtil.cs</Link>
+    </Compile>
     <Compile Include="..\BencodeNET.Net45\UtilityExtensions.cs">
       <Link>UtilityExtensions.cs</Link>
     </Compile>
