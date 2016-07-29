@@ -13,8 +13,6 @@ namespace BencodeNET.Torrents
     // TODO: Equals comparison
     public class Torrent : BObject
     {
-        private static readonly DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-
         // Announce + Announce-List
         // The announce list is actually a list of lists of trackers, but we don't support that for now.
         public IList<string> Trackers { get; set; } = new List<string>();
