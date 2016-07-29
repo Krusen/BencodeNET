@@ -6,7 +6,7 @@ using System.Text;
 
 namespace BencodeNET.Objects
 {
-    public sealed class BList : BObject<IList<IBObject>>, IList<IBObject>
+    public sealed class BList : BList<IBObject>
     {
         public BList()
         {
@@ -55,33 +55,7 @@ namespace BencodeNET.Objects
             return stream;
         }
 
-        public override int GetHashCode()
-        {
-            long hashValue = 269;
 
-            for (var i = 0; i < Value.Count; i++)
-            {
-                var bObject = Value[i];
-
-                var factor = 1;
-
-                if (bObject is BList)
-                    factor = 2;
-
-                if (bObject is BString)
-                    factor = 3;
-
-                if (bObject is BNumber)
-                    factor = 4;
-
-                if (bObject is BDictionary)
-                    factor = 5;
-
-                hashValue = (hashValue + 37*factor*(i + 2))%int.MaxValue;
-            }
-
-            return (int)hashValue;
-        }
 
         public IEnumerable<string> AsStrings()
         {
@@ -90,97 +64,13 @@ namespace BencodeNET.Objects
 
         public IEnumerable<string> AsStrings(Encoding encoding)
         {
-            return AsBStrings().Select(x => x.ToString(encoding));
+            return As<BString>().Select(x => x.ToString(encoding));
         }
 
-        public BList<BString> AsBStrings()
+        public BList<T> As<T>() where T : IBObject
         {
-            return new BList<BString>(this);
+            return new BList<T>(this);
         }
-
-        public BList<BNumber> AsBNumbers()
-        {
-            return new BList<BNumber>(this);
-        }
-
-        public BList<BList> AsBLists()
-        {
-            return new BList<BList>(this);
-        }
-
-        public BList<BDictionary> AsBDictionaries()
-        {
-            return new BList<BDictionary>(this);
-        }
-
-        #region IList<IBObject> Members
-
-        public int Count => Value.Count;
-
-        public bool IsReadOnly => Value.IsReadOnly;
-
-        public IBObject this[int index]
-        {
-            get { return Value[index]; }
-            set
-            {
-                if (value == null) throw new ArgumentNullException(nameof(value));
-                Value[index] = value;
-            }
-        }
-
-        public void Add(IBObject item)
-        {
-            if (item == null) throw new ArgumentNullException(nameof(item));
-            Value.Add(item);
-        }
-
-        public void Clear()
-        {
-            Value.Clear();
-        }
-
-        public bool Contains(IBObject item)
-        {
-            return Value.Contains(item);
-        }
-
-        public void CopyTo(IBObject[] array, int arrayIndex)
-        {
-            Value.CopyTo(array, arrayIndex);
-        }
-
-        public IEnumerator<IBObject> GetEnumerator()
-        {
-            return Value.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        public int IndexOf(IBObject item)
-        {
-            return Value.IndexOf(item);
-        }
-
-        public void Insert(int index, IBObject item)
-        {
-            Value.Insert(index, item);
-        }
-
-        public bool Remove(IBObject item)
-        {
-            return Value.Remove(item);
-        }
-
-        public void RemoveAt(int index)
-        {
-            Value.RemoveAt(index);
-        }
-
-        #endregion
     }
 
     public class BList<T> : BObject<IList<T>>, IList<T> where T : IBObject
