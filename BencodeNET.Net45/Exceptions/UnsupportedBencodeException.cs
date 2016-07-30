@@ -3,7 +3,9 @@ using System.Runtime.Serialization;
 
 namespace BencodeNET.Exceptions
 {
+#if !NETSTANDARD
     [Serializable]
+#endif
     public class UnsupportedBencodeException : Exception
     {
         public long StreamPosition { get; set; }
@@ -34,6 +36,7 @@ namespace BencodeNET.Exceptions
             return message;
         }
 
+#if !NETSTANDARD
         protected UnsupportedBencodeException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -49,5 +52,6 @@ namespace BencodeNET.Exceptions
 
             info.AddValue("StreamPosition", StreamPosition);
         }
+#endif
     }
 }

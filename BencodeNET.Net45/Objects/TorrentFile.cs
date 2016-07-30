@@ -119,7 +119,7 @@ namespace BencodeNET.Objects
 
         public static byte[] CalculateInfoHashBytes(BDictionary info)
         {
-            using (var sha1 = new SHA1Managed())
+            using (var sha1 = SHA1.Create())
             using (var ms = new MemoryStream())
             {
                 info.EncodeToStream(ms);
