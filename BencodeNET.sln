@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BencodeNET.Net45", "BencodeNET.Net45\BencodeNET.Net45.csproj", "{A267EADE-6093-41DF-AB20-53CB9661B47B}"
 EndProject
@@ -24,28 +24,44 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuGet", "NuGet", "{4EA69A14
 		Package\BencodeNET.nuspec = Package\BencodeNET.nuspec
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BencodeNET.Standard", "BencodeNET.Standard\BencodeNET.Standard.csproj", "{103D64D8-255A-40F4-8F86-DB62CF95CAB5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		MonoRelease|Any CPU = MonoRelease|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{A267EADE-6093-41DF-AB20-53CB9661B47B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A267EADE-6093-41DF-AB20-53CB9661B47B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A267EADE-6093-41DF-AB20-53CB9661B47B}.MonoRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{A267EADE-6093-41DF-AB20-53CB9661B47B}.MonoRelease|Any CPU.Build.0 = Release|Any CPU
 		{A267EADE-6093-41DF-AB20-53CB9661B47B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A267EADE-6093-41DF-AB20-53CB9661B47B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EEEE6947-258B-4E6E-AE99-F72B7A29D96F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EEEE6947-258B-4E6E-AE99-F72B7A29D96F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEEE6947-258B-4E6E-AE99-F72B7A29D96F}.MonoRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{EEEE6947-258B-4E6E-AE99-F72B7A29D96F}.MonoRelease|Any CPU.Build.0 = Release|Any CPU
 		{EEEE6947-258B-4E6E-AE99-F72B7A29D96F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EEEE6947-258B-4E6E-AE99-F72B7A29D96F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B72053C7-01F2-47EC-AAF3-8A4FC078AF1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B72053C7-01F2-47EC-AAF3-8A4FC078AF1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B72053C7-01F2-47EC-AAF3-8A4FC078AF1D}.MonoRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{B72053C7-01F2-47EC-AAF3-8A4FC078AF1D}.MonoRelease|Any CPU.Build.0 = Release|Any CPU
 		{B72053C7-01F2-47EC-AAF3-8A4FC078AF1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B72053C7-01F2-47EC-AAF3-8A4FC078AF1D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7BAC8D29-CAED-4940-BC0B-3E4F8EDB74F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7BAC8D29-CAED-4940-BC0B-3E4F8EDB74F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BAC8D29-CAED-4940-BC0B-3E4F8EDB74F1}.MonoRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{7BAC8D29-CAED-4940-BC0B-3E4F8EDB74F1}.MonoRelease|Any CPU.Build.0 = Release|Any CPU
 		{7BAC8D29-CAED-4940-BC0B-3E4F8EDB74F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7BAC8D29-CAED-4940-BC0B-3E4F8EDB74F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{103D64D8-255A-40F4-8F86-DB62CF95CAB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{103D64D8-255A-40F4-8F86-DB62CF95CAB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{103D64D8-255A-40F4-8F86-DB62CF95CAB5}.MonoRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{103D64D8-255A-40F4-8F86-DB62CF95CAB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{103D64D8-255A-40F4-8F86-DB62CF95CAB5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

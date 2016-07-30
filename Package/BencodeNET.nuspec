@@ -12,6 +12,13 @@
     <releaseNotes>Better handling of CreationDate in torrent files. Added some XML documentation.</releaseNotes>
     <copyright></copyright>
     <tags>bencode torrent torrents</tags>
+
+    <dependencies>
+      <group targetFramework="netstandard1.3">
+        <dependency id="System.Security.Cryptography.Algorithms" version="4.2.0" />
+      </group>
+    </dependencies>
+
   </metadata>
   <files>
     <file src="BencodeNET.Net35\bin\Release\BencodeNET.dll" target="lib\net35" />
@@ -25,5 +32,9 @@
     <file src="BencodeNET.Net45\bin\Release\BencodeNET.dll" target="lib\net45" />
     <file src="BencodeNET.Net45\bin\Release\BencodeNET.pdb" target="lib\net45" />
     <file src="BencodeNET.Net45\bin\Release\BencodeNET.xml" target="lib\net45" />
+
+    <file src="BencodeNET.Standard\bin\Release\BencodeNET.dll" target="lib\netstandard1.3" />
+    <file src="BencodeNET.Standard\bin\Release\BencodeNET.pdb" target="lib\netstandard1.3" />
+    <file src="BencodeNET.Standard\bin\Release\BencodeNET.xml" target="lib\netstandard1.3" />
   </files>
 </package>

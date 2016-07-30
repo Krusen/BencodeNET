@@ -218,7 +218,7 @@ namespace BencodeNET.IO
             if (disposing)
             {
                 if (_stream != null && !_leaveOpen)
-                    _stream.Close();
+                    _stream.Dispose();
                 _stream = null;
             }
         }

@@ -4,7 +4,9 @@ using BencodeNET.Objects;
 
 namespace BencodeNET.Exceptions
 {
+#if !NETSTANDARD
     [Serializable]
+#endif
     public class BencodeDecodingException<T> : Exception
     {
         public long StreamPosition { get; set; }
@@ -49,6 +51,7 @@ namespace BencodeNET.Exceptions
             return output;
         }
 
+#if !NETSTANDARD
         protected BencodeDecodingException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -64,5 +67,6 @@ namespace BencodeNET.Exceptions
 
             info.AddValue("StreamPosition", StreamPosition);
         }
+#endif
     }
 }
