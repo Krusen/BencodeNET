@@ -6,7 +6,7 @@ install:
   - nuget restore BencodeNET.sln
   - nuget install xunit.runner.console -Version 2.0.0 -OutputDirectory xunit
 script:
-  - xbuild /p:Configuration=Release BencodeNET.sln
+  - xbuild /p:Configuration=MonoRelease BencodeNET.sln
   - mono ./xunit/xunit.runner.console.2.0.0/tools/xunit.console.exe ./BencodeNET.Tests/bin/Release/BencodeNET.Tests.dll
   
   
