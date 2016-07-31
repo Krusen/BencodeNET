@@ -11,6 +11,8 @@ namespace BencodeNET.Objects
 {
     public sealed class BList : BList<IBObject>
     {
+        public override IList<IBObject> Value { get; }
+
         public BList()
         {
             Value = new List<IBObject>();
@@ -58,8 +60,6 @@ namespace BencodeNET.Objects
             return stream;
         }
 
-
-
         public IEnumerable<string> AsStrings()
         {
             return AsStrings(Bencode.DefaultEncoding);
@@ -78,6 +78,8 @@ namespace BencodeNET.Objects
 
     public class BList<T> : BObject<IList<T>>, IList<T> where T : IBObject
     {
+        public override IList<T> Value { get; }
+
         public BList()
         {
             Value = new List<T>();

@@ -16,6 +16,8 @@ namespace BencodeNET.Objects
         /// </summary>
         internal const int LengthMaxDigits = 10;
 
+        public override byte[] Value { get; }
+
         private Encoding _encoding;
         /// <summary>
         /// Gets or sets the encoding used as the default with <c>ToString()</c>.

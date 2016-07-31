@@ -111,6 +111,6 @@ namespace BencodeNET.Objects
         /// <summary>
         /// The underlying value of the BObject.
         /// </summary>
-        public TY Value { get; protected set; }
+        public abstract TY Value { get; }
     }
 }

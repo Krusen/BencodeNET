@@ -10,6 +10,8 @@ namespace BencodeNET.Objects
     {
         private readonly DateTime _epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
+        public override BDictionary Value { get; }
+
         /// <summary>
         /// The dictionary that describes the file(s) of the torrent
         /// </summary>

@@ -15,6 +15,8 @@ namespace BencodeNET.Objects
         /// </summary>
         internal const int MaxDigits = 19;
 
+        public override long Value { get; }
+
         public BNumber(long value)
         {
             Value = value;

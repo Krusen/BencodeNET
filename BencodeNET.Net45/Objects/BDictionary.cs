@@ -9,6 +9,8 @@ namespace BencodeNET.Objects
 {
     public sealed class BDictionary : BObject<IDictionary<BString, IBObject>>, IDictionary<BString, IBObject>
     {
+        public override IDictionary<BString, IBObject> Value { get; }
+
         public BDictionary()
         {
             Value = new SortedDictionary<BString, IBObject>();
