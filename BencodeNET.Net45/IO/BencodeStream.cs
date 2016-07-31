@@ -64,17 +64,13 @@ namespace BencodeNET.IO
 
         public int Read()
         {
-            if (_hasPeeked)
-            {
-                if (_peekedByte == -1)
-                    return _peekedByte;
-
-                _hasPeeked = false;
-                _stream.Seek(1, SeekOrigin.Current);
+            if (!_hasPeeked) return _stream.ReadByte();
+            if (_peekedByte == -1)
                 return _peekedByte;
-            }
 
-            return _stream.ReadByte();
+            _hasPeeked = false;
+            _stream.Seek(1, SeekOrigin.Current);
+            return _peekedByte;
         }
 
         public char ReadChar()
