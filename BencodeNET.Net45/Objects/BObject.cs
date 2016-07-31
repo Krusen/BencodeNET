@@ -2,6 +2,9 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+#if !NET35
+using System.Threading.Tasks;
+#endif
 
 namespace BencodeNET.Objects
 {
@@ -46,6 +49,16 @@ namespace BencodeNET.Objects
         /// <param name="stream">The stream to encode the object to.</param>
         /// <returns>The supplied stream.</returns>
         public abstract TStream EncodeToStream<TStream>(TStream stream) where TStream : Stream;
+
+#if !NET35
+        /// <summary>
+        /// Encodes the object to the specified stream and returns a reference to the stream.
+        /// </summary>
+        /// <typeparam name="TStream">The type of stream.</typeparam>
+        /// <param name="stream">The stream to encode the object to.</param>
+        /// <returns>The supplied stream.</returns>
+        public abstract Task<TStream> EncodeToStreamAsync<TStream>(TStream stream) where TStream : Stream;
+#endif
 
         public virtual void EncodeToFile(string path)
         {

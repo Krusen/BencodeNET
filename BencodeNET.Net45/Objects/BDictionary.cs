@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+#if !NET35
+using System.Threading.Tasks;
+#endif
 
 namespace BencodeNET.Objects
 {
@@ -21,6 +24,11 @@ namespace BencodeNET.Objects
             Add(new BString(key), new BNumber(value));
         }
 
+        public T Get<T>(string key) where T : class, IBObject
+        {
+            return this[key] as T;
+        }
+
         public override T EncodeToStream<T>(T stream)
         {
             stream.Write('d');
@@ -33,10 +41,19 @@ namespace BencodeNET.Objects
             return stream;
         }
 
-        public T Get<T>(string key) where T : class, IBObject
+#if !NET35
+        public override async Task<TStream> EncodeToStreamAsync<TStream>(TStream stream)
         {
-            return this[key] as T;
+            await stream.WriteAsync('d').ConfigureAwait(false);
+            foreach (var kvPair in this)
+            {
+                await kvPair.Key.EncodeToStreamAsync(stream).ConfigureAwait(false);
+                await kvPair.Value.EncodeToStreamAsync(stream).ConfigureAwait(false);
+            }
+            await stream.WriteAsync('e').ConfigureAwait(false);
+            return stream;
         }
+#endif
 
         #region IDictionary<BString, IBObject> Members
 

@@ -1,4 +1,7 @@
 ﻿using System;
+#if !NET35
+using System.Threading.Tasks;
+#endif
 using BencodeNET.IO;
 
 namespace BencodeNET.Objects
@@ -123,5 +126,18 @@ namespace BencodeNET.Objects
                 return stream;
             }
         }
+
+#if !NET35
+        public override async Task<TStream> EncodeToStreamAsync<TStream>(TStream stream)
+        {
+            using (var bstream = new BencodeStream(stream, leaveOpen: true))
+            {
+                await bstream.WriteAsync('i').ConfigureAwait(false);
+                await bstream.WriteAsync(Value).ConfigureAwait(false);
+                await bstream.WriteAsync('e').ConfigureAwait(false);
+                return stream;
+            }
+        }
+#endif
     }
 }

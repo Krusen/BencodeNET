@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+#if !NET35
+using System.Threading.Tasks;
+#endif
 
 namespace BencodeNET.Objects
 {
@@ -96,10 +99,25 @@ namespace BencodeNET.Objects
         {
             stream.Write('l');
             foreach (var item in this)
+            {
                 item.EncodeToStream(stream);
+            }
             stream.Write('e');
             return stream;
         }
+
+#if !NET35
+        public override async Task<TStream> EncodeToStreamAsync<TStream>(TStream stream)
+        {
+            await stream.WriteAsync('l').ConfigureAwait(false);
+            foreach (var item in this)
+            {
+                await item.EncodeToStreamAsync(stream).ConfigureAwait(false);
+            }
+            await stream.WriteAsync('e').ConfigureAwait(false);
+            return stream;
+        }
+#endif
 
         public override int GetHashCode()
         {

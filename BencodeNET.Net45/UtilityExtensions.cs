@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Text;
+#if !NET35
+using System.Threading.Tasks;
+#endif
 
 namespace BencodeNET
 {
@@ -15,5 +18,12 @@ namespace BencodeNET
         {
             stream.WriteByte((byte)c);
         }
+
+#if !NET35
+        public static Task WriteAsync(this Stream stream, char c)
+        {
+            return stream.WriteAsync(new [] {(byte) c}, 0, 1);
+        }
+#endif
     }
 }

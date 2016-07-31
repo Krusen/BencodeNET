@@ -1,6 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+#if !NET35
+using System.Threading.Tasks;
+#endif
 
 namespace BencodeNET.IO
 {
@@ -154,13 +157,37 @@ namespace BencodeNET.IO
 
         public void Write(char c)
         {
-            _stream.WriteByte((byte)c);
+            _stream.Write(c);
         }
 
         public void Write(byte[] bytes)
         {
             _stream.Write(bytes, 0, bytes.Length);
         }
+
+#if !NET35
+        public Task WriteAsync(int number)
+        {
+            var bytes = Encoding.ASCII.GetBytes(number.ToString());
+            return WriteAsync(bytes);
+        }
+
+        public Task WriteAsync(long number)
+        {
+            var bytes = Encoding.ASCII.GetBytes(number.ToString());
+            return WriteAsync(bytes);
+        }
+
+        public Task WriteAsync(char c)
+        {
+            return _stream.WriteAsync(c);
+        }
+
+        public Task WriteAsync(byte[] bytes)
+        {
+            return _stream.WriteAsync(bytes, 0, bytes.Length);
+        }
+#endif
 
         public void Flush()
         {
