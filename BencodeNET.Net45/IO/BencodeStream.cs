@@ -74,8 +74,6 @@ namespace BencodeNET.IO
                 return _peekedByte;
             }
 
-            _hasPeeked = false;
-
             return _stream.ReadByte();
         }
 
