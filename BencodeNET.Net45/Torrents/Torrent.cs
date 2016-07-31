@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace BencodeNET.Torrents
 {
@@ -158,14 +159,12 @@ namespace BencodeNET.Torrents
             return trackers;
         }
 
-        public override T EncodeToStream<T>(T stream)
+        protected BDictionary ToBDictionary()
         {
-            return EncodeToStream(stream, Bencode.DefaultEncoding);
+            return ToBDictionary(Bencode.DefaultEncoding);
         }
 
-        // TODO: Split into smaller parts - maybe a TorrentFactory
-        // TODO: Some sort of error handling?
-        public virtual T EncodeToStream<T>(T stream, Encoding encoding) where T : Stream
+        protected BDictionary ToBDictionary(Encoding encoding)
         {
             var torrent = new BDictionary();
 
@@ -198,7 +197,31 @@ namespace BencodeNET.Torrents
 
             torrent[Fields.Info] = CreateInfo(encoding);
 
+            return torrent;
+        }
+
+        public override T EncodeToStream<T>(T stream)
+        {
+            return EncodeToStream(stream, Bencode.DefaultEncoding);
+        }
+
+        // TODO: Split into smaller parts - maybe a TorrentFactory
+        // TODO: Some sort of error handling?
+        public virtual T EncodeToStream<T>(T stream, Encoding encoding) where T : Stream
+        {
+            var torrent = ToBDictionary(encoding);
             return torrent.EncodeToStream(stream);
+        }
+
+        public override Task<T> EncodeToStreamAsync<T>(T stream)
+        {
+            return EncodeToStreamAsync(stream, Bencode.DefaultEncoding);
+        }
+
+        public virtual Task<T> EncodeToStreamAsync<T>(T stream, Encoding encoding) where T : Stream
+        {
+            var torrent = ToBDictionary(encoding);
+            return torrent.EncodeToStreamAsync(stream);
         }
 
         public virtual void EncodeToFile(string path, Encoding encoding)
