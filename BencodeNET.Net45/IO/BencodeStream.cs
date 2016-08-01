@@ -44,6 +44,7 @@ namespace BencodeNET.IO
             Seek(offset, SeekOrigin.Current);
         }
 
+        // TODO: Documentation - this is cheap to call several times, only reads the first time until next Read()
         public int Peek()
         {
             if (_hasPeeked)
@@ -64,7 +65,9 @@ namespace BencodeNET.IO
 
         public int Read()
         {
-            if (!_hasPeeked) return _stream.ReadByte();
+            if (!_hasPeeked)
+                return _stream.ReadByte();
+
             if (_peekedByte == -1)
                 return _peekedByte;
 
@@ -136,6 +139,111 @@ namespace BencodeNET.IO
                 return default(char);
             return (char)value;
         }
+
+#if !NET35
+        public async Task<int> PeekAsync()
+        {
+            if (_hasPeeked)
+                return _peekedByte;
+
+            _peekedByte = await _stream.ReadByteAsync().ConfigureAwait(false);
+            _stream.Seek(-1, SeekOrigin.Current);
+            _hasPeeked = true;
+            return _peekedByte;
+        }
+
+        public async Task<char> PeekCharAsync()
+        {
+            return (char)await PeekAsync().ConfigureAwait(false);
+        }
+
+        public Task<int> ReadAsync()
+        {
+            if (!_hasPeeked)
+                return _stream.ReadByteAsync();
+
+            if (_peekedByte == -1)
+            {
+#if NET40
+                return TaskEx.FromResult(_peekedByte);
+#else
+                return Task.FromResult(_peekedByte);
+#endif
+            }
+
+            _hasPeeked = false;
+            _stream.Seek(1, SeekOrigin.Current);
+#if NET40
+            return TaskEx.FromResult(_peekedByte);
+#else
+            return Task.FromResult(_peekedByte);
+#endif
+        }
+
+        public async Task<char> ReadCharAsync()
+        {
+            var value = await ReadAsync().ConfigureAwait(false);
+            if (value == -1)
+                return default(char);
+            return (char)value;
+        }
+
+        public async Task<byte[]> ReadAsync(int bytesToRead)
+        {
+            if (bytesToRead < 0) throw new ArgumentOutOfRangeException(nameof(bytesToRead));
+            if (bytesToRead == 0) return _emptyByteArray;
+
+            var bytes = new byte[bytesToRead];
+
+            var offset = 0;
+
+            if (_hasPeeked)
+            {
+                if (_peekedByte == -1)
+                    return _emptyByteArray;
+
+                bytes[0] = (byte)_peekedByte;
+                offset = 1;
+            }
+
+            _hasPeeked = false;
+
+            if (offset > 0)
+                _stream.Seek(offset, SeekOrigin.Current);
+
+            var readBytes = offset + await _stream.ReadAsync(bytes, offset, bytesToRead - offset).ConfigureAwait(false);
+            if (readBytes != bytesToRead)
+                Array.Resize(ref bytes, readBytes);
+
+            return bytes;
+        }
+
+        public async Task<int> ReadPreviousAsync()
+        {
+            if (_stream.Position == 0)
+                return -1;
+
+            _hasPeeked = false;
+
+            _stream.Position -= 1;
+
+            var bytes = new byte[1];
+
+            var readBytes = await _stream.ReadAsync(bytes, 0, 1).ConfigureAwait(false);
+            if (readBytes == 0)
+                return -1;
+
+            return bytes[0];
+        }
+
+        public async Task<char> ReadPreviousCharAsync()
+        {
+            var value = await ReadPreviousAsync().ConfigureAwait(false);
+            if (value == -1)
+                return default(char);
+            return (char)value;
+        }
+#endif
 
         public void Write(int number)
         {
