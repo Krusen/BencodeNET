@@ -11,9 +11,10 @@ namespace BencodeNET.Objects
         string Encode();
         string Encode(Encoding encoding);
         T EncodeToStream<T>(T stream) where T : Stream;
+        void EncodeToFile(string path);
 #if !NET35
         Task<T> EncodeToStreamAsync<T>(T stream) where T : Stream;
+        Task EncodeToFileAsync(string path);
 #endif
-        void EncodeToFile(string path);
     }
 }

@@ -50,6 +50,14 @@ namespace BencodeNET.Objects
         /// <returns>The supplied stream.</returns>
         public abstract TStream EncodeToStream<TStream>(TStream stream) where TStream : Stream;
 
+        public virtual void EncodeToFile(string path)
+        {
+            using (var stream = File.OpenWrite(path))
+            {
+                EncodeToStream(stream);
+            }
+        }
+
 #if !NET35
         /// <summary>
         /// Encodes the object to the specified stream and returns a reference to the stream.
@@ -58,15 +66,15 @@ namespace BencodeNET.Objects
         /// <param name="stream">The stream to encode the object to.</param>
         /// <returns>The supplied stream.</returns>
         public abstract Task<TStream> EncodeToStreamAsync<TStream>(TStream stream) where TStream : Stream;
-#endif
 
-        public virtual void EncodeToFile(string path)
+        public virtual Task EncodeToFileAsync(string path)
         {
             using (var stream = File.OpenWrite(path))
             {
-                EncodeToStream(stream);
+                return EncodeToStreamAsync(stream);
             }
         }
+#endif
 
         public static bool operator ==(BObject first, BObject second)
         {

@@ -5,7 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+#if !NET35
 using System.Threading.Tasks;
+#endif
 
 namespace BencodeNET.Torrents
 {
@@ -75,7 +77,7 @@ namespace BencodeNET.Torrents
 
         public static Torrent FromFile(string path, Encoding encoding)
         {
-            var data = Bencode.DecodeDictionaryFromFile(path, encoding);
+            var data = (BDictionary)Bencode.DecodeFromFile(path, encoding);
             return FromBDictionary(data);
         }
 
@@ -213,6 +215,7 @@ namespace BencodeNET.Torrents
             return torrent.EncodeToStream(stream);
         }
 
+#if !NET35
         public override Task<T> EncodeToStreamAsync<T>(T stream)
         {
             return EncodeToStreamAsync(stream, Bencode.DefaultEncoding);
@@ -223,6 +226,7 @@ namespace BencodeNET.Torrents
             var torrent = ToBDictionary(encoding);
             return torrent.EncodeToStreamAsync(stream);
         }
+#endif
 
         public virtual void EncodeToFile(string path, Encoding encoding)
         {
