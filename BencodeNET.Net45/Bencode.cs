@@ -36,30 +36,12 @@ namespace BencodeNET
             }
         }
 
-        public static IBObject DecodeFromFile(string path)
-        {
-            return DecodeFromFile(path, DefaultEncoding);
-        }
-
-        public static IBObject DecodeFromFile(string path, Encoding encoding)
+        public static IBObject DecodeFromFile(string path, Encoding encoding = null)
         {
             using (var stream = File.OpenRead(path))
             {
                 return Decode(stream, encoding);
             }
-        }
-
-        /// <summary>
-        /// Decodes the specified bencoded string using the default encoding.
-        /// </summary>
-        /// <param name="bencodedString">The bencoded string.</param>
-        /// <returns>An <see cref="IBObject"/> representing the bencoded string.</returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        public static IBObject Decode(string bencodedString)
-        {
-            if (bencodedString == null) throw new ArgumentNullException(nameof(bencodedString));
-
-            return Decode(bencodedString, DefaultEncoding);
         }
 
         /// <summary>
@@ -69,28 +51,16 @@ namespace BencodeNET
         /// <param name="encoding">The encoding used to convert the string to bytes.</param>
         /// <returns>An <see cref="IBObject"/> representing the bencoded string.</returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public static IBObject Decode(string bencodedString, Encoding encoding)
+        public static IBObject Decode(string bencodedString, Encoding encoding = null)
         {
             if (bencodedString == null) throw new ArgumentNullException(nameof(bencodedString));
-            if (encoding == null) throw new ArgumentNullException(nameof(encoding));
+
+            encoding = encoding ?? DefaultEncoding;
 
             using (var ms = new MemoryStream(encoding.GetBytes(bencodedString)))
             {
                 return Decode(ms, encoding);
             }
-        }
-
-        /// <summary>
-        /// Decodes the specified stream using the default encoding.
-        /// </summary>
-        /// <param name="stream">The stream to decode.</param>
-        /// <returns>An <see cref="IBObject"/> representing the bencoded stream.</returns>
-        /// <exception cref="ArgumentNullException">stream</exception>
-        public static IBObject Decode(Stream stream)
-        {
-            if (stream == null) throw new ArgumentNullException(nameof(stream));
-
-            return Decode(stream, DefaultEncoding);
         }
 
         /// <summary>
@@ -100,10 +70,9 @@ namespace BencodeNET
         /// <param name="encoding">The encoding used by <see cref="BString"/> when calling <c>ToString()</c> with no arguments.</param>
         /// <returns>An <see cref="IBObject"/> representing the bencoded stream.</returns>
         /// <exception cref="ArgumentNullException">stream</exception>
-        public static IBObject Decode(Stream stream, Encoding encoding)
+        public static IBObject Decode(Stream stream, Encoding encoding = null)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
-            if (encoding == null) throw new ArgumentNullException(nameof(encoding));
 
             return Decode(new BencodeStream(stream, leaveOpen: true), encoding);
         }
@@ -115,10 +84,9 @@ namespace BencodeNET
         /// <param name="encoding">The encoding used by <see cref="BString"/> when calling <c>ToString()</c> with no arguments.</param>
         /// <returns>An <see cref="IBObject"/> representing the bencoded stream.</returns>
         /// <exception cref="ArgumentNullException">stream</exception>
-        public static IBObject Decode(BencodeStream stream, Encoding encoding)
+        public static IBObject Decode(BencodeStream stream, Encoding encoding = null)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
-            if (encoding == null) throw new ArgumentNullException(nameof(encoding));
 
             switch (stream.PeekChar())
             {
@@ -141,12 +109,7 @@ namespace BencodeNET
             return null;
         }
 
-        public static Task<IBObject> DecodeFromFileAsync(string path)
-        {
-            return DecodeFromFileAsync(path, DefaultEncoding);
-        }
-
-        public static Task<IBObject> DecodeFromFileAsync(string path, Encoding encoding)
+        public static Task<IBObject> DecodeFromFileAsync(string path, Encoding encoding = null)
         {
             using (var stream = File.OpenRead(path))
             {
@@ -154,15 +117,11 @@ namespace BencodeNET
             }
         }
 
-        public static Task<IBObject> DecodeAsync(string bencodedString)
-        {
-            return DecodeAsync(bencodedString, DefaultEncoding);
-        }
-
-        public static Task<IBObject> DecodeAsync(string bencodedString, Encoding encoding)
+        public static Task<IBObject> DecodeAsync(string bencodedString, Encoding encoding = null)
         {
             if (bencodedString == null) throw new ArgumentNullException(nameof(bencodedString));
-            if (encoding == null) throw new ArgumentNullException(nameof(encoding));
+
+            encoding = encoding ?? DefaultEncoding;
 
             using (var ms = new MemoryStream(encoding.GetBytes(bencodedString)))
             {
@@ -170,20 +129,14 @@ namespace BencodeNET
             }
         }
 
-        public static Task<IBObject> DecodeAsync(Stream stream)
-        {
-            return DecodeAsync(stream, DefaultEncoding);
-        }
-
-        public static Task<IBObject> DecodeAsync(Stream stream, Encoding encoding)
+        public static Task<IBObject> DecodeAsync(Stream stream, Encoding encoding = null)
         {
             return DecodeAsync(new BencodeStream(stream, leaveOpen: true), encoding);
         }
 
-        public static async Task<IBObject> DecodeAsync(BencodeStream stream, Encoding encoding)
+        public static async Task<IBObject> DecodeAsync(BencodeStream stream, Encoding encoding = null)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
-            if (encoding == null) throw new ArgumentNullException(nameof(encoding));
 
             switch (await stream.PeekCharAsync().ConfigureAwait(false))
             {
@@ -206,17 +159,11 @@ namespace BencodeNET
             return null;
         }
 
-        public static BString DecodeString(string bencodedString)
+        public static BString DecodeString(string bencodedString, Encoding encoding = null)
         {
             if (bencodedString == null) throw new ArgumentNullException(nameof(bencodedString));
 
-            return DecodeString(bencodedString, DefaultEncoding);
-        }
-
-        public static BString DecodeString(string bencodedString, Encoding encoding)
-        {
-            if (bencodedString == null) throw new ArgumentNullException(nameof(bencodedString));
-            if (encoding == null) throw new ArgumentNullException(nameof(encoding));
+            encoding = encoding ?? DefaultEncoding;
 
             using (var ms = new MemoryStream(encoding.GetBytes(bencodedString)))
             {
@@ -224,25 +171,18 @@ namespace BencodeNET
             }
         }
 
-        public static BString DecodeString(Stream stream)
+        public static BString DecodeString(Stream stream, Encoding encoding = null)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
-
-            return DecodeString(stream, DefaultEncoding);
-        }
-
-        public static BString DecodeString(Stream stream, Encoding encoding)
-        {
-            if (stream == null) throw new ArgumentNullException(nameof(stream));
-            if (encoding == null) throw new ArgumentNullException(nameof(encoding));
 
             return DecodeString(new BencodeStream(stream, leaveOpen: true), encoding);
         }
 
-        public static BString DecodeString(BencodeStream stream, Encoding encoding)
+        public static BString DecodeString(BencodeStream stream, Encoding encoding = null)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
-            if (encoding == null) throw new ArgumentNullException(nameof(encoding));
+
+            encoding = encoding ?? DefaultEncoding;
 
             // Minimum valid bencode string is '0:' meaning an empty string
             if (stream.Length < BStringMinLength)
@@ -291,20 +231,16 @@ namespace BencodeNET
             return new BString(bytes, encoding);
         }
 
-        public static Task<BString> DecodeStringAsync(Stream stream)
-        {
-            return DecodeStringAsync(stream, DefaultEncoding);
-        }
-
-        public static Task<BString> DecodeStringAsync(Stream stream, Encoding encoding)
+        public static Task<BString> DecodeStringAsync(Stream stream, Encoding encoding = null)
         {
             return DecodeStringAsync(new BencodeStream(stream, leaveOpen:true), encoding);
         }
 
-        public static async Task<BString> DecodeStringAsync(BencodeStream stream, Encoding encoding)
+        public static async Task<BString> DecodeStringAsync(BencodeStream stream, Encoding encoding = null)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
-            if (encoding == null) throw new ArgumentNullException(nameof(encoding));
+
+            encoding = encoding ?? DefaultEncoding;
 
             // Minimum valid bencode string is '0:' meaning an empty string
             if (stream.Length < BStringMinLength)
@@ -359,7 +295,7 @@ namespace BencodeNET
         {
             if (bencodedString == null) throw new ArgumentNullException(nameof(bencodedString));
 
-            using (var ms = new MemoryStream(DefaultEncoding.GetBytes(bencodedString)))
+            using (var ms = new MemoryStream(Encoding.ASCII.GetBytes(bencodedString)))
             {
                 return DecodeNumber(ms);
             }
@@ -501,15 +437,11 @@ namespace BencodeNET
             return new BNumber(number);
         }
 
-        public static BList DecodeList(string bencodedString)
-        {
-            return DecodeList(bencodedString, DefaultEncoding);
-        }
-
-        public static BList DecodeList(string bencodedString, Encoding encoding)
+        public static BList DecodeList(string bencodedString, Encoding encoding = null)
         {
             if (bencodedString == null) throw new ArgumentNullException(nameof(bencodedString));
-            if (encoding == null) throw new ArgumentNullException(nameof(encoding));
+
+            encoding = encoding ?? DefaultEncoding;
 
             using (var ms = new MemoryStream(encoding.GetBytes(bencodedString)))
             {
@@ -517,20 +449,16 @@ namespace BencodeNET
             }
         }
 
-        public static BList DecodeList(Stream stream)
-        {
-            return DecodeList(stream, DefaultEncoding);
-        }
-
-        public static BList DecodeList(Stream stream, Encoding encoding)
+        public static BList DecodeList(Stream stream, Encoding encoding = null)
         {
             return DecodeList(new BencodeStream(stream, leaveOpen: true), encoding);
         }
 
-        public static BList DecodeList(BencodeStream stream, Encoding encoding)
+        public static BList DecodeList(BencodeStream stream, Encoding encoding = null)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
-            if (encoding == null) throw new ArgumentNullException(nameof(encoding));
+
+            encoding = encoding ?? DefaultEncoding;
 
             if (stream.Length < BListMinLength)
                 throw new BencodeDecodingException<BList>("Minimum valid length is 2 (an empty list: 'le')", stream.Position);
@@ -558,12 +486,7 @@ namespace BencodeNET
             return list;
         }
 
-        public static Task<BList> DecodeListAsync(Stream stream)
-        {
-            return DecodeListAsync(stream, DefaultEncoding);
-        }
-
-        public static Task<BList> DecodeListAsync(Stream stream, Encoding encoding)
+        public static Task<BList> DecodeListAsync(Stream stream, Encoding encoding = null)
         {
             return DecodeListAsync(new BencodeStream(stream, leaveOpen: true), encoding);
         }
@@ -571,7 +494,8 @@ namespace BencodeNET
         public static async Task<BList> DecodeListAsync(BencodeStream stream, Encoding encoding)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
-            if (encoding == null) throw new ArgumentNullException(nameof(encoding));
+
+            encoding = encoding ?? DefaultEncoding;
 
             if (stream.Length < BListMinLength)
                 throw new BencodeDecodingException<BList>("Minimum valid length is 2 (an empty list: 'le')", stream.Position);
@@ -599,15 +523,11 @@ namespace BencodeNET
             return list;
         }
 
-        public static BDictionary DecodeDictionary(string bencodedString)
-        {
-            return DecodeDictionary(bencodedString, DefaultEncoding);
-        }
-
-        public static BDictionary DecodeDictionary(string bencodedString, Encoding encoding)
+        public static BDictionary DecodeDictionary(string bencodedString, Encoding encoding = null)
         {
             if (bencodedString == null) throw new ArgumentNullException(nameof(bencodedString));
-            if (encoding == null) throw new ArgumentNullException(nameof(encoding));
+
+            encoding = encoding ?? DefaultEncoding;
 
             using (var ms = new MemoryStream(encoding.GetBytes(bencodedString)))
             {
@@ -615,20 +535,16 @@ namespace BencodeNET
             }
         }
 
-        public static BDictionary DecodeDictionary(Stream stream)
-        {
-            return DecodeDictionary(stream, DefaultEncoding);
-        }
-
-        public static BDictionary DecodeDictionary(Stream stream, Encoding encoding)
+        public static BDictionary DecodeDictionary(Stream stream, Encoding encoding = null)
         {
             return DecodeDictionary(new BencodeStream(stream, leaveOpen: true), encoding);
         }
 
-        public static BDictionary DecodeDictionary(BencodeStream stream, Encoding encoding)
+        public static BDictionary DecodeDictionary(BencodeStream stream, Encoding encoding = null)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
-            if (encoding == null) throw new ArgumentNullException(nameof(encoding));
+
+            encoding = encoding ?? DefaultEncoding;
 
             var startPosition = stream.Position;
 
@@ -668,12 +584,7 @@ namespace BencodeNET
             return dictionary;
         }
 
-        public static Task<BDictionary> DecodeDictionaryAsync(Stream stream)
-        {
-            return DecodeDictionaryAsync(stream, DefaultEncoding);
-        }
-
-        public static Task<BDictionary> DecodeDictionaryAsync(Stream stream, Encoding encoding)
+        public static Task<BDictionary> DecodeDictionaryAsync(Stream stream, Encoding encoding = null)
         {
             return DecodeDictionaryAsync(new BencodeStream(stream, leaveOpen: true), encoding);
         }
@@ -681,7 +592,8 @@ namespace BencodeNET
         public static async Task<BDictionary> DecodeDictionaryAsync(BencodeStream stream, Encoding encoding)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
-            if (encoding == null) throw new ArgumentNullException(nameof(encoding));
+
+            encoding = encoding ?? DefaultEncoding;
 
             var startPosition = stream.Position;
 
@@ -721,12 +633,7 @@ namespace BencodeNET
             return dictionary;
         }
 
-        public static Torrent DecodeTorrent(string path)
-        {
-            return DecodeTorrent(path, DefaultEncoding);
-        }
-
-        public static Torrent DecodeTorrent(string path, Encoding encoding)
+        public static Torrent DecodeTorrent(string path, Encoding encoding = null)
         {
             using (var stream = File.OpenRead(path))
             {
@@ -734,12 +641,7 @@ namespace BencodeNET
             }
         }
 
-        public static Torrent DecodeTorrent(Stream stream)
-        {
-            return DecodeTorrent(stream, DefaultEncoding);
-        }
-
-        public static Torrent DecodeTorrent(Stream stream, Encoding encoding)
+        public static Torrent DecodeTorrent(Stream stream, Encoding encoding = null)
         {
             return DecodeTorrent(new BencodeStream(stream, leaveOpen: true), encoding);
         }
@@ -750,12 +652,7 @@ namespace BencodeNET
             return Torrent.FromBDictionary(bdictionary);
         }
 
-        public static Task<Torrent> DecodeTorrentAsync(Stream stream)
-        {
-            return DecodeTorrentAsync(stream, DefaultEncoding);
-        }
-
-        public static Task<Torrent> DecodeTorrentAsync(Stream stream, Encoding encoding)
+        public static Task<Torrent> DecodeTorrentAsync(Stream stream, Encoding encoding = null)
         {
             return DecodeTorrentAsync(new BencodeStream(stream, leaveOpen: true), encoding);
         }
