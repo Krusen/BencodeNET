@@ -1,9 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-#if !NET35
 using System.Threading.Tasks;
-#endif
 using BencodeNET.Exceptions;
 using BencodeNET.IO;
 using BencodeNET.Objects;
@@ -143,7 +141,6 @@ namespace BencodeNET
             return null;
         }
 
-#if !NET35
         public static Task<IBObject> DecodeFromFileAsync(string path)
         {
             return DecodeFromFileAsync(path, DefaultEncoding);
@@ -208,7 +205,6 @@ namespace BencodeNET
             // TODO: Throw BencodeDecodingException because next char was not a valid start of a BObject?
             return null;
         }
-#endif
 
         public static BString DecodeString(string bencodedString)
         {
@@ -295,7 +291,6 @@ namespace BencodeNET
             return new BString(bytes, encoding);
         }
 
-#if !NET35
         public static Task<BString> DecodeStringAsync(Stream stream)
         {
             return DecodeStringAsync(stream, DefaultEncoding);
@@ -359,7 +354,6 @@ namespace BencodeNET
 
             return new BString(bytes, encoding);
         }
-#endif
 
         public static BNumber DecodeNumber(string bencodedString)
         {
@@ -439,7 +433,6 @@ namespace BencodeNET
             return new BNumber(number);
         }
 
-#if !NET35
         public static Task<BNumber> DecodeNumberAsync(Stream stream)
         {
             return DecodeNumberAsync(new BencodeStream(stream, leaveOpen: true));
@@ -507,7 +500,6 @@ namespace BencodeNET
 
             return new BNumber(number);
         }
-#endif
 
         public static BList DecodeList(string bencodedString)
         {
@@ -566,7 +558,6 @@ namespace BencodeNET
             return list;
         }
 
-#if !NET35
         public static Task<BList> DecodeListAsync(Stream stream)
         {
             return DecodeListAsync(stream, DefaultEncoding);
@@ -607,7 +598,6 @@ namespace BencodeNET
 
             return list;
         }
-#endif
 
         public static BDictionary DecodeDictionary(string bencodedString)
         {
@@ -678,7 +668,6 @@ namespace BencodeNET
             return dictionary;
         }
 
-#if !NET35
         public static Task<BDictionary> DecodeDictionaryAsync(Stream stream)
         {
             return DecodeDictionaryAsync(stream, DefaultEncoding);
@@ -731,7 +720,6 @@ namespace BencodeNET
 
             return dictionary;
         }
-#endif
 
         public static Torrent DecodeTorrent(string path)
         {
@@ -762,7 +750,6 @@ namespace BencodeNET
             return Torrent.FromBDictionary(bdictionary);
         }
 
-#if !NET35
         public static Task<Torrent> DecodeTorrentAsync(Stream stream)
         {
             return DecodeTorrentAsync(stream, DefaultEncoding);
@@ -778,7 +765,6 @@ namespace BencodeNET
             var bdictionary = await DecodeDictionaryAsync(stream, encoding);
             return Torrent.FromBDictionary(bdictionary);
         }
-#endif
 
         [Obsolete("Use DecodeTorrent(string) instead. Will be removed in a future version.")]
         public static TorrentFile DecodeTorrentFile(string path)

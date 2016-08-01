@@ -21,11 +21,7 @@ namespace BencodeNET.Torrents
         {
             get
             {
-#if NET35
-                return string.Join(System.IO.Path.DirectorySeparatorChar.ToString(), Path.ToArray());
-#else
                 return string.Join(System.IO.Path.DirectorySeparatorChar.ToString(), Path);
-#endif
             }
             set
             {

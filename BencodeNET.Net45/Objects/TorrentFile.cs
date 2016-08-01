@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
-#if !NET35
 using System.Threading.Tasks;
-#endif
 
 namespace BencodeNET.Objects
 {
@@ -159,12 +157,10 @@ namespace BencodeNET.Objects
             return Value.EncodeToStream(stream);
         }
 
-#if !NET35
         public override Task<TStream> EncodeToStreamAsync<TStream>(TStream stream)
         {
             return Value.EncodeToStreamAsync(stream);
         }
-#endif
 
         public override bool Equals(object other)
         {

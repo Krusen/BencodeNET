@@ -2,9 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Text;
-#if !NET35
 using System.Threading.Tasks;
-#endif
 
 namespace BencodeNET.Objects
 {
@@ -58,7 +56,6 @@ namespace BencodeNET.Objects
             }
         }
 
-#if !NET35
         /// <summary>
         /// Encodes the object to the specified stream and returns a reference to the stream.
         /// </summary>
@@ -74,7 +71,6 @@ namespace BencodeNET.Objects
                 return EncodeToStreamAsync(stream);
             }
         }
-#endif
 
         public static bool operator ==(BObject first, BObject second)
         {

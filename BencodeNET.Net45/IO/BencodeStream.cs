@@ -1,9 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-#if !NET35
 using System.Threading.Tasks;
-#endif
 
 namespace BencodeNET.IO
 {
@@ -140,7 +138,6 @@ namespace BencodeNET.IO
             return (char)value;
         }
 
-#if !NET35
         public async Task<int> PeekAsync()
         {
             if (_hasPeeked)
@@ -243,7 +240,6 @@ namespace BencodeNET.IO
                 return default(char);
             return (char)value;
         }
-#endif
 
         public void Write(int number)
         {
@@ -267,7 +263,6 @@ namespace BencodeNET.IO
             _stream.Write(bytes, 0, bytes.Length);
         }
 
-#if !NET35
         public Task WriteAsync(int number)
         {
             var bytes = Encoding.ASCII.GetBytes(number.ToString());
@@ -289,7 +284,6 @@ namespace BencodeNET.IO
         {
             return _stream.WriteAsync(bytes, 0, bytes.Length);
         }
-#endif
 
         public void Flush()
         {
