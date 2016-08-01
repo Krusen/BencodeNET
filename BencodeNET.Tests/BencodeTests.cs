@@ -30,41 +30,6 @@ namespace BencodeNET.Tests
         }
 
         [Fact]
-        public void Decode_TorrentFile_FromPath()
-        {
-            const string path = @"Files/ubuntu-14.10-desktop-amd64.iso.torrent";
-
-            TorrentFile actual;
-            TorrentFile expected;
-
-            using (var stream = File.OpenRead(path))
-            {
-                actual = Bencode.DecodeTorrentFile(path);
-                expected = new TorrentFile(Bencode.DecodeDictionary(stream));
-            }
-
-            Assert.Equal(actual, expected);
-        }
-
-        [Fact]
-        public void Decode_TorrentFile_FromStream()
-        {
-            const string path = @"Files/ubuntu-14.10-desktop-amd64.iso.torrent";
-
-            TorrentFile actual;
-            TorrentFile expected;
-
-            using (var stream = File.OpenRead(path))
-            {
-                actual = Bencode.DecodeTorrentFile(stream);
-                stream.Position = 0;
-                expected = new TorrentFile(Bencode.DecodeDictionary(stream));
-            }
-
-            Assert.Equal(actual, expected);
-        }
-
-        [Fact]
         public void DefaultEncodingCannotBeSetToNull()
         {
             Assert.Throws<ArgumentNullException>(() => Bencode.DefaultEncoding = null);
@@ -92,7 +57,7 @@ namespace BencodeNET.Tests
         {
             var obj = Bencode.Decode("l5:hello5:worldi123ee");
             Assert.IsType<BList>(obj);
-            
+
             var blist = obj as BList;
             Assert.NotNull(blist);
             Assert.Equal(3, blist.Count);
@@ -120,7 +85,7 @@ namespace BencodeNET.Tests
             Assert.True(bdict.ContainsKey("hello"));
             Assert.IsType<BString>(bdict["hello"]);
             Assert.Equal("world", bdict["hello"].ToString());
-            
+
             Assert.True(bdict.ContainsKey("foo"));
             Assert.IsType<BNumber>(bdict["foo"]);
             Assert.Equal("234", bdict["foo"].ToString());

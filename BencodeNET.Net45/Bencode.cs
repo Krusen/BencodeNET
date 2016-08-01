@@ -766,34 +766,6 @@ namespace BencodeNET
             return Torrent.FromBDictionary(bdictionary);
         }
 
-        [Obsolete("Use DecodeTorrent(string) instead. Will be removed in a future version.")]
-        public static TorrentFile DecodeTorrentFile(string path)
-        {
-            using (var stream = File.OpenRead(path))
-            {
-                return DecodeTorrentFile(stream);
-            }
-        }
-
-        [Obsolete("Use DecodeTorrent(Stream) instead. Will be removed in a future version.")]
-        public static TorrentFile DecodeTorrentFile(Stream stream)
-        {
-            return DecodeTorrentFile(stream, DefaultEncoding);
-        }
-
-        [Obsolete("Use DecodeTorrent(Stream, Encoding) instead. Will be removed in a future version.")]
-        public static TorrentFile DecodeTorrentFile(Stream stream, Encoding encoding)
-        {
-            return DecodeTorrentFile(new BencodeStream(stream, leaveOpen: true), encoding);
-        }
-
-        [Obsolete("Use DecodeTorrent(BencodeStream, Encoding) instead. Will be removed in a future version.")]
-        public static TorrentFile DecodeTorrentFile(BencodeStream stream, Encoding encoding)
-        {
-            var bdictionary = DecodeDictionary(stream, encoding);
-            return new TorrentFile(bdictionary);
-        }
-
         // TODO: Unit tests
         /// <summary>
         /// A faster implementation than <see cref="long.TryParse(string, out long)"/>
