@@ -41,7 +41,7 @@ namespace BencodeNET.Parsing
                 BString key;
                 try
                 {
-                    key = BencodeParser.ParseString(stream);
+                    key = BencodeParser.Parse<BString>(stream);
                 }
                 catch (BencodeParsingException<BString>)
                 {
@@ -83,7 +83,7 @@ namespace BencodeNET.Parsing
                 BString key;
                 try
                 {
-                    key = await BencodeParser.ParseStringAsync(stream).ConfigureAwait(false);
+                    key = await BencodeParser.ParseAsync<BString>(stream).ConfigureAwait(false);
                 }
                 catch (BencodeParsingException<BString>)
                 {

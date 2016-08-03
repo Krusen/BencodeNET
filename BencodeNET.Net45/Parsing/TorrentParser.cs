@@ -21,13 +21,13 @@ namespace BencodeNET.Parsing
 
         public override Torrent Parse(BencodeStream stream)
         {
-            var data = BencodeParser.ParseDictionary(stream);
+            var data = BencodeParser.Parse<BDictionary>(stream);
             return CreateTorrent(data);
         }
 
         public override async Task<Torrent> ParseAsync(BencodeStream stream)
         {
-            var data = await BencodeParser.ParseDictionaryAsync(stream);
+            var data = await BencodeParser.ParseAsync<BDictionary>(stream);
             return CreateTorrent(data);
         }
 
