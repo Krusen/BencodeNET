@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace BencodeNET
@@ -8,6 +9,11 @@ namespace BencodeNET
         public static bool IsDigit(this char c)
         {
             return (c >= '0' && c <= '9');
+        }
+
+        public static MemoryStream AsStream(this string str, Encoding encoding)
+        {
+            return new MemoryStream(encoding.GetBytes(str));
         }
 
         public static void Write(this Stream stream, char c)

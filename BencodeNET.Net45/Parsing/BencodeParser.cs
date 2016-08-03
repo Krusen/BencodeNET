@@ -51,9 +51,9 @@ namespace BencodeNET.Parsing
 
         public IBObject Parse(string bencodedString)
         {
-            using (var ms = new MemoryStream(Encoding.GetBytes(bencodedString)))
+            using (var stream = bencodedString.AsStream(Encoding))
             {
-                return Parse(ms);
+                return Parse(stream);
             }
         }
 
@@ -128,9 +128,9 @@ namespace BencodeNET.Parsing
 
         public Task<T> ParseAsync<T>(string bencodedString) where T : class, IBObject
         {
-            using (var ms = new MemoryStream(Encoding.GetBytes(bencodedString)))
+            using (var stream = bencodedString.AsStream(Encoding))
             {
-                return ParseAsync<T>(ms);
+                return ParseAsync<T>(stream);
             }
         }
 
@@ -221,9 +221,9 @@ namespace BencodeNET.Parsing
 
         public Task<IBObject> ParseAsync(string bencodedString)
         {
-            using (var ms = new MemoryStream(Encoding.GetBytes(bencodedString)))
+            using (var stream = bencodedString.AsStream(Encoding))
             {
-                return ParseAsync(ms);
+                return ParseAsync(stream);
             }
         }
 

@@ -17,12 +17,12 @@ namespace BencodeNET.Torrents
         public static byte[] CalculateInfoHashBytes(BDictionary info)
         {
             using (var sha1 = new SHA1Managed())
-            using (var ms = new MemoryStream())
+            using (var stream = new MemoryStream())
             {
-                info.EncodeToStream(ms);
-                ms.Position = 0;
+                info.EncodeToStream(stream);
+                stream.Position = 0;
 
-                return sha1.ComputeHash(ms);
+                return sha1.ComputeHash(stream);
             }
         }
     }

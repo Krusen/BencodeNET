@@ -12,17 +12,15 @@ namespace BencodeNET.Objects
         internal BObject()
         { }
 
-        // <summary>
-        /// Encodes the object and returns the result as a string using
-        /// the default encoding from <c>Bencode.DefaultEncoding</c>.
+        /// <summary>
+        /// Encodes the object and returns the result as a string using <c>Encoding.UTF8</c>.
         /// </summary>
         /// <returns>
-        /// The object bencoded and converted to a string using
-        /// the encoding of <c>Bencode.DefaultEncoding</c>.
+        /// The object bencoded and converted to a string using <c>Encoding.UTF8</c>.
         /// </returns>
         public virtual string Encode()
         {
-            return Encode(Bencode.DefaultEncoding);
+            return Encode(Encoding.UTF8);
         }
 
         /// <summary>
@@ -34,9 +32,9 @@ namespace BencodeNET.Objects
         /// </returns>
         public virtual string Encode(Encoding encoding)
         {
-            using (var ms = EncodeToStream(new MemoryStream()))
+            using (var stream = EncodeToStream(new MemoryStream()))
             {
-                return encoding.GetString(ms.ToArray());
+                return encoding.GetString(stream.ToArray());
             }
         }
 

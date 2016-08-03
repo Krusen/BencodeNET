@@ -9,9 +9,9 @@ namespace BencodeNET.Parsing
     {
         public T Parse(string bencodedString)
         {
-            using (var ms = new MemoryStream())
+            using (var stream = new MemoryStream())
             {
-                return Parse(ms);
+                return Parse(stream);
             }
         }
 
