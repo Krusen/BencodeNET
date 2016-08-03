@@ -51,25 +51,25 @@ namespace BencodeNET.Tests
         [Fact]
         public void DecodeList_Invalid_InputMinimumLength2()
         {
-            Assert.Throws<BencodeDecodingException<BList>>(() => Bencode.DecodeList("l"));
+            Assert.Throws<BencodeParsingException<BList>>(() => Bencode.DecodeList("l"));
         }
 
         [Fact]
         public void DecodeList_Invalid_WrongBeginChar()
         {
-            Assert.Throws<BencodeDecodingException<BList>>(() => Bencode.DecodeList("4:spam3:fooi42ee"));
+            Assert.Throws<BencodeParsingException<BList>>(() => Bencode.DecodeList("4:spam3:fooi42ee"));
         }
 
         [Fact]
         public void DecodeList_Invalid_MissingEndChar()
         {
-            Assert.Throws<BencodeDecodingException<BList>>(() => Bencode.DecodeList("l4:spam3:fooi42e"));
+            Assert.Throws<BencodeParsingException<BList>>(() => Bencode.DecodeList("l4:spam3:fooi42e"));
         }
 
         [Fact]
         public void DecodeList_Invalid_InvalidObjectInList()
         {
-            Assert.Throws<BencodeDecodingException<BList>>(() => Bencode.DecodeList("l4:spamse"));
+            Assert.Throws<BencodeParsingException<BList>>(() => Bencode.DecodeList("l4:spamse"));
         }
     }
 }

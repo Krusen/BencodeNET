@@ -30,5 +30,16 @@ namespace BencodeNET
         {
             return stream.WriteAsync(new [] {(byte) c}, 0, 1);
         }
+
+        public static Task<TBase> FromDerived<TBase, TDerived>(this Task<TDerived> task) where TDerived : TBase
+        {
+            var tcs = new TaskCompletionSource<TBase>();
+
+            task.ContinueWith(t => tcs.SetResult(t.Result), TaskContinuationOptions.OnlyOnRanToCompletion);
+            task.ContinueWith(t => tcs.SetException(t.Exception.InnerExceptions), TaskContinuationOptions.OnlyOnFaulted);
+            task.ContinueWith(t => tcs.SetCanceled(), TaskContinuationOptions.OnlyOnCanceled);
+
+            return tcs.Task;
+        }
     }
 }

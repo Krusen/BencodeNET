@@ -105,7 +105,7 @@ namespace BencodeNET
                 case 'd': return DecodeDictionary(stream, encoding);
             }
 
-            // TODO: Throw BencodeDecodingException because next char was not a valid start of a BObject?
+            // TODO: Throw BencodeParsingException because next char was not a valid start of a BObject?
             return null;
         }
 
@@ -155,7 +155,7 @@ namespace BencodeNET
                 case 'd': return await DecodeDictionaryAsync(stream, encoding).ConfigureAwait(false);
             }
 
-            // TODO: Throw BencodeDecodingException because next char was not a valid start of a BObject?
+            // TODO: Throw BencodeParsingException because next char was not a valid start of a BObject?
             return null;
         }
 
@@ -186,7 +186,7 @@ namespace BencodeNET
 
             // Minimum valid bencode string is '0:' meaning an empty string
             if (stream.Length < BStringMinLength)
-                throw new BencodeDecodingException<BString>("Minimum valid stream length is 2 (an empty string: '0:')", stream.Position);
+                throw new BencodeParsingException<BString>("Minimum valid stream length is 2 (an empty string: '0:')", stream.Position);
 
             var startPosition = stream.Position;
 
@@ -207,7 +207,7 @@ namespace BencodeNET
             long stringLength;
             if (!TryParseLongFast(lengthString.ToString(), out stringLength))
             {
-                throw new BencodeDecodingException<BString>($"Invalid length of string '{lengthString}'", startPosition);
+                throw new BencodeParsingException<BString>($"Invalid length of string '{lengthString}'", startPosition);
             }
 
             // Int32.MaxValue is ~2GB and is the absolute maximum that can be handled in memory
@@ -223,7 +223,7 @@ namespace BencodeNET
             // If the two don't match we've reached the end of the stream before reading the expected number of chars
             if (bytes.Length != stringLength)
             {
-                throw new BencodeDecodingException<BString>(
+                throw new BencodeParsingException<BString>(
                     $"Expected string to be {stringLength:N0} bytes long but could only read {bytes.Length:N0} bytes.",
                     stream.Position);
             }
@@ -244,7 +244,7 @@ namespace BencodeNET
 
             // Minimum valid bencode string is '0:' meaning an empty string
             if (stream.Length < BStringMinLength)
-                throw new BencodeDecodingException<BString>("Minimum valid stream length is 2 (an empty string: '0:')", stream.Position);
+                throw new BencodeParsingException<BString>("Minimum valid stream length is 2 (an empty string: '0:')", stream.Position);
 
             var startPosition = stream.Position;
 
@@ -267,7 +267,7 @@ namespace BencodeNET
             long stringLength;
             if (!TryParseLongFast(lengthString.ToString(), out stringLength))
             {
-                throw new BencodeDecodingException<BString>($"Invalid length of string '{lengthString}'", startPosition);
+                throw new BencodeParsingException<BString>($"Invalid length of string '{lengthString}'", startPosition);
             }
 
             // Int32.MaxValue is ~2GB and is the absolute maximum that can be handled in memory
@@ -283,7 +283,7 @@ namespace BencodeNET
             // If the two don't match we've reached the end of the stream before reading the expected number of chars
             if (bytes.Length != stringLength)
             {
-                throw new BencodeDecodingException<BString>(
+                throw new BencodeParsingException<BString>(
                     $"Expected string to be {stringLength:N0} bytes long but could only read {bytes.Length:N0} bytes.",
                     stream.Position);
             }
@@ -313,13 +313,13 @@ namespace BencodeNET
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
             if (stream.Length < BNumberMinLength)
-                throw new BencodeDecodingException<BNumber>("Minimum valid length of stream is 3 ('i0e').", stream.Position);
+                throw new BencodeParsingException<BNumber>("Minimum valid length of stream is 3 ('i0e').", stream.Position);
 
             var startPosition = stream.Position;
 
             // Numbers must start with 'i'
             if (stream.ReadChar() != 'i')
-                throw new BencodeDecodingException<BNumber>(
+                throw new BencodeParsingException<BNumber>(
                     $"Must begin with 'i' but began with '{stream.ReadPreviousChar()}'.", stream.Position);
 
             var digits = new StringBuilder();
@@ -331,7 +331,7 @@ namespace BencodeNET
 
             // Last read character should be 'e'
             if (c != 'e')
-                throw new BencodeDecodingException<BNumber>("Missing end character 'e'.", stream.Position);
+                throw new BencodeParsingException<BNumber>("Missing end character 'e'.", stream.Position);
 
             var isNegative = digits[0] == '-';
             var numberOfDigits = isNegative ? digits.Length - 1 : digits.Length;
@@ -346,22 +346,22 @@ namespace BencodeNET
 
             // We need at least one digit
             if (numberOfDigits < 1)
-                throw new BencodeDecodingException<BNumber>("It contains no digits.", startPosition);
+                throw new BencodeParsingException<BNumber>("It contains no digits.", startPosition);
 
             var firstDigit = isNegative ? digits[1] : digits[0];
 
             // Leading zeros are not valid
             if (firstDigit == '0' && numberOfDigits > 1)
-                throw new BencodeDecodingException<BNumber>("Leading '0's are not valid.", startPosition);
+                throw new BencodeParsingException<BNumber>("Leading '0's are not valid.", startPosition);
 
             // '-0' is not valid either
             if (firstDigit == '0' && numberOfDigits == 1 && isNegative)
-                throw new BencodeDecodingException<BNumber>("'-0' is not a valid number.", startPosition);
+                throw new BencodeParsingException<BNumber>("'-0' is not a valid number.", startPosition);
 
             long number;
             if (!TryParseLongFast(digits.ToString(), out number))
             {
-                throw new BencodeDecodingException<BNumber>(
+                throw new BencodeParsingException<BNumber>(
                     $"The value '{digits}' is not a valid long (Int64). Supported values range from '{long.MinValue:N0}' to '{long.MaxValue:N0}'.",
                     stream.Position);
             }
@@ -379,13 +379,13 @@ namespace BencodeNET
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
             if (stream.Length < BNumberMinLength)
-                throw new BencodeDecodingException<BNumber>("Minimum valid length of stream is 3 ('i0e').", stream.Position);
+                throw new BencodeParsingException<BNumber>("Minimum valid length of stream is 3 ('i0e').", stream.Position);
 
             var startPosition = stream.Position;
 
             // Numbers must start with 'i'
             if (await stream.ReadCharAsync().ConfigureAwait(false) != 'i')
-                throw new BencodeDecodingException<BNumber>(
+                throw new BencodeParsingException<BNumber>(
                     $"Must begin with 'i' but began with '{await stream.ReadPreviousCharAsync().ConfigureAwait(false)}'.", stream.Position);
 
             var digits = new StringBuilder();
@@ -399,7 +399,7 @@ namespace BencodeNET
 
             // Last read character should be 'e'
             if (c != 'e')
-                throw new BencodeDecodingException<BNumber>("Missing end character 'e'.", stream.Position);
+                throw new BencodeParsingException<BNumber>("Missing end character 'e'.", stream.Position);
 
             var isNegative = digits[0] == '-';
             var numberOfDigits = isNegative ? digits.Length - 1 : digits.Length;
@@ -414,22 +414,22 @@ namespace BencodeNET
 
             // We need at least one digit
             if (numberOfDigits < 1)
-                throw new BencodeDecodingException<BNumber>("It contains no digits.", startPosition);
+                throw new BencodeParsingException<BNumber>("It contains no digits.", startPosition);
 
             var firstDigit = isNegative ? digits[1] : digits[0];
 
             // Leading zeros are not valid
             if (firstDigit == '0' && numberOfDigits > 1)
-                throw new BencodeDecodingException<BNumber>("Leading '0's are not valid.", startPosition);
+                throw new BencodeParsingException<BNumber>("Leading '0's are not valid.", startPosition);
 
             // '-0' is not valid either
             if (firstDigit == '0' && numberOfDigits == 1 && isNegative)
-                throw new BencodeDecodingException<BNumber>("'-0' is not a valid number.", startPosition);
+                throw new BencodeParsingException<BNumber>("'-0' is not a valid number.", startPosition);
 
             long number;
             if (!TryParseLongFast(digits.ToString(), out number))
             {
-                throw new BencodeDecodingException<BNumber>(
+                throw new BencodeParsingException<BNumber>(
                     $"The value '{digits}' is not a valid long (Int64). Supported values range from '{long.MinValue:N0}' to '{long.MaxValue:N0}'.",
                     stream.Position);
             }
@@ -461,11 +461,11 @@ namespace BencodeNET
             encoding = encoding ?? DefaultEncoding;
 
             if (stream.Length < BListMinLength)
-                throw new BencodeDecodingException<BList>("Minimum valid length is 2 (an empty list: 'le')", stream.Position);
+                throw new BencodeParsingException<BList>("Minimum valid length is 2 (an empty list: 'le')", stream.Position);
 
             // Lists must start with 'l'
             if (stream.ReadChar() != 'l')
-                throw new BencodeDecodingException<BList>(
+                throw new BencodeParsingException<BList>(
                     $"Must begin with 'l' but began with '{stream.ReadPreviousChar()}'.", stream.Position);
 
             var list = new BList();
@@ -475,13 +475,13 @@ namespace BencodeNET
                 // Decode next object in stream
                 var bObject = Decode(stream, encoding);
                 if (bObject == null)
-                    throw new BencodeDecodingException<BList>($"Invalid object beginning with '{stream.PeekChar()}'", stream.Position);
+                    throw new BencodeParsingException<BList>($"Invalid object beginning with '{stream.PeekChar()}'", stream.Position);
 
                 list.Add(bObject);
             }
 
             if (stream.ReadChar() != 'e')
-                throw new BencodeDecodingException<BList>("Missing end character 'e'.", stream.Position);
+                throw new BencodeParsingException<BList>("Missing end character 'e'.", stream.Position);
 
             return list;
         }
@@ -498,11 +498,11 @@ namespace BencodeNET
             encoding = encoding ?? DefaultEncoding;
 
             if (stream.Length < BListMinLength)
-                throw new BencodeDecodingException<BList>("Minimum valid length is 2 (an empty list: 'le')", stream.Position);
+                throw new BencodeParsingException<BList>("Minimum valid length is 2 (an empty list: 'le')", stream.Position);
 
             // Lists must start with 'l'
             if (await stream.ReadCharAsync().ConfigureAwait(false) != 'l')
-                throw new BencodeDecodingException<BList>(
+                throw new BencodeParsingException<BList>(
                     $"Must begin with 'l' but began with '{await stream.ReadPreviousCharAsync().ConfigureAwait(false)}'.", stream.Position);
 
             var list = new BList();
@@ -512,13 +512,13 @@ namespace BencodeNET
                 // Decode next object in stream
                 var bObject = await DecodeAsync(stream, encoding).ConfigureAwait(false);
                 if (bObject == null)
-                    throw new BencodeDecodingException<BList>($"Invalid object beginning with '{await stream.PeekCharAsync().ConfigureAwait(false)}'", stream.Position);
+                    throw new BencodeParsingException<BList>($"Invalid object beginning with '{await stream.PeekCharAsync().ConfigureAwait(false)}'", stream.Position);
 
                 list.Add(bObject);
             }
 
             if (await stream.ReadCharAsync().ConfigureAwait(false) != 'e')
-                throw new BencodeDecodingException<BList>("Missing end character 'e'.", stream.Position);
+                throw new BencodeParsingException<BList>("Missing end character 'e'.", stream.Position);
 
             return list;
         }
@@ -549,11 +549,11 @@ namespace BencodeNET
             var startPosition = stream.Position;
 
             if (stream.Length < BDictionaryMinLength)
-                throw new BencodeDecodingException<BDictionary>("Minimum valid length is 2 (an empty dictionary: 'de')", startPosition);
+                throw new BencodeParsingException<BDictionary>("Minimum valid length is 2 (an empty dictionary: 'de')", startPosition);
 
             // Dictionaries must start with 'd'
             if (stream.ReadChar() != 'd')
-                throw new BencodeDecodingException<BDictionary>($"Must begin with 'd' but began with '{stream.ReadPreviousChar()}'", startPosition);
+                throw new BencodeParsingException<BDictionary>($"Must begin with 'd' but began with '{stream.ReadPreviousChar()}'", startPosition);
 
             var dictionary = new BDictionary();
             // Loop until next character is the end character 'e' or end of stream
@@ -565,21 +565,21 @@ namespace BencodeNET
                 {
                     key = DecodeString(stream, encoding);
                 }
-                catch (BencodeDecodingException<BString> ex)
+                catch (BencodeParsingException<BString> ex)
                 {
-                    throw new BencodeDecodingException<BDictionary>("Dictionary keys must be strings.", stream.Position);
+                    throw new BencodeParsingException<BDictionary>("Dictionary keys must be strings.", stream.Position);
                 }
 
                 // Decode next object in stream as the value
                 var value = Decode(stream, encoding);
                 if (value == null)
-                    throw new BencodeDecodingException<BDictionary>("All keys must have a corresponding value.", stream.Position);
+                    throw new BencodeParsingException<BDictionary>("All keys must have a corresponding value.", stream.Position);
 
                 dictionary.Add(key, value);
             }
 
             if (stream.ReadChar() != 'e')
-                throw new BencodeDecodingException<BDictionary>("Missing end character 'e'.", stream.Position);
+                throw new BencodeParsingException<BDictionary>("Missing end character 'e'.", stream.Position);
 
             return dictionary;
         }
@@ -598,11 +598,11 @@ namespace BencodeNET
             var startPosition = stream.Position;
 
             if (stream.Length < BDictionaryMinLength)
-                throw new BencodeDecodingException<BDictionary>("Minimum valid length is 2 (an empty dictionary: 'de')", startPosition);
+                throw new BencodeParsingException<BDictionary>("Minimum valid length is 2 (an empty dictionary: 'de')", startPosition);
 
             // Dictionaries must start with 'd'
             if (await stream.ReadCharAsync().ConfigureAwait(false) != 'd')
-                throw new BencodeDecodingException<BDictionary>($"Must begin with 'd' but began with '{await stream.ReadPreviousCharAsync().ConfigureAwait(false)}'", startPosition);
+                throw new BencodeParsingException<BDictionary>($"Must begin with 'd' but began with '{await stream.ReadPreviousCharAsync().ConfigureAwait(false)}'", startPosition);
 
             var dictionary = new BDictionary();
             // Loop until next character is the end character 'e' or end of stream
@@ -614,21 +614,21 @@ namespace BencodeNET
                 {
                     key = await DecodeStringAsync(stream, encoding).ConfigureAwait(false);
                 }
-                catch (BencodeDecodingException<BString> ex)
+                catch (BencodeParsingException<BString> ex)
                 {
-                    throw new BencodeDecodingException<BDictionary>("Dictionary keys must be strings.", stream.Position);
+                    throw new BencodeParsingException<BDictionary>("Dictionary keys must be strings.", stream.Position);
                 }
 
                 // Decode next object in stream as the value
                 var value = await DecodeAsync(stream, encoding).ConfigureAwait(false);
                 if (value == null)
-                    throw new BencodeDecodingException<BDictionary>("All keys must have a corresponding value.", stream.Position);
+                    throw new BencodeParsingException<BDictionary>("All keys must have a corresponding value.", stream.Position);
 
                 dictionary.Add(key, value);
             }
 
             if (await stream.ReadCharAsync().ConfigureAwait(false) != 'e')
-                throw new BencodeDecodingException<BDictionary>("Missing end character 'e'.", stream.Position);
+                throw new BencodeParsingException<BDictionary>("Missing end character 'e'.", stream.Position);
 
             return dictionary;
         }

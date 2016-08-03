@@ -44,67 +44,67 @@ namespace BencodeNET.Tests
         [Fact]
         public void DecodeNumber_Invalid_LeadingZeros()
         {
-            Assert.Throws<BencodeDecodingException<BNumber>>(() => Bencode.DecodeNumber("i012345e"));
+            Assert.Throws<BencodeParsingException<BNumber>>(() => Bencode.DecodeNumber("i012345e"));
         }
 
         [Fact]
         public void DecodeNumber_Invalid_MinusZero()
         {
-            Assert.Throws<BencodeDecodingException<BNumber>>(() => Bencode.DecodeNumber("i-0e"));
+            Assert.Throws<BencodeParsingException<BNumber>>(() => Bencode.DecodeNumber("i-0e"));
         }
 
         [Fact]
         public void DecodeNumber_Invalid_MissingEndChar()
         {
-            Assert.Throws<BencodeDecodingException<BNumber>>(() => Bencode.DecodeNumber("i42"));
+            Assert.Throws<BencodeParsingException<BNumber>>(() => Bencode.DecodeNumber("i42"));
         }
 
         [Fact]
         public void DecodeNumber_Invalid_WrongBeginChar()
         {
-            Assert.Throws<BencodeDecodingException<BNumber>>(() => Bencode.DecodeNumber("42e"));
+            Assert.Throws<BencodeParsingException<BNumber>>(() => Bencode.DecodeNumber("42e"));
         }
 
         [Fact]
         public void DecodeNumber_Invalid_NoDigits()
         {
-            Assert.Throws<BencodeDecodingException<BNumber>>(() => Bencode.DecodeNumber("i-e"));
+            Assert.Throws<BencodeParsingException<BNumber>>(() => Bencode.DecodeNumber("i-e"));
         }
 
         [Fact]
         public void DecodeNumber_Invalid_InputMinimumLength3()
         {
-            Assert.Throws<BencodeDecodingException<BNumber>>(() => Bencode.DecodeNumber("ie"));
+            Assert.Throws<BencodeParsingException<BNumber>>(() => Bencode.DecodeNumber("ie"));
         }
 
         [Fact]
         public void DecodeNumber_Invalid_InvalidChars()
         {
-            Assert.Throws<BencodeDecodingException<BNumber>>(() => Bencode.DecodeNumber("i12abe"));
+            Assert.Throws<BencodeParsingException<BNumber>>(() => Bencode.DecodeNumber("i12abe"));
         }
 
         [Fact]
         public void DecodeNumber_Invalid_DoubleNegativeSign()
         {
-            Assert.Throws<BencodeDecodingException<BNumber>>(() => Bencode.DecodeNumber("i--123e"));
+            Assert.Throws<BencodeParsingException<BNumber>>(() => Bencode.DecodeNumber("i--123e"));
         }
 
         [Fact]
         public void DecodeNumber_Invalid_NegativeSignInsideNumber()
         {
-            Assert.Throws<BencodeDecodingException<BNumber>>(() => Bencode.DecodeNumber("i12-3e"));
+            Assert.Throws<BencodeParsingException<BNumber>>(() => Bencode.DecodeNumber("i12-3e"));
         }
 
         [Fact]
         public void DecodeNumber_Invalid_BiggerThanInt64MaxValue()
         {
-            Assert.Throws<BencodeDecodingException<BNumber>>(() => Bencode.DecodeNumber("i9223372036854775808e"));
+            Assert.Throws<BencodeParsingException<BNumber>>(() => Bencode.DecodeNumber("i9223372036854775808e"));
         }
 
         [Fact]
         public void DecodeNumber_Invalid_SmallerThanInt64MinValue()
         {
-            Assert.Throws<BencodeDecodingException<BNumber>>(() => Bencode.DecodeNumber("i-9223372036854775809e"));
+            Assert.Throws<BencodeParsingException<BNumber>>(() => Bencode.DecodeNumber("i-9223372036854775809e"));
         }
 
         [Fact]

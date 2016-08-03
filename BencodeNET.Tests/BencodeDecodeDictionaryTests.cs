@@ -66,37 +66,37 @@ namespace BencodeNET.Tests
         [Fact]
         public void DecodeDictionary_Invalid_InputMinimumLength2()
         {
-            Assert.Throws<BencodeDecodingException<BDictionary>>(() => Bencode.DecodeDictionary("d"));
+            Assert.Throws<BencodeParsingException<BDictionary>>(() => Bencode.DecodeDictionary("d"));
         }
 
         [Fact]
         public void DecodeDictionary_Invalid_NonStringKey()
         {
-            Assert.Throws<BencodeDecodingException<BDictionary>>(() => Bencode.DecodeDictionary("di42e4:spame"));
+            Assert.Throws<BencodeParsingException<BDictionary>>(() => Bencode.DecodeDictionary("di42e4:spame"));
         }
 
         [Fact]
         public void DecodeDictionary_Invalid_InvalidKeyObject()
         {
-            Assert.Throws<BencodeDecodingException<BDictionary>>(() => Bencode.DecodeDictionary("da:spam3:egge"));
+            Assert.Throws<BencodeParsingException<BDictionary>>(() => Bencode.DecodeDictionary("da:spam3:egge"));
         }
 
         [Fact]
         public void DecodeDictionary_Invalid_WrongBeginChar()
         {
-            Assert.Throws<BencodeDecodingException<BDictionary>>(() => Bencode.DecodeDictionary("l4:spam3:egg3:fooi42ee"));
+            Assert.Throws<BencodeParsingException<BDictionary>>(() => Bencode.DecodeDictionary("l4:spam3:egg3:fooi42ee"));
         }
 
         [Fact]
         public void DecodeDictionary_Invalid_MissingEndChar()
         {
-            Assert.Throws<BencodeDecodingException<BDictionary>>(() => Bencode.DecodeDictionary("d4:spam3:egg3:fooi42e"));
+            Assert.Throws<BencodeParsingException<BDictionary>>(() => Bencode.DecodeDictionary("d4:spam3:egg3:fooi42e"));
         }
 
         [Fact]
         public void DecodeDictionary_Invalid_MissingKeyValueOrInvalidValueObject()
         {
-            Assert.Throws<BencodeDecodingException<BDictionary>>(() => Bencode.DecodeDictionary("d4:spame"));
+            Assert.Throws<BencodeParsingException<BDictionary>>(() => Bencode.DecodeDictionary("d4:spame"));
         }
     }
 }

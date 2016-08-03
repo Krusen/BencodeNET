@@ -333,5 +333,15 @@ namespace BencodeNET.IO
                 _stream = null;
             }
         }
+
+        public static implicit operator BencodeStream(Stream stream)
+        {
+            return new BencodeStream(stream);
+        }
+
+        //public static implicit operator Stream(BencodeStream stream)
+        //{
+        //    return stream._stream;
+        //}
     }
 }

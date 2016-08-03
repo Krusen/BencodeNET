@@ -64,8 +64,8 @@
     <Compile Include="..\BencodeNET.Net45\Bencode.cs">
       <Link>Bencode.cs</Link>
     </Compile>
-    <Compile Include="..\BencodeNET.Net45\Exceptions\BencodeDecodingException.cs">
-      <Link>Exceptions\BencodeDecodingException.cs</Link>
+    <Compile Include="..\BencodeNET.Net45\Exceptions\BencodeParsingException.cs">
+      <Link>Exceptions\BencodeParsingException.cs</Link>
     </Compile>
     <Compile Include="..\BencodeNET.Net45\Exceptions\UnsupportedBencodeException.cs">
       <Link>Exceptions\UnsupportedBencodeException.cs</Link>
@@ -90,6 +90,30 @@
     </Compile>
     <Compile Include="..\BencodeNET.Net45\Objects\IBObject.cs">
       <Link>Objects\IBObject.cs</Link>
+    </Compile>
+    <Compile Include="..\BencodeNET.Net45\Parsing\BencodeParser.cs">
+      <Link>Parsing\BencodeParser.cs</Link>
+    </Compile>
+    <Compile Include="..\BencodeNET.Net45\Parsing\DictionaryParser.cs">
+      <Link>Parsing\DictionaryParser.cs</Link>
+    </Compile>
+    <Compile Include="..\BencodeNET.Net45\Parsing\IBencodeParser.cs">
+      <Link>Parsing\IBencodeParser.cs</Link>
+    </Compile>
+    <Compile Include="..\BencodeNET.Net45\Parsing\IBObjectParser.cs">
+      <Link>Parsing\IBObjectParser.cs</Link>
+    </Compile>
+    <Compile Include="..\BencodeNET.Net45\Parsing\ListParser.cs">
+      <Link>Parsing\ListParser.cs</Link>
+    </Compile>
+    <Compile Include="..\BencodeNET.Net45\Parsing\NumberParser.cs">
+      <Link>Parsing\NumberParser.cs</Link>
+    </Compile>
+    <Compile Include="..\BencodeNET.Net45\Parsing\ParseUtil.cs">
+      <Link>Parsing\ParseUtil.cs</Link>
+    </Compile>
+    <Compile Include="..\BencodeNET.Net45\Parsing\StringParser.cs">
+      <Link>Parsing\StringParser.cs</Link>
     </Compile>
     <Compile Include="..\BencodeNET.Net45\Torrents\Torrent.cs">
       <Link>Torrents\Torrent.cs</Link>
