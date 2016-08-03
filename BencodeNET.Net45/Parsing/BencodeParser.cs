@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,24 +20,34 @@ namespace BencodeNET.Parsing
         {
             Encoding = encoding;
 
-            StringParser = new StringParser(this);
-            NumberParser = new NumberParser();
-            ListParser = new ListParser(this);
-            DictionaryParser = new DictionaryParser(this);
-            TorrentParser = new TorrentParser(this);
+            var listParser = new ListParser(this);
+            Parsers = new Dictionary<Type, IBObjectParser>
+            {
+                [typeof (BString)] = new StringParser(this),
+                [typeof (BNumber)] = new NumberParser(),
+                [typeof (BList)] = listParser,
+                [typeof (BList<BString>)] = listParser,
+                [typeof (BList<BNumber>)] = listParser,
+                [typeof (BList<BList>)] = listParser,
+                [typeof (BList<BDictionary>)] = listParser,
+                [typeof(BDictionary)] = new DictionaryParser(this),
+                [typeof(Torrent)] = new TorrentParser(this),
+            };
         }
 
         public Encoding Encoding { get; set; }
 
-        protected StringParser StringParser { get; set; }
+        public IDictionary<Type, IBObjectParser> Parsers { get; }
 
-        protected NumberParser NumberParser { get; set; }
+        protected StringParser StringParser => Parsers[typeof (BString)] as StringParser;
 
-        protected ListParser ListParser { get; set; }
+        protected NumberParser NumberParser => Parsers[typeof(BNumber)] as NumberParser;
 
-        protected DictionaryParser DictionaryParser { get; set; }
+        protected ListParser ListParser => Parsers[typeof(BList)] as ListParser;
 
-        private TorrentParser TorrentParser { get; set; }
+        protected DictionaryParser DictionaryParser => Parsers[typeof(BDictionary)] as DictionaryParser;
+
+        private TorrentParser TorrentParser => Parsers[typeof(Torrent)] as TorrentParser;
 
         public IBObject Parse(string bencodedString)
         {
@@ -83,6 +94,91 @@ namespace BencodeNET.Parsing
             }
         }
 
+        public T Parse<T>(BencodeStream stream) where T : class, IBObject
+        {
+            if (typeof (BString) == typeof (T))
+                return StringParser.Parse(stream) as T;
+
+            if (typeof (BNumber) == typeof (T))
+                return NumberParser.Parse(stream) as T;
+
+            if (typeof (BList) == typeof (T))
+                return ListParser.Parse(stream) as T;
+
+            if (typeof (BList<BString>) == typeof (T))
+                return ListParser.Parse<BString>(stream) as T;
+
+            if (typeof (BList<BNumber>) == typeof (T))
+                return ListParser.Parse<BNumber>(stream) as T;
+
+            if (typeof (BList<BList>) == typeof (T))
+                return ListParser.Parse<BList>(stream) as T;
+
+            if (typeof (BList<BDictionary>) == typeof (T))
+                return ListParser.Parse<BDictionary>(stream) as T;
+
+            if (typeof (BDictionary) == typeof (T))
+                return DictionaryParser.Parse(stream) as T;
+
+            if (typeof (Torrent) == typeof (T))
+                return TorrentParser.Parse(stream) as T;
+
+            throw new BencodeParsingException($"Missing parser for the type '{typeof (T).FullName}'");
+        }
+
+        public Task<T> ParseAsync<T>(string bencodedString) where T : class, IBObject
+        {
+            using (var ms = new MemoryStream(Encoding.GetBytes(bencodedString)))
+            {
+                return ParseAsync<T>(ms);
+            }
+        }
+
+        public Task<T> ParseAsync<T>(Stream stream) where T : class, IBObject
+        {
+            return ParseAsync<T>(new BencodeStream(stream));
+        }
+
+        public async Task<T> ParseAsync<T>(BencodeStream stream) where T : class, IBObject
+        {
+            if (typeof (BString) == typeof (T))
+                return await StringParser.ParseAsync(stream) as T;
+
+            if (typeof (BNumber) == typeof (T))
+                return await NumberParser.ParseAsync(stream) as T;
+
+            if (typeof (BList) == typeof (T))
+                return await ListParser.ParseAsync(stream) as T;
+
+            if (typeof (BList<BString>) == typeof (T))
+                return await ListParser.ParseAsync<BString>(stream) as T;
+
+            if (typeof (BList<BNumber>) == typeof (T))
+                return await ListParser.ParseAsync<BNumber>(stream) as T;
+
+            if (typeof (BList<BList>) == typeof (T))
+                return await ListParser.ParseAsync<BList>(stream) as T;
+
+            if (typeof (BList<BDictionary>) == typeof (T))
+                return await ListParser.ParseAsync<BDictionary>(stream) as T;
+
+            if (typeof (BDictionary) == typeof (T))
+                return await DictionaryParser.ParseAsync(stream) as T;
+
+            if (typeof (Torrent) == typeof (T))
+                return await TorrentParser.ParseAsync(stream) as T;
+
+            throw new BencodeParsingException($"Missing parser for the type '{typeof (T).FullName}'");
+        }
+
+        public Task<T> ParseFromFileAsync<T>(string path) where T : class, IBObject
+        {
+            using (var stream = File.OpenRead(path))
+            {
+                return ParseAsync<T>(stream);
+            }
+        }
+
         public BString ParseString(BencodeStream stream)
         {
             return StringParser.Parse(stream);
@@ -98,7 +194,6 @@ namespace BencodeNET.Parsing
             return ListParser.Parse(stream);
         }
 
-        // TODO: Maybe leave this out, as we have BList.As<T>()
         public BList<T> ParseList<T>(BencodeStream stream) where T : IBObject
         {
             return ListParser.Parse(stream).As<T>();
@@ -109,7 +204,6 @@ namespace BencodeNET.Parsing
             return DictionaryParser.Parse(stream);
         }
 
-        // TODO: Make torrent parser?
         public Torrent ParseTorrent(Stream stream)
         {
             throw new NotImplementedException();

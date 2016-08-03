@@ -79,5 +79,15 @@ namespace BencodeNET.Parsing
 
             return list;
         }
+
+        public BList<T> Parse<T>(BencodeStream stream) where T : IBObject
+        {
+            return Parse(stream).As<T>();
+        }
+
+        public async Task<BList<T>> ParseAsync<T>(BencodeStream stream) where T : IBObject
+        {
+            return (await ParseAsync(stream)).As<T>();
+        }
     }
 }
