@@ -11,12 +11,14 @@ namespace BencodeNET.Parsing
     {
         protected const int MinimumLength = 2;
 
-        public StringParser(Encoding encoding)
+        public StringParser(IBencodeParser bencodeParser)
         {
-            Encoding = encoding;
+            if (bencodeParser == null) throw new ArgumentNullException(nameof(bencodeParser));
+
+            BencodeParser = bencodeParser;
         }
 
-        public Encoding Encoding { get; set; }
+        protected IBencodeParser BencodeParser { get; set; }
 
         public override BString Parse(BencodeStream stream)
         {
@@ -66,7 +68,7 @@ namespace BencodeNET.Parsing
                     stream.Position);
             }
 
-            return new BString(bytes, Encoding);
+            return new BString(bytes, BencodeParser.Encoding);
         }
 
         public override async Task<BString> ParseAsync(BencodeStream stream)
@@ -119,7 +121,7 @@ namespace BencodeNET.Parsing
                     stream.Position);
             }
 
-            return new BString(bytes);
+            return new BString(bytes, BencodeParser.Encoding);
         }
     }
 }

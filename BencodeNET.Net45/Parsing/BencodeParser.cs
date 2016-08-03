@@ -11,8 +11,6 @@ namespace BencodeNET.Parsing
 {
     public class BencodeParser : IBencodeParser
     {
-        private Encoding _encoding;
-
         public BencodeParser()
             : this(Encoding.UTF8)
         { }
@@ -21,33 +19,24 @@ namespace BencodeNET.Parsing
         {
             Encoding = encoding;
 
-            StringParser = new StringParser(encoding);
+            StringParser = new StringParser(this);
             NumberParser = new NumberParser();
-            // TODO: Just use parser.Encoding inside contructor instead of passing encoding variable?
-            ListParser = new ListParser(this, encoding);
-            DictionaryParser = new DictionaryParser(this, encoding);
+            ListParser = new ListParser(this);
+            DictionaryParser = new DictionaryParser(this);
+            TorrentParser = new TorrentParser(this);
         }
 
-        public Encoding Encoding
-        {
-            get { return _encoding; }
-            set
-            {
-                _encoding = value;
+        public Encoding Encoding { get; set; }
 
-                StringParser.Encoding = value;
-                ListParser.Encoding = value;
-                DictionaryParser.Encoding = value;
-            }
-        }
+        protected StringParser StringParser { get; set; }
 
-        private StringParser StringParser { get; set; }
+        protected NumberParser NumberParser { get; set; }
 
-        private NumberParser NumberParser { get; set; }
+        protected ListParser ListParser { get; set; }
 
-        private ListParser ListParser { get; set; }
+        protected DictionaryParser DictionaryParser { get; set; }
 
-        private DictionaryParser DictionaryParser { get; set; }
+        private TorrentParser TorrentParser { get; set; }
 
         public IBObject Parse(string bencodedString)
         {

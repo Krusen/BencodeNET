@@ -53,9 +53,11 @@
     <Compile Include="Parsing\NumberParser.cs" />
     <Compile Include="Parsing\ParseUtil.cs" />
     <Compile Include="Parsing\StringParser.cs" />
+    <Compile Include="Parsing\TorrentParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Exceptions\UnsupportedBencodeException.cs" />
     <Compile Include="Torrents\Torrent.cs" />
+    <Compile Include="Torrents\TorrentFields.cs" />
     <Compile Include="Torrents\TorrentSingleFileInfo.cs" />
     <Compile Include="Torrents\TorrentMultiFileInfoList.cs" />
     <Compile Include="Torrents\TorrentFileMode.cs" />

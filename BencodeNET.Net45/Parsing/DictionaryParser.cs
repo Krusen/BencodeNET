@@ -11,18 +11,14 @@ namespace BencodeNET.Parsing
     {
         protected const int MinimumLength = 2;
 
-        public DictionaryParser(IBencodeParser bencodeParser, Encoding encoding)
+        public DictionaryParser(IBencodeParser bencodeParser)
         {
             if (bencodeParser == null) throw new ArgumentNullException(nameof(bencodeParser));
-            if (encoding == null) throw new ArgumentNullException(nameof(encoding));
 
             BencodeParser = bencodeParser;
-            Encoding = encoding;
         }
 
         protected IBencodeParser BencodeParser { get; set; }
-
-        public Encoding Encoding { get; set; }
 
         public override BDictionary Parse(BencodeStream stream)
         {

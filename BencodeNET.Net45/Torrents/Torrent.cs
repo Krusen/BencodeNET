@@ -12,46 +12,61 @@ namespace BencodeNET.Torrents
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
     // TODO: Equals comparison
+    // TODO: Support for extra fields
     public class Torrent : BObject
     {
+        // TODO: This controls the encoding used during encoding. Maybe abstract away the "string Encoding" property and reuse this for both
+        public Encoding OutputEncoding { get; set; } = System.Text.Encoding.UTF8;
+
         // Announce + Announce-List
         // The announce list is actually a list of lists of trackers, but we don't support that for now.
-        public IList<string> Trackers { get; set; } = new List<string>();
+        public virtual IList<string> Trackers { get; set; } = new List<string>();
 
         // Info - Single file
-        public TorrentSingleFileInfo File { get; set; }
+        public virtual TorrentSingleFileInfo File { get; set; }
 
         // Info - Multi file
-        public TorrentMultiFileInfoList Files { get; set; }
+        public virtual TorrentMultiFileInfoList Files { get; set; }
 
-        // TODO: Make dynamic? Check if File != null or Files != null etc.?
-        public virtual TorrentFileMode FileMode { get; private set; }
+        public virtual TorrentFileMode FileMode
+        {
+            get
+            {
+                if (Files?.Any() == true)
+                    return TorrentFileMode.Multi;
+
+                if (File != null)
+                    return TorrentFileMode.Single;
+
+                return TorrentFileMode.Unknown;
+            }
+        }
 
         /// <summary>
         /// The creation date of the .torrent file [optional]
         /// </summary>
-        public DateTime? CreationDate { get; set; }
+        public virtual DateTime? CreationDate { get; set; }
 
         /// <summary>
         /// The comment of the .torrent file [optional]
         /// </summary>
-        public string Comment { get; set; }
+        public virtual string Comment { get; set; }
 
         /// <summary>
         /// The name and version of the program used to create the .torrent [optional]
         /// </summary>
-        public string CreatedBy { get; set; }
+        public virtual string CreatedBy { get; set; }
 
         /// <summary>
         /// The encoding used by the client that created the .torrent file [optional]
         /// </summary>
-        public string Encoding { get; set; }
+        public virtual string Encoding { get; set; }
 
-        public long PieceSize { get; set; }
-        public BString Pieces { get; internal set; }
-        public bool IsPrivate { get; set; }
+        public virtual long PieceSize { get; set; }
+        public virtual BString Pieces { get; internal set; }
+        public virtual bool IsPrivate { get; set; }
 
-        public long TotalSize
+        public virtual long TotalSize
         {
             get
             {
@@ -65,213 +80,98 @@ namespace BencodeNET.Torrents
             }
         }
 
-        public int NumberOfPieces => (int)Math.Ceiling((double)TotalSize / PieceSize);
+        public virtual int NumberOfPieces => (int)Math.Ceiling((double)TotalSize / PieceSize);
 
-        // TODO: Move these to a TorrentFactory?
-        public static Torrent FromFile(string path)
-        {
-            return FromFile(path, Bencode.DefaultEncoding);
-        }
-
-        public static Torrent FromFile(string path, Encoding encoding)
-        {
-            var data = (BDictionary)Bencode.DecodeFromFile(path, encoding);
-            return FromBDictionary(data);
-        }
-
-        public static Torrent FromBDictionary(BDictionary data)
-        {
-            var info = data.Get<BDictionary>(Fields.Info);
-
-            var torrent = new Torrent
-            {
-                IsPrivate = info.Get<BNumber>(Fields.Private) == 1,
-                PieceSize = info.Get<BNumber>(Fields.PieceLength),
-                Pieces = info.Get<BString>(Fields.Pieces),
-
-                Comment = data.Get<BString>(Fields.Comment)?.ToString(),
-                CreatedBy = data.Get<BString>(Fields.CreatedBy)?.ToString(),
-                Encoding = data.Get<BString>(Fields.Encoding)?.ToString(),
-                CreationDate = data.Get<BNumber>(Fields.CreationDate),
-
-                // TODO: More foolproof detection, look at more keys
-                FileMode = info.ContainsKey(Fields.Files) ? TorrentFileMode.Multi : TorrentFileMode.Single,
-
-                Trackers = LoadTrackers(data)
-            };
-
-            if (torrent.FileMode == TorrentFileMode.Single)
-                torrent.File = LoadSingleFileInfo(info);
-
-            if (torrent.FileMode == TorrentFileMode.Multi)
-                torrent.Files = LoadMultiFileInfoList(info);
-
-            return torrent;
-        }
-
-        protected static TorrentSingleFileInfo LoadSingleFileInfo(BDictionary info)
-        {
-            return new TorrentSingleFileInfo
-            {
-                FileName = info.Get<BString>(Fields.Name)?.ToString(),
-                FileSize = info.Get<BNumber>(Fields.Length),
-                Md5Sum = info.Get<BString>(Fields.Md5Sum)?.ToString()
-            };
-        }
-
-        protected static TorrentMultiFileInfoList LoadMultiFileInfoList(BDictionary info)
-        {
-            var list = new TorrentMultiFileInfoList
-            {
-                DirectoryName = info.Get<BString>(Fields.Name).ToString(),
-            };
-
-            var fileInfos = info.Get<BList>(Fields.Files).Cast<BDictionary>()
-                .Select(x => new TorrentMultiFileInfo
-                {
-                    FileSize = x.Get<BNumber>(Fields.Length),
-                    Path = x.Get<BList>(Fields.Path)?.AsStrings().ToList(),
-                    Md5Sum = x.Get<BString>(Fields.Md5Sum)?.ToString()
-                });
-
-            list.AddRange(fileInfos);
-
-            return list;
-        }
-
-        private static IList<string> LoadTrackers(BDictionary data)
-        {
-            var trackers = new List<string>();
-            var announce = data.Get<BString>(Fields.Announce)?.ToString();
-            if (!string.IsNullOrEmpty(announce))
-            {
-                trackers.Add(announce);
-            }
-
-            var announceLists = data.Get<BList>(Fields.AnnounceList)?.As<BList>();
-            if (announceLists != null)
-            {
-                trackers.AddRange(announceLists.SelectMany(list => list.AsStrings()));
-
-                trackers = trackers.Distinct().ToList();
-            }
-
-            return trackers;
-        }
-
-        protected BDictionary ToBDictionary()
-        {
-            return ToBDictionary(Bencode.DefaultEncoding);
-        }
-
-        protected BDictionary ToBDictionary(Encoding encoding)
+        protected virtual BDictionary ToBDictionary()
         {
             var torrent = new BDictionary();
 
             if (Trackers?.Count > 0)
             {
-                torrent[Fields.Announce] = new BString(Trackers.First(), encoding);
+                torrent[TorrentFields.Announce] = new BString(Trackers.First(), OutputEncoding);
             }
 
             if (Trackers?.Count > 1)
             {
-                torrent[Fields.AnnounceList] = new BList
+                torrent[TorrentFields.AnnounceList] = new BList
                 {
-                    new BList<BString>(Trackers.Select(x => (IBObject) new BString(x, encoding)))
+                    new BList<BString>(Trackers.Select(x => (IBObject) new BString(x, OutputEncoding)))
                 };
             }
 
             if (Encoding != null)
-                torrent[Fields.Encoding] = new BString(Encoding, encoding);
+                torrent[TorrentFields.Encoding] = new BString(Encoding, OutputEncoding);
 
             if (Comment != null)
-                torrent[Fields.Comment] = new BString(Comment, encoding);
+                torrent[TorrentFields.Comment] = new BString(Comment, OutputEncoding);
 
             if (CreatedBy != null)
-                torrent[Fields.CreatedBy] = new BString(CreatedBy, encoding);
+                torrent[TorrentFields.CreatedBy] = new BString(CreatedBy, OutputEncoding);
 
             if (CreationDate != null)
             {
-                torrent[Fields.CreationDate] = (BNumber)CreationDate;
+                torrent[TorrentFields.CreationDate] = (BNumber)CreationDate;
             }
 
-            torrent[Fields.Info] = CreateInfo(encoding);
+            torrent[TorrentFields.Info] = CreateInfo(OutputEncoding);
 
             return torrent;
         }
 
-        public override T EncodeToStream<T>(T stream)
-        {
-            return EncodeToStream(stream, Bencode.DefaultEncoding);
-        }
-
         // TODO: Split into smaller parts - maybe a TorrentFactory
         // TODO: Some sort of error handling?
-        public virtual T EncodeToStream<T>(T stream, Encoding encoding) where T : Stream
+        public override T EncodeToStream<T>(T stream)
         {
-            var torrent = ToBDictionary(encoding);
+            var torrent = ToBDictionary();
             return torrent.EncodeToStream(stream);
         }
 
         public override Task<T> EncodeToStreamAsync<T>(T stream)
         {
-            return EncodeToStreamAsync(stream, Bencode.DefaultEncoding);
-        }
-
-        public virtual Task<T> EncodeToStreamAsync<T>(T stream, Encoding encoding) where T : Stream
-        {
-            var torrent = ToBDictionary(encoding);
+            var torrent = ToBDictionary();
             return torrent.EncodeToStreamAsync(stream);
         }
 
-        public virtual void EncodeToFile(string path, Encoding encoding)
-        {
-            using (var stream = System.IO.File.OpenWrite(path))
-            {
-                EncodeToStream(stream);
-            }
-        }
-
-        private BDictionary CreateInfo(Encoding encoding)
+        protected virtual BDictionary CreateInfo(Encoding encoding)
         {
             var info = new BDictionary
             {
-                [Fields.PieceLength] = (BNumber)PieceSize,
-                [Fields.Pieces] = Pieces,
+                [TorrentFields.PieceLength] = (BNumber)PieceSize,
+                [TorrentFields.Pieces] = Pieces,
             };
 
             if (IsPrivate)
-                info[Fields.Private] = (BNumber)1;
+                info[TorrentFields.Private] = (BNumber)1;
 
             if (FileMode == TorrentFileMode.Single)
             {
-                info[Fields.Name] = new BString(File.FileName, encoding);
-                info[Fields.Length] = (BNumber)File.FileSize;
+                info[TorrentFields.Name] = new BString(File.FileName, encoding);
+                info[TorrentFields.Length] = (BNumber)File.FileSize;
 
                 if (File.Md5Sum != null)
-                    info[Fields.Md5Sum] = new BString(File.Md5Sum, encoding);
+                    info[TorrentFields.Md5Sum] = new BString(File.Md5Sum, encoding);
 
             }
             else if (FileMode == TorrentFileMode.Multi)
             {
-                info[Fields.Name] = new BString(Files.DirectoryName, encoding);
+                info[TorrentFields.Name] = new BString(Files.DirectoryName, encoding);
 
                 var files = new BList<BDictionary>();
                 foreach (var file in Files)
                 {
                     var fileDictionary = new BDictionary
                     {
-                        [Fields.Length] = (BNumber)file.FileSize,
-                        [Fields.Path] = new BList(file.Path)
+                        [TorrentFields.Length] = (BNumber)file.FileSize,
+                        [TorrentFields.Path] = new BList(file.Path)
                     };
 
                     if (file.Md5Sum != null)
-                        fileDictionary[Fields.Md5Sum] = new BString(file.Md5Sum, encoding);
+                        fileDictionary[TorrentFields.Md5Sum] = new BString(file.Md5Sum, encoding);
 
                     files.Add(fileDictionary);
                 }
 
-                info[Fields.Files] = files;
+                info[TorrentFields.Files] = files;
             }
 
             return info;
@@ -328,25 +228,9 @@ namespace BencodeNET.Torrents
             }
         }
 
-        // TODO: Maybe astract this away and change to dependency and put in constructor?
-        public static class Fields
+        public override int GetHashCode()
         {
-            public const string Announce = "announce";
-            public const string AnnounceList = "announce-list";
-            public const string CreatedBy = "created by";
-            public const string CreationDate = "creation date";
-            public const string Comment = "comment";
-            public const string Encoding = "encoding";
-            public const string Info = "info";
-
-            public const string Name = "name";
-            public const string Private = "private";
-            public const string PieceLength = "piece length";
-            public const string Pieces = "pieces";
-            public const string Length = "length";
-            public const string Files = "files";
-            public const string Path = "path";
-            public const string Md5Sum = "md5sum";
+            throw new NotSupportedException();
         }
     }
 }

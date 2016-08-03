@@ -115,8 +115,14 @@
     <Compile Include="..\BencodeNET.Net45\Parsing\StringParser.cs">
       <Link>Parsing\StringParser.cs</Link>
     </Compile>
+    <Compile Include="..\BencodeNET.Net45\Parsing\TorrentParser.cs">
+      <Link>Parsing\TorrentParser.cs</Link>
+    </Compile>
     <Compile Include="..\BencodeNET.Net45\Torrents\Torrent.cs">
       <Link>Torrents\Torrent.cs</Link>
+    </Compile>
+    <Compile Include="..\BencodeNET.Net45\Torrents\TorrentFields.cs">
+      <Link>Torrents\TorrentFields.cs</Link>
     </Compile>
     <Compile Include="..\BencodeNET.Net45\Torrents\TorrentFileMode.cs">
       <Link>Torrents\TorrentFileMode.cs</Link>
