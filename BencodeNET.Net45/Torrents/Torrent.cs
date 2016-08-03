@@ -177,26 +177,15 @@ namespace BencodeNET.Torrents
             return info;
         }
 
-        // TODO: Do we expect people to know that encoding matters for this and that we are using OutputEncoding implicitly?
         public virtual string CalculateInfoHash()
         {
-            return CalculateInfoHash(OutputEncoding);
-        }
-
-        public virtual string CalculateInfoHash(Encoding encoding)
-        {
-            var info = CreateInfo(encoding);
+            var info = CreateInfo(OutputEncoding);
             return TorrentUtil.CalculateInfoHash(info);
         }
 
         public virtual byte[] CalculateInfoHashBytes()
         {
-            return CalculateInfoHashBytes(OutputEncoding);
-        }
-
-        public virtual byte[] CalculateInfoHashBytes(Encoding encoding)
-        {
-            var info = CreateInfo(encoding);
+            var info = CreateInfo(OutputEncoding);
             return TorrentUtil.CalculateInfoHashBytes(info);
         }
 
