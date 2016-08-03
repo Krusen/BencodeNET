@@ -33,7 +33,7 @@ namespace BencodeNET.Objects
         }
 
         public BString(IEnumerable<byte> bytes)
-            : this(bytes, Bencode.DefaultEncoding)
+            : this(bytes, Encoding.UTF8)
         { }
 
         public BString(IEnumerable<byte> bytes, Encoding encoding)
@@ -47,12 +47,12 @@ namespace BencodeNET.Objects
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BString"/> class using
-        /// the default encoding from <c>Bencode.DefaultEncoding</c> to convert the string to bytes.
+        /// <c>Encoding.UTF8</c> to convert the string to bytes.
         /// </summary>
         /// <param name="str"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public BString(string str)
-            : this(str, Bencode.DefaultEncoding)
+            : this(str, Encoding.UTF8)
         { }
 
         /// <summary>

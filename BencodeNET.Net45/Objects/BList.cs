@@ -17,7 +17,7 @@ namespace BencodeNET.Objects
         }
 
         public BList(IEnumerable<string> strings)
-            : this(strings, Bencode.DefaultEncoding)
+            : this(strings, Encoding.UTF8)
         { }
 
         public BList(IEnumerable<string> strings, Encoding encoding)
@@ -60,7 +60,7 @@ namespace BencodeNET.Objects
 
         public IEnumerable<string> AsStrings()
         {
-            return AsStrings(Bencode.DefaultEncoding);
+            return AsStrings(Encoding.UTF8);
         }
 
         public IEnumerable<string> AsStrings(Encoding encoding)
