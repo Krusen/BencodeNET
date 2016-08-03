@@ -38,7 +38,6 @@
   <ItemGroup>
     <Compile Include="IO\BencodeStream.cs" />
     <Compile Include="Objects\BDictionary.cs" />
-    <Compile Include="Bencode.cs" />
     <Compile Include="Objects\BNumber.cs" />
     <Compile Include="Objects\BList.cs" />
     <Compile Include="Objects\BObject.cs" />

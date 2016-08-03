@@ -17,7 +17,7 @@ namespace BencodeNET.IO
 
         public bool EndOfStream => Position >= Length;
 
-        public BencodeStream(string str) : this(Bencode.DefaultEncoding.GetBytes(str))
+        public BencodeStream(string str) : this(str, Encoding.UTF8)
         { }
 
         public BencodeStream(string str, Encoding encoding) : this(encoding.GetBytes(str))

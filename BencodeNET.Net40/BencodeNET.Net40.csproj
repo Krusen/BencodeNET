@@ -61,9 +61,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\BencodeNET.Net45\Bencode.cs">
-      <Link>Bencode.cs</Link>
-    </Compile>
     <Compile Include="..\BencodeNET.Net45\Exceptions\BencodeParsingException.cs">
       <Link>Exceptions\BencodeParsingException.cs</Link>
     </Compile>
