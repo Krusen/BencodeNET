@@ -45,6 +45,7 @@
     <Compile Include="Objects\IBObject.cs" />
     <Compile Include="Exceptions\BencodeParsingException.cs" />
     <Compile Include="Parsing\BencodeParser.cs" />
+    <Compile Include="Parsing\BObjectParser.cs" />
     <Compile Include="Parsing\DictionaryParser.cs" />
     <Compile Include="Parsing\IBObjectParser.cs" />
     <Compile Include="Parsing\IBencodeParser.cs" />
