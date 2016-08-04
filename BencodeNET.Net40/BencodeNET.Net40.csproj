@@ -94,6 +94,9 @@
     <Compile Include="..\BencodeNET.Net45\Parsing\BObjectParser.cs">
       <Link>Parsing\BObjectParser.cs</Link>
     </Compile>
+    <Compile Include="..\BencodeNET.Net45\Parsing\BObjectParserList.cs">
+      <Link>Parsing\BObjectParserList.cs</Link>
+    </Compile>
     <Compile Include="..\BencodeNET.Net45\Parsing\DictionaryParser.cs">
       <Link>Parsing\DictionaryParser.cs</Link>
     </Compile>

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 using System.Threading.Tasks;
 using BencodeNET.Exceptions;
 using BencodeNET.IO;
@@ -7,7 +6,14 @@ using BencodeNET.Objects;
 
 namespace BencodeNET.Parsing
 {
-    public class ListParser : BObjectParser<BList>
+    public class ListParser : ListParser<IBObject>
+    {
+        public ListParser(IBencodeParser bencodeParser)
+            : base(bencodeParser)
+        { }
+    }
+
+    public class ListParser<T> : BObjectParser<BList<T>> where T : IBObject
     {
         protected const int MinimumLength = 2;
 
@@ -20,7 +26,7 @@ namespace BencodeNET.Parsing
 
         protected IBencodeParser BencodeParser { get; set; }
 
-        public override BList Parse(BencodeStream stream)
+        public override BList<T> Parse(BencodeStream stream)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
@@ -47,10 +53,10 @@ namespace BencodeNET.Parsing
             if (stream.ReadChar() != 'e')
                 throw new BencodeParsingException<BList>("Missing end character 'e'.", stream.Position);
 
-            return list;
+            return list.As<T>();
         }
 
-        public override async Task<BList> ParseAsync(BencodeStream stream)
+        public override async Task<BList<T>> ParseAsync(BencodeStream stream)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
@@ -77,17 +83,7 @@ namespace BencodeNET.Parsing
             if (await stream.ReadCharAsync().ConfigureAwait(false) != 'e')
                 throw new BencodeParsingException<BList>("Missing end character 'e'.", stream.Position);
 
-            return list;
-        }
-
-        public BList<T> Parse<T>(BencodeStream stream) where T : IBObject
-        {
-            return Parse(stream).As<T>();
-        }
-
-        public async Task<BList<T>> ParseAsync<T>(BencodeStream stream) where T : IBObject
-        {
-            return (await ParseAsync(stream)).As<T>();
+            return list.As<T>();
         }
     }
 }

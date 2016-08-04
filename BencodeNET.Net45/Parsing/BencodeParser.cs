@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BencodeNET.Exceptions;
@@ -20,24 +21,45 @@ namespace BencodeNET.Parsing
         {
             Encoding = encoding;
 
-            var listParser = new ListParser(this);
-            Parsers = new Dictionary<Type, IBObjectParser>
+            Parsers = new BObjectParserList
             {
-                [typeof (BString)] = new StringParser(this),
-                [typeof (BNumber)] = new NumberParser(),
-                [typeof (BList)] = listParser,
-                [typeof (BList<BString>)] = listParser,
-                [typeof (BList<BNumber>)] = listParser,
-                [typeof (BList<BList>)] = listParser,
-                [typeof (BList<BDictionary>)] = listParser,
-                [typeof(BDictionary)] = new DictionaryParser(this),
-                [typeof(Torrent)] = new TorrentParser(this),
+                new StringParser(this),
+                new NumberParser(),
+                new ListParser(this),
+                new ListParser<BString>(this),
+                new ListParser<BNumber>(this),
+                new ListParser<BList>(this),
+                new ListParser<BDictionary>(this),
+                new DictionaryParser(this),
+                new TorrentParser(this)
             };
         }
 
+        public BencodeParser(IEnumerable<KeyValuePair<Type, IBObjectParser>> parsers)
+            : this(Encoding.UTF8, parsers)
+        { }
+
+        public BencodeParser(IDictionary<Type, IBObjectParser> parsers)
+            : this(Encoding.UTF8, parsers)
+        { }
+
+        public BencodeParser(Encoding encoding, IEnumerable<KeyValuePair<Type, IBObjectParser>> parsers)
+        {
+            Encoding = encoding;
+
+            foreach (var entry in parsers)
+            {
+                Parsers.AddOrReplace(entry.Key, entry.Value);
+            }
+        }
+
+        public BencodeParser(Encoding encoding, IDictionary<Type, IBObjectParser> parsers)
+            : this(encoding, (IEnumerable<KeyValuePair<Type, IBObjectParser>>)parsers)
+        { }
+
         public Encoding Encoding { get; set; }
 
-        public IDictionary<Type, IBObjectParser> Parsers { get; }
+        public BObjectParserList Parsers { get; }
 
         public IBObject Parse(string bencodedString)
         {
@@ -136,12 +158,12 @@ namespace BencodeNET.Parsing
 
         public T Parse<T>(BencodeStream stream) where T : class, IBObject
         {
-            var parser = Parsers.GetValueOrDefault(typeof (T));
+            var parser = Parsers.Get<T>();
 
             if (parser == null)
                 throw new BencodeParsingException($"Missing parser for the type '{typeof(T).FullName}'");
 
-            return parser.Parse(stream) as T;
+            return parser.Parse(stream);
         }
 
         public T ParseFromFile<T>(string path) where T : class, IBObject
@@ -157,14 +179,14 @@ namespace BencodeNET.Parsing
             return ParseAsync<T>(new BencodeStream(stream));
         }
 
-        public async Task<T> ParseAsync<T>(BencodeStream stream) where T : class, IBObject
+        public Task<T> ParseAsync<T>(BencodeStream stream) where T : class, IBObject
         {
-            var parser = Parsers.GetValueOrDefault(typeof(T));
+            var parser = Parsers.Get<T>();
 
             if (parser == null)
                 throw new BencodeParsingException($"Missing parser for the type '{typeof(T).FullName}'");
 
-            return await parser.ParseAsync(stream) as T;
+            return parser.ParseAsync(stream);
         }
 
         public Task<T> ParseFromFileAsync<T>(string path) where T : class, IBObject
