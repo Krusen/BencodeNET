@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,6 +15,14 @@ namespace BencodeNET
         public static MemoryStream AsStream(this string str, Encoding encoding)
         {
             return new MemoryStream(encoding.GetBytes(str));
+        }
+
+        public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
+        {
+            TValue value;
+            if (dictionary.TryGetValue(key, out value))
+                return value;
+            return default(TValue);
         }
 
         public static void Write(this Stream stream, char c)

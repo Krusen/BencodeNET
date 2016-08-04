@@ -94,67 +94,6 @@ namespace BencodeNET.Parsing
             }
         }
 
-        public T Parse<T>(string bencodedString) where T : class, IBObject
-        {
-            using (var stream = bencodedString.AsStream(Encoding))
-            {
-                return Parse<T>(stream);
-            }
-        }
-
-        public T Parse<T>(Stream stream) where T : class, IBObject
-        {
-            return Parse<T>(new BencodeStream(stream));
-        }
-
-        public T Parse<T>(BencodeStream stream) where T : class, IBObject
-        {
-            if (typeof (BString) == typeof (T))
-                return StringParser.Parse(stream) as T;
-
-            if (typeof (BNumber) == typeof (T))
-                return NumberParser.Parse(stream) as T;
-
-            if (typeof (BList) == typeof (T))
-                return ListParser.Parse(stream) as T;
-
-            if (typeof (BList<BString>) == typeof (T))
-                return ListParser.Parse<BString>(stream) as T;
-
-            if (typeof (BList<BNumber>) == typeof (T))
-                return ListParser.Parse<BNumber>(stream) as T;
-
-            if (typeof (BList<BList>) == typeof (T))
-                return ListParser.Parse<BList>(stream) as T;
-
-            if (typeof (BList<BDictionary>) == typeof (T))
-                return ListParser.Parse<BDictionary>(stream) as T;
-
-            if (typeof (BDictionary) == typeof (T))
-                return DictionaryParser.Parse(stream) as T;
-
-            if (typeof (Torrent) == typeof (T))
-                return TorrentParser.Parse(stream) as T;
-
-            throw new BencodeParsingException($"Missing parser for the type '{typeof (T).FullName}'");
-        }
-
-        public T ParseFromFile<T>(string path) where T : class, IBObject
-        {
-            using (var stream = File.OpenRead(path))
-            {
-                return Parse<T>(stream);
-            }
-        }
-
-        public Task<IBObject> ParseAsync(string bencodedString)
-        {
-            using (var stream = bencodedString.AsStream(Encoding))
-            {
-                return ParseAsync(stream);
-            }
-        }
-
         public Task<IBObject> ParseAsync(Stream stream)
         {
             return ParseAsync(new BencodeStream(stream));
@@ -192,11 +131,34 @@ namespace BencodeNET.Parsing
             }
         }
 
-        public Task<T> ParseAsync<T>(string bencodedString) where T : class, IBObject
+        public T Parse<T>(string bencodedString) where T : class, IBObject
         {
             using (var stream = bencodedString.AsStream(Encoding))
             {
-                return ParseAsync<T>(stream);
+                return Parse<T>(stream);
+            }
+        }
+
+        public T Parse<T>(Stream stream) where T : class, IBObject
+        {
+            return Parse<T>(new BencodeStream(stream));
+        }
+
+        public T Parse<T>(BencodeStream stream) where T : class, IBObject
+        {
+            var parser = Parsers.GetValueOrDefault(typeof (T));
+
+            if (parser == null)
+                throw new BencodeParsingException($"Missing parser for the type '{typeof(T).FullName}'");
+
+            return parser.Parse(stream) as T;
+        }
+
+        public T ParseFromFile<T>(string path) where T : class, IBObject
+        {
+            using (var stream = File.OpenRead(path))
+            {
+                return Parse<T>(stream);
             }
         }
 
@@ -207,34 +169,12 @@ namespace BencodeNET.Parsing
 
         public async Task<T> ParseAsync<T>(BencodeStream stream) where T : class, IBObject
         {
-            if (typeof(BString) == typeof(T))
-                return await StringParser.ParseAsync(stream) as T;
+            var parser = Parsers.GetValueOrDefault(typeof(T));
 
-            if (typeof(BNumber) == typeof(T))
-                return await NumberParser.ParseAsync(stream) as T;
+            if (parser == null)
+                throw new BencodeParsingException($"Missing parser for the type '{typeof(T).FullName}'");
 
-            if (typeof(BList) == typeof(T))
-                return await ListParser.ParseAsync(stream) as T;
-
-            if (typeof(BList<BString>) == typeof(T))
-                return await ListParser.ParseAsync<BString>(stream) as T;
-
-            if (typeof(BList<BNumber>) == typeof(T))
-                return await ListParser.ParseAsync<BNumber>(stream) as T;
-
-            if (typeof(BList<BList>) == typeof(T))
-                return await ListParser.ParseAsync<BList>(stream) as T;
-
-            if (typeof(BList<BDictionary>) == typeof(T))
-                return await ListParser.ParseAsync<BDictionary>(stream) as T;
-
-            if (typeof(BDictionary) == typeof(T))
-                return await DictionaryParser.ParseAsync(stream) as T;
-
-            if (typeof(Torrent) == typeof(T))
-                return await TorrentParser.ParseAsync(stream) as T;
-
-            throw new BencodeParsingException($"Missing parser for the type '{typeof(T).FullName}'");
+            return await parser.ParseAsync(stream) as T;
         }
 
         public Task<T> ParseFromFileAsync<T>(string path) where T : class, IBObject

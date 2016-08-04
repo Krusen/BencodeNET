@@ -7,6 +7,31 @@ namespace BencodeNET.Parsing
 {
     public abstract class BObjectParser<T> : IBObjectParser<T> where T : IBObject
     {
+        IBObject IBObjectParser.Parse(string bencodedString)
+        {
+            return Parse(bencodedString);
+        }
+
+        IBObject IBObjectParser.Parse(Stream stream)
+        {
+            return Parse(stream);
+        }
+
+        IBObject IBObjectParser.Parse(BencodeStream stream)
+        {
+            return Parse(stream);
+        }
+
+        Task<IBObject> IBObjectParser.ParseAsync(Stream stream)
+        {
+            return ParseAsync(stream).FromDerived<IBObject, T>();
+        }
+
+        Task<IBObject> IBObjectParser.ParseAsync(BencodeStream stream)
+        {
+            return ParseAsync(stream).FromDerived<IBObject, T>();
+        }
+
         public T Parse(string bencodedString)
         {
             using (var stream = new MemoryStream())

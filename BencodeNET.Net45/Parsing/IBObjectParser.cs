@@ -6,7 +6,15 @@ using BencodeNET.Objects;
 
 namespace BencodeNET.Parsing
 {
-    public interface IBObjectParser { }
+    public interface IBObjectParser
+    {
+        IBObject Parse(string bencodedString);
+        IBObject Parse(Stream stream);
+        IBObject Parse(BencodeStream stream);
+
+        Task<IBObject> ParseAsync(Stream stream);
+        Task<IBObject> ParseAsync(BencodeStream stream);
+    }
 
     public interface IBObjectParser<T> : IBObjectParser where T : IBObject
     {
