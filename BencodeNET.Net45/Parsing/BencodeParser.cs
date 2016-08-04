@@ -39,16 +39,6 @@ namespace BencodeNET.Parsing
 
         public IDictionary<Type, IBObjectParser> Parsers { get; }
 
-        protected StringParser StringParser => Parsers[typeof (BString)] as StringParser;
-
-        protected NumberParser NumberParser => Parsers[typeof(BNumber)] as NumberParser;
-
-        protected ListParser ListParser => Parsers[typeof(BList)] as ListParser;
-
-        protected DictionaryParser DictionaryParser => Parsers[typeof(BDictionary)] as DictionaryParser;
-
-        private TorrentParser TorrentParser => Parsers[typeof(Torrent)] as TorrentParser;
-
         public IBObject Parse(string bencodedString)
         {
             using (var stream = bencodedString.AsStream(Encoding))
@@ -77,10 +67,10 @@ namespace BencodeNET.Parsing
                 case '6':
                 case '7':
                 case '8':
-                case '9': return StringParser.Parse(stream);
-                case 'i': return NumberParser.Parse(stream);
-                case 'l': return ListParser.Parse(stream);
-                case 'd': return DictionaryParser.Parse(stream);
+                case '9': return Parse<BString>(stream);
+                case 'i': return Parse<BNumber>(stream);
+                case 'l': return Parse<BList>(stream);
+                case 'd': return Parse<BDictionary>(stream);
             }
 
             throw new BencodeParsingException("Invalid first character - valid characters are: 0-9, 'i', 'l' and 'd'", stream.Position);
@@ -114,10 +104,10 @@ namespace BencodeNET.Parsing
                 case '6':
                 case '7':
                 case '8':
-                case '9': return StringParser.ParseAsync(stream).FromDerived<IBObject, BString>();
-                case 'i': return NumberParser.ParseAsync(stream).FromDerived<IBObject, BNumber>();
-                case 'l': return ListParser.ParseAsync(stream).FromDerived<IBObject, BList>();
-                case 'd': return DictionaryParser.ParseAsync(stream).FromDerived<IBObject, BDictionary>();
+                case '9': return ParseAsync<BString>(stream).FromDerived<IBObject, BString>();
+                case 'i': return ParseAsync<BNumber>(stream).FromDerived<IBObject, BNumber>();
+                case 'l': return ParseAsync<BList>(stream).FromDerived<IBObject, BList>();
+                case 'd': return ParseAsync<BDictionary>(stream).FromDerived<IBObject, BDictionary>();
             }
 
             throw new BencodeParsingException("Invalid first character - valid characters are: 0-9, 'i', 'l' and 'd'", stream.Position);
