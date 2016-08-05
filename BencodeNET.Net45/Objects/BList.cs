@@ -29,6 +29,14 @@ namespace BencodeNET.Objects
             }
         }
 
+        public BList(IEnumerable<IBObject> objects)
+        {
+            foreach (var obj in objects)
+            {
+                Add(obj);
+            }
+        }
+
         public void Add(string value)
         {
             Add(new BString(value));
