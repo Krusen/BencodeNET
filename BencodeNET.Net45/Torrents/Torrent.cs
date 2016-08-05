@@ -95,7 +95,7 @@ namespace BencodeNET.Torrents
             {
                 torrent[TorrentFields.AnnounceList] = new BList
                 {
-                    new BList<BString>(Trackers.Select(x => (IBObject) new BString(x, OutputEncoding)))
+                    new BList<BString>(Trackers.Select(x => new BString(x, OutputEncoding)))
                 };
             }
 
