@@ -73,14 +73,8 @@ namespace BencodeNET.Objects
 
         public override bool Equals(object other)
         {
-            if (other == null)
-                return false;
-
             var bnumber = other as BNumber;
-            if (bnumber != null)
-                return Value == bnumber.Value;
-
-            return false;
+            return Value == bnumber?.Value;
         }
 
         public override int GetHashCode()

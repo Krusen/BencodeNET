@@ -96,14 +96,18 @@ namespace BencodeNET.Objects
 
         public override bool Equals(object other)
         {
-            if (other == null)
-                return false;
-
-            var bstr = other as BString;
-            if (bstr != null)
-                return Value.SequenceEqual(bstr.Value);
+            var bstring = other as BString;
+            if (bstring != null)
+                return Value.SequenceEqual(bstring.Value);
 
             return false;
+        }
+
+        public bool Equals(BString bstring)
+        {
+            if (bstring == null)
+                return false;
+            return Value.SequenceEqual(bstring.Value);
         }
 
         public override int GetHashCode()
