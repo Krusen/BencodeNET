@@ -39,7 +39,7 @@ namespace BencodeNET.Objects
             return bint.Value;
         }
 
-        public static implicit operator DateTime? (BNumber number)
+        public static implicit operator DateTime?(BNumber number)
         {
             return Epoch.AddSeconds(number);
         }
