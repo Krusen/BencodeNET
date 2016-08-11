@@ -4,6 +4,8 @@ using BencodeNET.Objects;
 
 namespace BencodeNET.Exceptions
 {
+    // TODO: Rename to InvalidBencodeException?
+    // TODO: More specific exceptions, e.g. InvalidFirstChar, MissingEndChar, WrongLength, BelowMinimumLength etc.
     public class BencodeParsingException : Exception
     {
         public long StreamPosition { get; set; }
