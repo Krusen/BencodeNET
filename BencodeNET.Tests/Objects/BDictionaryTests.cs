@@ -1,0 +1,260 @@
+﻿using System;
+using System.Collections.Generic;
+using BencodeNET.Objects;
+using FluentAssertions;
+using Xunit;
+
+namespace BencodeNET.Tests.Objects
+{
+    public class BDictionaryTests
+    {
+        [Fact]
+        public void Add_NullValue_ThrowsArgumentNullException()
+        {
+            var dict = new BDictionary();
+            Action action = () => dict.Add("key", null);
+            action.ShouldThrow<ArgumentNullException>();
+        }
+
+        [Fact]
+        public void Add_NullIBobjectValue_ThrowsArgumentNullException()
+        {
+            var dict = new BDictionary();
+            Action action = () => dict.Add("key", (IBObject)null);
+            action.ShouldThrow<ArgumentNullException>();
+        }
+
+        [Fact]
+        public void Add_KeyValuePairWithNullValue_ThrowsArgumentException()
+        {
+            var dict = new BDictionary();
+            Action action = () => dict.Add(new KeyValuePair<BString, IBObject>("key", null));
+            action.ShouldThrow<ArgumentException>();
+        }
+
+        [Fact]
+        public void Indexer_Set_Null_ThrowsArgumentNullException()
+        {
+            var dict = new BDictionary {{"key", "value"}};
+            Action action = () => dict["key"] = null;
+            action.ShouldThrow<ArgumentNullException>();
+        }
+
+        [Fact]
+        public void Equals_WithKeysAddedInSameOrder_AreEqual()
+        {
+            var bdict1 = new BDictionary
+            {
+                {"foobar", "Hello World!"},
+                {"number", 747},
+                {"key", "value"}
+            };
+
+            var bdict2 = new BDictionary
+            {
+                {"foobar", "Hello World!"},
+                {"number", 747},
+                {"key", "value"}
+            };
+
+            bdict1.Equals(bdict2).Should().BeTrue();
+            bdict2.Equals(bdict1).Should().BeTrue();
+        }
+
+        [Fact]
+        public void Equals_WithKeysAddedInDifferentOrder_AreEqual()
+        {
+            var bdict1 = new BDictionary
+            {
+                {"foobar", "Hello World!"},
+                {"number", 747},
+                {"key", "value"}
+            };
+
+            var bdict2 = new BDictionary
+            {
+                {"key", "value"},
+                {"foobar", "Hello World!"},
+                {"number", 747}
+            };
+
+            bdict1.Equals(bdict2).Should().BeTrue();
+            bdict2.Equals(bdict1).Should().BeTrue();
+        }
+
+        [Fact]
+        public void Equals_WithDifferentKeys_AreNotEqual()
+        {
+            var bdict1 = new BDictionary
+            {
+                {"foobar", "Hello World!"},
+            };
+
+            var bdict2 = new BDictionary
+            {
+                {"key", "Hello World!"},
+            };
+
+            bdict1.Equals(bdict2).Should().BeFalse();
+            bdict2.Equals(bdict1).Should().BeFalse();
+        }
+
+        [Fact]
+        public void Equals_WithDifferentValues_AreNotEqual()
+        {
+            var bdict1 = new BDictionary
+            {
+                {"foobar", "Hello World!"},
+            };
+
+            var bdict2 = new BDictionary
+            {
+                {"foobar", "Another world..."},
+            };
+
+            bdict1.Equals(bdict2).Should().BeFalse();
+            bdict2.Equals(bdict1).Should().BeFalse();
+        }
+
+        [Fact]
+        public void EqualsOperator_WithKeysAddedInSameOrder_AreEqual()
+        {
+            var bdict1 = new BDictionary
+            {
+                {"foobar", "Hello World!"},
+                {"number", 747},
+                {"key", "value"}
+            };
+
+            var bdict2 = new BDictionary
+            {
+                {"foobar", "Hello World!"},
+                {"number", 747},
+                {"key", "value"}
+            };
+
+            (bdict1 == bdict2).Should().BeTrue();
+        }
+
+        [Fact]
+        public void EqualsOperator_WithKeysAddedInDifferentOrder_AreEqual()
+        {
+            var bdict1 = new BDictionary
+            {
+                {"foobar", "Hello World!"},
+                {"number", 747},
+                {"key", "value"}
+            };
+
+            var bdict2 = new BDictionary
+            {
+                {"key", "value"},
+                {"foobar", "Hello World!"},
+                {"number", 747}
+            };
+
+            (bdict1 == bdict2).Should().BeTrue();
+        }
+
+        [Fact]
+        public void EqualsOperator_WithDifferentKeys_AreNotEqual()
+        {
+            var bdict1 = new BDictionary
+            {
+                {"foobar", "Hello World!"},
+            };
+
+            var bdict2 = new BDictionary
+            {
+                {"key", "Hello World!"},
+            };
+
+            (bdict1 == bdict2).Should().BeFalse();
+        }
+
+        [Fact]
+        public void EqualsOperator_WithDifferentValues_AreNotEqual()
+        {
+            var bdict1 = new BDictionary
+            {
+                {"foobar", "Hello World!"},
+            };
+
+            var bdict2 = new BDictionary
+            {
+                {"foobar", "Another world..."},
+            };
+
+            (bdict1 == bdict2).Should().BeFalse();
+        }
+
+        [Fact]
+        public void CanEncode_Simple()
+        {
+            var bdict = new BDictionary
+            {
+                {"foobar", "Hello World!"},
+                {"number", 747}
+            };
+
+            var bencode = bdict.Encode();
+
+            bencode.Should().Be("d6:foobar12:Hello World!6:numberi747ee");
+        }
+
+        [Fact]
+        public void Encode_KeyAreSortedInLexicalOrder()
+        {
+            var bdict = new BDictionary
+            {
+                {"number", 747},
+                {"foobar", "Hello World!"},
+                {"key", "value"}
+            };
+
+            var bencode = bdict.Encode();
+
+            bencode.Should().Be("d6:foobar12:Hello World!3:key5:value6:numberi747ee");
+        }
+
+        [Fact]
+        public void CanEncode_EmptyDictionary()
+        {
+            var bdict = new BDictionary();
+            var bencode = bdict.Encode();
+            bencode.Should().Be("de");
+        }
+
+        [Fact]
+        public void CanEncode_Complex()
+        {
+            var bdict = new BDictionary
+            {
+                {"spam", "egg"},
+                {
+                    "A List", new BList
+                    {
+                        "foo",
+                        "bar",
+                        123,
+                        new BDictionary
+                        {
+                            {"more spam", "more eggs"}
+                        }
+                    }
+                },
+                {
+                    "foobar", new BDictionary
+                    {
+                        {"numbers", new BList {1, 2, 3}}
+                    }
+                }
+            };
+
+            var bencode = bdict.Encode();
+
+            bencode.Should()
+                .Be("d6:A Listl3:foo3:bari123ed9:more spam9:more eggsee6:foobard7:numbersli1ei2ei3eee4:spam3:egge");
+        }
+    }
+}

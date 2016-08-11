@@ -3,9 +3,10 @@ using System.Text;
 using System.Threading.Tasks;
 using BencodeNET.IO;
 using Xunit;
+
 // ReSharper disable ConsiderUsingConfigureAwait
 
-namespace BencodeNET.Tests
+namespace BencodeNET.Tests.IO
 {
     public class BencodeStreamTests
     {
@@ -683,6 +684,13 @@ namespace BencodeNET.Tests
                 Assert.True(bs.EndOfStream);
                 Assert.Equal(-1, await bs.ReadAsync());
             }
+        }
+
+        private BencodeStream BencodeStreamFrom(string str)
+        {
+            //return new BencodeStream();
+            // TODO:
+            return null;
         }
     }
 }
