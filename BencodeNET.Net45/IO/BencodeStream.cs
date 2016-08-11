@@ -49,8 +49,12 @@ namespace BencodeNET.IO
                 return _peekedByte;
 
             _peekedByte = _stream.ReadByte();
-            _stream.Seek(-1, SeekOrigin.Current);
             _hasPeeked = true;
+
+            // Only seek backwards if not at end of stream
+            if (_peekedByte > -1)
+                _stream.Seek(-1, SeekOrigin.Current);
+
             return _peekedByte;
         }
 
@@ -144,8 +148,12 @@ namespace BencodeNET.IO
                 return _peekedByte;
 
             _peekedByte = await _stream.ReadByteAsync().ConfigureAwait(false);
-            _stream.Seek(-1, SeekOrigin.Current);
             _hasPeeked = true;
+
+            // Only seek backwards if not at end of stream
+            if (_peekedByte > -1)
+                _stream.Seek(-1, SeekOrigin.Current);
+
             return _peekedByte;
         }
 
