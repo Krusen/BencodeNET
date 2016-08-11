@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using BencodeNET.Objects;
 using FluentAssertions;
@@ -8,6 +9,8 @@ namespace BencodeNET.Tests.Objects
 {
     public class BNumberTests
     {
+        private static readonly DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
         [Theory]
         [InlineAutoMockedData(0, 0)]
         [InlineAutoMockedData(42, 42)]
@@ -135,6 +138,41 @@ namespace BencodeNET.Tests.Objects
             }
         }
 
-        // TODO: ToString methods
+        [Fact]
+        public void ToString_SameAsLong()
+        {
+            var bnumber = new BNumber(42);
+
+            var str1 = bnumber.ToString();
+            var str2 = 42L.ToString();
+
+            str1.Should().Be(str2);
+        }
+
+        [Fact]
+        public void ToString_WithFormat_SameAsLong()
+        {
+            var bnumber = new BNumber(42);
+
+            var str1 = bnumber.ToString("N2");
+            var str2 = 42L.ToString("N2");
+
+            str1.Should().Be(str2);
+        }
+
+        [Fact]
+        public void CanCastFromDateTime()
+        {
+            var bnumber = (BNumber) new DateTime(2016, 1, 1);
+            bnumber.Should().Be(1451606400);
+        }
+
+        [Fact]
+        public void CanCastToDateTime()
+        {
+            var bnumber = new BNumber(1451606400);
+            var datetime = (DateTime) bnumber;
+            datetime.Should().Be(new DateTime(2016, 1, 1));
+        }
     }
 }
