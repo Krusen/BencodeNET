@@ -20,6 +20,8 @@ namespace BencodeNET.Parsing
 
         protected IBencodeParser BencodeParser { get; set; }
 
+        protected override Encoding Encoding => BencodeParser.Encoding;
+
         public override BDictionary Parse(BencodeStream stream)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
@@ -45,13 +47,13 @@ namespace BencodeNET.Parsing
                 }
                 catch (BencodeParsingException<BString>)
                 {
+                    // TODO: Change this message? Exception could be caused by anything?
                     throw new BencodeParsingException<BDictionary>("Dictionary keys must be strings.", stream.Position);
                 }
 
+                // TODO: try/catch exception and tell that we need a value for each key?
                 // Decode next object in stream as the value
                 var value = BencodeParser.Parse(stream);
-                if (value == null)
-                    throw new BencodeParsingException<BDictionary>("All keys must have a corresponding value.", stream.Position);
 
                 dictionary.Add(key, value);
             }
@@ -92,8 +94,6 @@ namespace BencodeNET.Parsing
 
                 // Decode next object in stream as the value
                 var value = await BencodeParser.ParseAsync(stream).ConfigureAwait(false);
-                if (value == null)
-                    throw new BencodeParsingException<BDictionary>("All keys must have a corresponding value.", stream.Position);
 
                 dictionary.Add(key, value);
             }

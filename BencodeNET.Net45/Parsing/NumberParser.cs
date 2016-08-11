@@ -11,6 +11,8 @@ namespace BencodeNET.Parsing
     {
         protected const int MinimumLength = 3;
 
+        protected override Encoding Encoding => Encoding.UTF8;
+
         public override BNumber Parse(BencodeStream stream)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));

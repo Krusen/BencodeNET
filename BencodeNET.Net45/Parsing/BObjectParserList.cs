@@ -9,9 +9,15 @@ namespace BencodeNET.Parsing
     {
         private IDictionary<Type, IBObjectParser> Parsers { get; } = new Dictionary<Type, IBObjectParser>();
 
+        // TODO: Add type check (IBObject) here, for easier understanding of exception?
         public void Add(Type type, IBObjectParser parser)
         {
-            Parsers.Add(type, parser);
+            AddOrReplace(type, parser);
+        }
+
+        public void Add(IEnumerable<Type> types, IBObjectParser parser)
+        {
+            AddOrReplace(types, parser);
         }
 
         public void Add<T>(IBObjectParser<T> parser) where T : IBObject
@@ -21,9 +27,20 @@ namespace BencodeNET.Parsing
 
         public void AddOrReplace(Type type, IBObjectParser parser)
         {
+            if (!typeof(IBObject).IsAssignableFrom(type))
+                throw new ArgumentException($"The '{nameof(type)}' parameter must be assignable to '{typeof(IBObject).FullName}'");
+
             if (Parsers.ContainsKey(type))
                 Parsers.Remove(type);
             Parsers.Add(type, parser);
+        }
+
+        public void AddOrReplace(IEnumerable<Type> types, IBObjectParser parser)
+        {
+            foreach (var type in types)
+            {
+                AddOrReplace(type, parser);
+            }
         }
 
         public void AddOrReplace<T>(IBObjectParser<T> parser) where T : IBObject

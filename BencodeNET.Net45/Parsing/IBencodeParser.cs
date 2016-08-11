@@ -9,7 +9,7 @@ namespace BencodeNET.Parsing
 {
     public interface IBencodeParser
     {
-        Encoding Encoding { get; set; }
+        Encoding Encoding { get; }
 
         IBObject Parse(string bencodedString);
         IBObject Parse(Stream stream);

@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BencodeNET.Exceptions;
 using BencodeNET.IO;
 using BencodeNET.Objects;
-using BencodeNET.Torrents;
 
 namespace BencodeNET.Parsing
 {
@@ -23,13 +21,9 @@ namespace BencodeNET.Parsing
 
             Parsers = new BObjectParserList
             {
-                new StringParser(this),
+                new StringParser(encoding),
                 new NumberParser(),
                 new ListParser(this),
-                new ListParser<BString>(this),
-                new ListParser<BNumber>(this),
-                new ListParser<BList>(this),
-                new ListParser<BDictionary>(this),
                 new DictionaryParser(this),
                 new TorrentParser(this)
             };
@@ -57,7 +51,7 @@ namespace BencodeNET.Parsing
             : this(encoding, (IEnumerable<KeyValuePair<Type, IBObjectParser>>)parsers)
         { }
 
-        public Encoding Encoding { get; set; }
+        public Encoding Encoding { get; protected set; }
 
         public BObjectParserList Parsers { get; }
 

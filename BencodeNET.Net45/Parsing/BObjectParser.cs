@@ -1,4 +1,5 @@
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using BencodeNET.IO;
 using BencodeNET.Objects;
@@ -7,6 +8,8 @@ namespace BencodeNET.Parsing
 {
     public abstract class BObjectParser<T> : IBObjectParser<T> where T : IBObject
     {
+        protected abstract Encoding Encoding { get; }
+
         IBObject IBObjectParser.Parse(string bencodedString)
         {
             return Parse(bencodedString);
@@ -34,7 +37,7 @@ namespace BencodeNET.Parsing
 
         public T Parse(string bencodedString)
         {
-            using (var stream = new MemoryStream())
+            using (var stream = bencodedString.AsStream(Encoding))
             {
                 return Parse(stream);
             }

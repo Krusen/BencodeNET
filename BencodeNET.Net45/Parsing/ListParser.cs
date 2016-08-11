@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Threading.Tasks;
 using BencodeNET.Exceptions;
 using BencodeNET.IO;
@@ -6,14 +7,7 @@ using BencodeNET.Objects;
 
 namespace BencodeNET.Parsing
 {
-    public class ListParser : ListParser<IBObject>
-    {
-        public ListParser(IBencodeParser bencodeParser)
-            : base(bencodeParser)
-        { }
-    }
-
-    public class ListParser<T> : BObjectParser<BList<T>> where T : IBObject
+    public class ListParser : BObjectParser<BList>
     {
         protected const int MinimumLength = 2;
 
@@ -26,7 +20,9 @@ namespace BencodeNET.Parsing
 
         protected IBencodeParser BencodeParser { get; set; }
 
-        public override BList<T> Parse(BencodeStream stream)
+        protected override Encoding Encoding => BencodeParser.Encoding;
+
+        public override BList Parse(BencodeStream stream)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
@@ -44,19 +40,16 @@ namespace BencodeNET.Parsing
             {
                 // Decode next object in stream
                 var bObject = BencodeParser.Parse(stream);
-                if (bObject == null)
-                    throw new BencodeParsingException<BList>($"Invalid object beginning with '{stream.PeekChar()}'", stream.Position);
-
                 list.Add(bObject);
             }
 
             if (stream.ReadChar() != 'e')
                 throw new BencodeParsingException<BList>("Missing end character 'e'.", stream.Position);
 
-            return list.As<T>();
+            return list;
         }
 
-        public override async Task<BList<T>> ParseAsync(BencodeStream stream)
+        public override async Task<BList> ParseAsync(BencodeStream stream)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
@@ -74,16 +67,13 @@ namespace BencodeNET.Parsing
             {
                 // Decode next object in stream
                 var bObject = await BencodeParser.ParseAsync(stream).ConfigureAwait(false);
-                if (bObject == null)
-                    throw new BencodeParsingException<BList>($"Invalid object beginning with '{await stream.PeekCharAsync().ConfigureAwait(false)}'", stream.Position);
-
                 list.Add(bObject);
             }
 
             if (await stream.ReadCharAsync().ConfigureAwait(false) != 'e')
                 throw new BencodeParsingException<BList>("Missing end character 'e'.", stream.Position);
 
-            return list.As<T>();
+            return list;
         }
     }
 }
