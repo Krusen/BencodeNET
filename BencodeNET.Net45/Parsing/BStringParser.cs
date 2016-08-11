@@ -7,15 +7,15 @@ using BencodeNET.Objects;
 
 namespace BencodeNET.Parsing
 {
-    public class StringParser : BObjectParser<BString>
+    public class BStringParser : BObjectParser<BString>
     {
         protected const int MinimumLength = 2;
 
-        public StringParser()
+        public BStringParser()
             : this(Encoding.UTF8)
         { }
 
-        public StringParser(Encoding encoding)
+        public BStringParser(Encoding encoding)
         {
             if (encoding == null) throw new ArgumentNullException(nameof(encoding));
 

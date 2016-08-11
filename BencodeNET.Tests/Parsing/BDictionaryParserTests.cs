@@ -9,7 +9,7 @@ using Xunit;
 
 namespace BencodeNET.Tests.Parsing
 {
-    public class DictionaryParserTests
+    public class BDictionaryParserTests
     {
         [Theory]
         [InlineAutoMockedData("d4:spam3:egge")]
@@ -19,7 +19,7 @@ namespace BencodeNET.Tests.Parsing
             var value = new BString("value");
             SetupBencodeParser(bparser, bencode, key, value, hasEndChar:true);
 
-            var parser = new DictionaryParser(bparser);
+            var parser = new BDictionaryParser(bparser);
             var bdictionary = parser.Parse(bencode);
 
             bdictionary.Count.Should().Be(1);
@@ -31,7 +31,7 @@ namespace BencodeNET.Tests.Parsing
         [InlineAutoMockedData("de")]
         public void CanParseEmptyDictionary(string bencode, IBencodeParser bparser)
         {
-            var parser = new DictionaryParser(bparser);
+            var parser = new BDictionaryParser(bparser);
             var bdictionary = parser.Parse(bencode);
 
             bdictionary.Count.Should().Be(0);
@@ -41,7 +41,7 @@ namespace BencodeNET.Tests.Parsing
         [InlineAutoMockedData("d")]
         public void BelowMinimumLength2_ThrowsParsingException(string bencode, IBencodeParser bparser)
         {
-            var parser = new DictionaryParser(bparser);
+            var parser = new BDictionaryParser(bparser);
             Action action = () => parser.Parse(bencode);
 
             action.ShouldThrow<BencodeParsingException<BDictionary>>();
@@ -54,7 +54,7 @@ namespace BencodeNET.Tests.Parsing
         [InlineAutoMockedData("1de")]
         public void InvalidFirstChar_ThrowsParsingException(string bencode, IBencodeParser bparser)
         {
-            var parser = new DictionaryParser(bparser);
+            var parser = new BDictionaryParser(bparser);
             Action action = () => parser.Parse(bencode);
 
             action.ShouldThrow<BencodeParsingException<BDictionary>>();
@@ -68,7 +68,7 @@ namespace BencodeNET.Tests.Parsing
         {
             SetupBencodeParser(bparser, bencode, new BString("key"), new BString("value"), hasEndChar:false);
 
-            var parser = new DictionaryParser(bparser);
+            var parser = new BDictionaryParser(bparser);
             Action action = () => parser.Parse(bencode);
 
             action.ShouldThrow<BencodeParsingException<BDictionary>>();

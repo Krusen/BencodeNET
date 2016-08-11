@@ -10,13 +10,13 @@ namespace BencodeNET.Tests.Parsing
     // TODO: Async methods
     // TODO: Other encoding tests
     // TODO: Test both string, stream and bencodestream parse methods
-    public class StringParserTests
+    public class BStringParserTests
     {
-        private StringParser Parser { get; }
+        private BStringParser Parser { get; }
 
-        public StringParserTests()
+        public BStringParserTests()
         {
-            Parser = new StringParser();
+            Parser = new BStringParser();
         }
 
         [Theory]

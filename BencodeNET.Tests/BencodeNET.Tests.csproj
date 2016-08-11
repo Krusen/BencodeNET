@@ -102,10 +102,10 @@
     <Compile Include="Parsing\BencodeParserTests.cs" />
     <Compile Include="Parsing\BObjectParserListTests.cs" />
     <Compile Include="Parsing\BObjectParserTests.cs" />
-    <Compile Include="Parsing\DictionaryParserTests.cs" />
-    <Compile Include="Parsing\ListParserTests.cs" />
-    <Compile Include="Parsing\NumberParserTests.cs" />
-    <Compile Include="Parsing\StringParserTests.cs" />
+    <Compile Include="Parsing\BDictionaryParserTests.cs" />
+    <Compile Include="Parsing\BListParserTests.cs" />
+    <Compile Include="Parsing\BNumberParserTests.cs" />
+    <Compile Include="Parsing\BStringParserTests.cs" />
     <Compile Include="Parsing\TorrentParserTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Objects\BListTests.cs" />

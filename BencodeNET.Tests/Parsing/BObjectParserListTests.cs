@@ -102,7 +102,7 @@ namespace BencodeNET.Tests.Parsing
         [Fact]
         public void Indexer_Get_ReturnsMatchingParserForType()
         {
-            var stringParser = new StringParser();
+            var stringParser = new BStringParser();
             var list = new BObjectParserList {stringParser};
 
             var parser = list[typeof(BString)];
@@ -113,7 +113,7 @@ namespace BencodeNET.Tests.Parsing
         [Fact]
         public void Indexer_Set_AddsParserForType()
         {
-            var stringParser = new StringParser();
+            var stringParser = new BStringParser();
 
             var list = new BObjectParserList();
             list[typeof (BString)] = stringParser;
@@ -125,8 +125,8 @@ namespace BencodeNET.Tests.Parsing
         [Fact]
         public void Indexer_Set_ReplacesExistingParserForType()
         {
-            var stringParser1 = new StringParser();
-            var stringParser2 = new StringParser();
+            var stringParser1 = new BStringParser();
+            var stringParser2 = new BStringParser();
             var list = new BObjectParserList { stringParser1 };
 
             list[typeof (BString)] = stringParser2;
@@ -138,7 +138,7 @@ namespace BencodeNET.Tests.Parsing
         [Fact]
         public void Get_Generic_ReturnsMatchingParser()
         {
-            var stringParser = new StringParser();
+            var stringParser = new BStringParser();
             var list = new BObjectParserList {stringParser};
 
             var parser = list.Get<BString>();

@@ -7,11 +7,11 @@ using BencodeNET.Objects;
 
 namespace BencodeNET.Parsing
 {
-    public class ListParser : BObjectParser<BList>
+    public class BListParser : BObjectParser<BList>
     {
         protected const int MinimumLength = 2;
 
-        public ListParser(IBencodeParser bencodeParser)
+        public BListParser(IBencodeParser bencodeParser)
         {
             if (bencodeParser == null) throw new ArgumentNullException(nameof(bencodeParser));
 

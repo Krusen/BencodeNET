@@ -21,10 +21,10 @@ namespace BencodeNET.Parsing
 
             Parsers = new BObjectParserList
             {
-                new StringParser(encoding),
-                new NumberParser(),
-                new ListParser(this),
-                new DictionaryParser(this),
+                new BStringParser(encoding),
+                new BNumberParser(),
+                new BListParser(this),
+                new BDictionaryParser(this),
                 new TorrentParser(this)
             };
         }

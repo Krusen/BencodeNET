@@ -9,13 +9,13 @@ namespace BencodeNET.Tests.Parsing
 {
     // TODO: Async methods
     // TODO: Test parsing string, stream and bencodestream
-    public class NumberParserTests
+    public class BNumberParserTests
     {
-        private NumberParser Parser { get; }
+        private BNumberParser Parser { get; }
 
-        public NumberParserTests()
+        public BNumberParserTests()
         {
-            Parser = new NumberParser();
+            Parser = new BNumberParser();
         }
 
         [Theory]

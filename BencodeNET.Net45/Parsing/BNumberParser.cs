@@ -7,7 +7,7 @@ using BencodeNET.Objects;
 
 namespace BencodeNET.Parsing
 {
-    public class NumberParser : BObjectParser<BNumber>
+    public class BNumberParser : BObjectParser<BNumber>
     {
         protected const int MinimumLength = 3;
 

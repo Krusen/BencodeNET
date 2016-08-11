@@ -9,7 +9,7 @@ using Xunit;
 
 namespace BencodeNET.Tests.Parsing
 {
-    public class ListParserTests
+    public class BListParserTests
     {
         [Theory]
         [InlineAutoMockedData("l-something-e")]
@@ -22,7 +22,7 @@ namespace BencodeNET.Tests.Parsing
             SetupBencodeParser(bparser, bencode, bstring, hasEndChar: true);
 
             // Act
-            var parser = new ListParser(bparser);
+            var parser = new BListParser(bparser);
             var blist = parser.Parse(bencode);
 
             // Assert
@@ -36,7 +36,7 @@ namespace BencodeNET.Tests.Parsing
         [InlineAutoMockedData("le")]
         public void CanParseEmptyList(string bencode, IBencodeParser bparser)
         {
-            var parser = new ListParser(bparser);
+            var parser = new BListParser(bparser);
             var blist = parser.Parse(bencode);
 
             blist.Count.Should().Be(0);
@@ -47,7 +47,7 @@ namespace BencodeNET.Tests.Parsing
         [InlineAutoMockedData("l")]
         public void BelowMinimumLength2_ThrowsParsingException(string bencode, IBencodeParser bparser)
         {
-            var parser = new ListParser(bparser);
+            var parser = new BListParser(bparser);
             Action action = () => parser.Parse(bencode);
 
             action.ShouldThrow<BencodeParsingException<BList>>();
@@ -62,7 +62,7 @@ namespace BencodeNET.Tests.Parsing
         [InlineAutoMockedData("e")]
         public void InvalidFirstChar_ThrowsParsingException(string bencode, IBencodeParser bparser)
         {
-            var parser = new ListParser(bparser);
+            var parser = new BListParser(bparser);
             Action action = () => parser.Parse(bencode);
 
             action.ShouldThrow<BencodeParsingException<BList>>();
@@ -80,7 +80,7 @@ namespace BencodeNET.Tests.Parsing
             SetupBencodeParser(bparser, bencode, bstring, hasEndChar:false);
 
             // Act
-            var parser = new ListParser(bparser);
+            var parser = new BListParser(bparser);
             Action action = () => parser.Parse(bencode);
 
             // Assert
