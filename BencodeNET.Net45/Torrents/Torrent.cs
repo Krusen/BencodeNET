@@ -14,9 +14,6 @@ namespace BencodeNET.Torrents
     // TODO: Support for adding extra fields (List of BObject)
     public class Torrent : BObject
     {
-        // TODO: This controls the encoding used during encoding. Maybe abstract away the "string Encoding" property and reuse this for both
-        public Encoding OutputEncoding { get; set; } = System.Text.Encoding.UTF8;
-
         /// <summary>
         ///     A list of list of trackers (announce URLs).
         ///     Lists are processed in order of first to last. Trackers in a list are processed randomly.
@@ -88,8 +85,9 @@ namespace BencodeNET.Torrents
 
         /// <summary>
         /// [optional] Indicates the encoding used to store the strings in this torrents.
+        /// Default is <see cref="System.Text.Encoding.UTF8"/>.
         /// </summary>
-        public virtual string Encoding { get; set; }
+        public Encoding Encoding { get; set; } = Encoding.UTF8;
 
         /// <summary>
         /// The size in bytes of each file piece (piece length).
@@ -140,7 +138,7 @@ namespace BencodeNET.Torrents
 
             if (Trackers?.Count > 0)
             {
-                torrent[TorrentFields.Announce] = new BList(Trackers.First().Select(x => new BString(x, OutputEncoding)));
+                torrent[TorrentFields.Announce] = new BList(Trackers.First().Select(x => new BString(x, Encoding)));
             }
 
             if (Trackers?.Count > 1)
@@ -149,18 +147,18 @@ namespace BencodeNET.Torrents
             }
 
             if (Encoding != null)
-                torrent[TorrentFields.Encoding] = new BString(Encoding, OutputEncoding);
+                torrent[TorrentFields.Encoding] = new BString(Encoding.WebName.ToUpper(), Encoding);
 
             if (Comment != null)
-                torrent[TorrentFields.Comment] = new BString(Comment, OutputEncoding);
+                torrent[TorrentFields.Comment] = new BString(Comment, Encoding);
 
             if (CreatedBy != null)
-                torrent[TorrentFields.CreatedBy] = new BString(CreatedBy, OutputEncoding);
+                torrent[TorrentFields.CreatedBy] = new BString(CreatedBy, Encoding);
 
             if (CreationDate != null)
                 torrent[TorrentFields.CreationDate] = (BNumber)CreationDate;
 
-            torrent[TorrentFields.Info] = CreateInfo(OutputEncoding);
+            torrent[TorrentFields.Info] = CreateInfo(Encoding);
 
             return torrent;
         }
@@ -248,7 +246,7 @@ namespace BencodeNET.Torrents
         /// <returns>A string representation of a 20-byte SHA1 hash of the value of the 'info' part</returns>
         public virtual string CalculateInfoHash()
         {
-            var info = CreateInfo(OutputEncoding);
+            var info = CreateInfo(Encoding);
             return TorrentUtil.CalculateInfoHash(info);
         }
 
@@ -259,7 +257,7 @@ namespace BencodeNET.Torrents
         /// <returns>A 20-byte SHA1 hash of the value of the 'info' part</returns>
         public virtual byte[] CalculateInfoHashBytes()
         {
-            var info = CreateInfo(OutputEncoding);
+            var info = CreateInfo(Encoding);
             return TorrentUtil.CalculateInfoHashBytes(info);
         }
 
