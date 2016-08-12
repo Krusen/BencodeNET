@@ -1,21 +1,25 @@
 ﻿using System;
+#if !NETSTANDARD
 using System.Runtime.Serialization;
+#endif
 
 namespace BencodeNET.Exceptions
 {
+#if !NETSTANDARD
     [Serializable]
+#endif
     public class UnsupportedBencodeException : Exception
     {
         public long StreamPosition { get; set; }
 
-        public UnsupportedBencodeException() 
+        public UnsupportedBencodeException()
         { }
 
         public UnsupportedBencodeException(string message)
             : base(message)
         { }
 
-        public UnsupportedBencodeException(string message, long streamPosition) 
+        public UnsupportedBencodeException(string message, long streamPosition)
             : base(CreateMessage(message, streamPosition))
         {
             StreamPosition = streamPosition;
@@ -34,6 +38,7 @@ namespace BencodeNET.Exceptions
             return message;
         }
 
+#if !NETSTANDARD
         protected UnsupportedBencodeException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -49,5 +54,6 @@ namespace BencodeNET.Exceptions
 
             info.AddValue("StreamPosition", StreamPosition);
         }
+#endif
     }
 }

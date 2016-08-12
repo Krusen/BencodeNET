@@ -129,7 +129,7 @@ namespace BencodeNET.Parsing
             }
             catch (Exception)
             {
-                if (string.Equals(str, "UTF8", StringComparison.InvariantCultureIgnoreCase))
+                if (string.Equals(str, "UTF8", StringComparison.OrdinalIgnoreCase))
                 {
                     return Encoding.UTF8;
                 }

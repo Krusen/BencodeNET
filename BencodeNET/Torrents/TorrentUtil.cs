@@ -16,7 +16,7 @@ namespace BencodeNET.Torrents
 
         public static byte[] CalculateInfoHashBytes(BDictionary info)
         {
-            using (var sha1 = new SHA1Managed())
+            using (var sha1 = SHA1.Create())
             using (var stream = new MemoryStream())
             {
                 info.EncodeToStream(stream);

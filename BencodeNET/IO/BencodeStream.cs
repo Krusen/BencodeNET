@@ -168,21 +168,12 @@ namespace BencodeNET.IO
                 return _stream.ReadByteAsync();
 
             if (_peekedByte == -1)
-            {
-#if NET40
-                return TaskEx.FromResult(_peekedByte);
-#else
                 return Task.FromResult(_peekedByte);
-#endif
-            }
 
             _hasPeeked = false;
             _stream.Seek(1, SeekOrigin.Current);
-#if NET40
-            return TaskEx.FromResult(_peekedByte);
-#else
+
             return Task.FromResult(_peekedByte);
-#endif
         }
 
         public async Task<char> ReadCharAsync()
@@ -337,7 +328,7 @@ namespace BencodeNET.IO
             if (disposing)
             {
                 if (_stream != null && !_leaveOpen)
-                    _stream.Close();
+                    _stream.Dispose();
                 _stream = null;
             }
         }

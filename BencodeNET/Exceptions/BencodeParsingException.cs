@@ -1,5 +1,7 @@
 ﻿using System;
+#if !NETSTANDARD
 using System.Runtime.Serialization;
+#endif
 using BencodeNET.Objects;
 
 namespace BencodeNET.Exceptions
@@ -55,6 +57,7 @@ namespace BencodeNET.Exceptions
             return CreateMessage(output, streamPosition);
         }
 
+#if !NETSTANDARD
         protected BencodeParsingException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -70,9 +73,12 @@ namespace BencodeNET.Exceptions
 
             info.AddValue("StreamPosition", StreamPosition);
         }
+#endif
     }
 
+#if !NETSTANDARD
     [Serializable]
+#endif
     public class BencodeParsingException<T> : BencodeParsingException
     {
         public BencodeParsingException()

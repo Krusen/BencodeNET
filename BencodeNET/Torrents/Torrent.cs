@@ -12,6 +12,9 @@ namespace BencodeNET.Torrents
 
     // TODO: Equals comparison
     // TODO: Support for adding extra fields (List of BObject)
+    /// <summary>
+    ///
+    /// </summary>
     public class Torrent : BObject
     {
         /// <summary>

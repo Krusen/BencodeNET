@@ -3,10 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BencodeNET.Net45", "BencodeNET.Net45\BencodeNET.Net45.csproj", "{A267EADE-6093-41DF-AB20-53CB9661B47B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BencodeNET.Tests", "BencodeNET.Tests\BencodeNET.Tests.csproj", "{EEEE6947-258B-4E6E-AE99-F72B7A29D96F}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{65E984B8-653C-4BCD-AE37-4E21497B5B87}"
 	ProjectSection(SolutionItems) = preProject
 		.gitattributes = .gitattributes
@@ -15,12 +11,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BencodeNET.Net40", "BencodeNET.Net40\BencodeNET.Net40.csproj", "{B72053C7-01F2-47EC-AAF3-8A4FC078AF1D}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuGet", "NuGet", "{4EA69A14-7296-4812-9E80-B20E0C9747A2}"
 	ProjectSection(SolutionItems) = preProject
 		Package\BencodeNET.nuspec = Package\BencodeNET.nuspec
 	EndProjectSection
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "BencodeNET", "BencodeNET\BencodeNET.xproj", "{F36BB49E-1B21-418B-A4A1-C05430A8F5BA}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "BencodeNET.Tests", "BencodeNET.Tests\BencodeNET.Tests.xproj", "{2CD467B2-EFD7-4000-90AA-A252FD729AB7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,18 +26,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A267EADE-6093-41DF-AB20-53CB9661B47B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A267EADE-6093-41DF-AB20-53CB9661B47B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A267EADE-6093-41DF-AB20-53CB9661B47B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A267EADE-6093-41DF-AB20-53CB9661B47B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EEEE6947-258B-4E6E-AE99-F72B7A29D96F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EEEE6947-258B-4E6E-AE99-F72B7A29D96F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EEEE6947-258B-4E6E-AE99-F72B7A29D96F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EEEE6947-258B-4E6E-AE99-F72B7A29D96F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B72053C7-01F2-47EC-AAF3-8A4FC078AF1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B72053C7-01F2-47EC-AAF3-8A4FC078AF1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B72053C7-01F2-47EC-AAF3-8A4FC078AF1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B72053C7-01F2-47EC-AAF3-8A4FC078AF1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F36BB49E-1B21-418B-A4A1-C05430A8F5BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F36BB49E-1B21-418B-A4A1-C05430A8F5BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F36BB49E-1B21-418B-A4A1-C05430A8F5BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F36BB49E-1B21-418B-A4A1-C05430A8F5BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2CD467B2-EFD7-4000-90AA-A252FD729AB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2CD467B2-EFD7-4000-90AA-A252FD729AB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2CD467B2-EFD7-4000-90AA-A252FD729AB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2CD467B2-EFD7-4000-90AA-A252FD729AB7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

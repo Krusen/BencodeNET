@@ -2,6 +2,10 @@
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+#if NETSTANDARD
+using System;
+using System.Reflection;
+#endif
 
 namespace BencodeNET
 {
@@ -54,5 +58,12 @@ namespace BencodeNET
 
             return tcs.Task;
         }
+
+#if NETSTANDARD
+        public static bool IsAssignableFrom(this Type type, Type otherType)
+        {
+            return type.GetTypeInfo().IsAssignableFrom(otherType.GetTypeInfo());
+        }
+#endif
     }
 }
