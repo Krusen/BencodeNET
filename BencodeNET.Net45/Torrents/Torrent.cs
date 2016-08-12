@@ -85,9 +85,8 @@ namespace BencodeNET.Torrents
 
         /// <summary>
         /// [optional] Indicates the encoding used to store the strings in this torrents.
-        /// Default is <see cref="System.Text.Encoding.UTF8"/>.
         /// </summary>
-        public Encoding Encoding { get; set; } = Encoding.UTF8;
+        public Encoding Encoding { get; set; }
 
         /// <summary>
         /// The size in bytes of each file piece (piece length).

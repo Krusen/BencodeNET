@@ -16,6 +16,8 @@ namespace BencodeNET.Objects
 
         public override byte[] Value { get; }
 
+        private static readonly Encoding DefaultEncoding = Encoding.UTF8;
+
         private Encoding _encoding;
         /// <summary>
         /// Gets or sets the encoding used as the default with <c>ToString()</c>.
@@ -24,24 +26,18 @@ namespace BencodeNET.Objects
         public Encoding Encoding
         {
             get { return _encoding; }
-            set
-            {
-                if (value == null)
-                    throw new ArgumentNullException(nameof(value), "Encoding may not be set to null");
-                _encoding = value;
-            }
+            set { _encoding = value ?? DefaultEncoding; }
         }
 
         public BString(IEnumerable<byte> bytes)
-            : this(bytes, Encoding.UTF8)
+            : this(bytes, null)
         { }
 
         public BString(IEnumerable<byte> bytes, Encoding encoding)
         {
             if (bytes == null) throw new ArgumentNullException(nameof(bytes));
-            if (encoding == null) throw new ArgumentNullException(nameof(encoding));
 
-            _encoding = encoding;
+            _encoding = encoding ?? DefaultEncoding;
             Value = bytes as byte[] ?? bytes.ToArray();
         }
 
@@ -52,7 +48,7 @@ namespace BencodeNET.Objects
         /// <param name="str"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public BString(string str)
-            : this(str, Encoding.UTF8)
+            : this(str, null)
         { }
 
         /// <summary>
@@ -65,10 +61,9 @@ namespace BencodeNET.Objects
         public BString(string str, Encoding encoding)
         {
             if (str == null) throw new ArgumentNullException(nameof(str));
-            if (encoding == null) throw new ArgumentNullException(nameof(encoding));
 
-            _encoding = encoding;
-            Value = encoding.GetBytes(str);
+            _encoding = encoding ?? DefaultEncoding;
+            Value = _encoding.GetBytes(str);
         }
 
         /// <summary>
