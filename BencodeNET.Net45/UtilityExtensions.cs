@@ -32,13 +32,11 @@ namespace BencodeNET
 
         public static async Task<int> ReadByteAsync(this Stream stream)
         {
-
             var data = new byte[1];
             var bytesRead = await stream.ReadAsync(data, 0, 1).ConfigureAwait(false);
             if (bytesRead == 0)
                 return -1;
             return data[0];
-
         }
 
         public static Task WriteAsync(this Stream stream, char c)
