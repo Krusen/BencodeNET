@@ -46,7 +46,7 @@ namespace BencodeNET.Parsing
 
                 Comment = data.Get<BString>(TorrentFields.Comment)?.ToString(),
                 CreatedBy = data.Get<BString>(TorrentFields.CreatedBy)?.ToString(),
-                Encoding = data.Get<BString>(TorrentFields.Encoding)?.ToString(),
+                Encoding = ParseEncoding(data.Get<BString>(TorrentFields.Encoding)),
                 CreationDate = data.Get<BNumber>(TorrentFields.CreationDate),
 
                 Trackers = LoadTrackers(data)
@@ -91,25 +91,51 @@ namespace BencodeNET.Parsing
             return list;
         }
 
-        // TODO: Make trackers a list of lists (as the actual torrent structure)
-        protected virtual IList<string> LoadTrackers(BDictionary data)
+        protected virtual IList<IList<string>> LoadTrackers(BDictionary data)
         {
-            var trackers = new List<string>();
+            var trackerList = new List<IList<string>>();
+            var primary = new List<string>();
+            trackerList.Add(primary);
+
             var announce = data.Get<BString>(TorrentFields.Announce)?.ToString();
             if (!string.IsNullOrEmpty(announce))
             {
-                trackers.Add(announce);
+                primary.Add(announce);
             }
 
             var announceLists = data.Get<BList>(TorrentFields.AnnounceList)?.As<BList>();
-            if (announceLists != null)
+            if (announceLists?.Any() == true)
             {
-                trackers.AddRange(announceLists.SelectMany(list => list.AsStrings()));
+                primary.AddRange(announceLists.First().AsStrings());
+                trackerList[0] = primary.Distinct().ToList();
 
-                trackers = trackers.Distinct().ToList();
+                trackerList.AddRange(
+                    announceLists.Skip(1)
+                        .Select(x => x.AsStrings().ToList()));
             }
 
-            return trackers;
+            return trackerList;
+        }
+
+        protected virtual Encoding ParseEncoding(BString bstring)
+        {
+            if (bstring == null)
+                return null;
+
+            var str = bstring.ToString();
+            try
+            {
+                return Encoding.GetEncoding(str);
+            }
+            catch (Exception)
+            {
+                if (string.Equals(str, "UTF8", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return Encoding.UTF8;
+                }
+            }
+
+            return null;
         }
     }
 }
