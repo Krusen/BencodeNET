@@ -15,17 +15,19 @@ namespace BencodeNET.Torrents
     public class Torrent : BObject
     {
         /// <summary>
-        ///     A list of list of trackers (announce URLs).
-        ///     Lists are processed in order of first to last. Trackers in a list are processed randomly.
+        /// A list of list of trackers (announce URLs).
+        /// Lists are processed in order of first to last. Trackers in a list are processed randomly.
         /// </summary>
+        ///
         /// <remarks>
         /// <para>
-        ///     The lists will be processed by clients in order of first to last.
-        ///     For each list the trackers will be processed in random order until one is successful.
-        ///     If no trackers in the first list responds, the next list is attempted etc.
+        /// The lists will be processed by clients in order of first to last.
+        /// For each list the trackers will be processed in random order until one is successful.
+        /// If no trackers in the first list responds, the next list is attempted etc.
         /// </para>
+        ///
         /// <para>
-        ///     See more here: http://bittorrent.org/beps/bep_0012.html
+        /// See more here: http://bittorrent.org/beps/bep_0012.html
         /// </para>
         /// </remarks>
         public virtual IList<IList<string>> Trackers { get; set; } = new List<IList<string>>();
