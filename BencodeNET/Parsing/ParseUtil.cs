@@ -54,11 +54,11 @@ namespace BencodeNET.Parsing
                     parsedLong = 10 * parsedLong + digit;
             }
 
-            // Negative - should be less than zero
+            // Negative - should be less than zero (Int64.MinValue overflow)
             if (isNegative && parsedLong >= 0)
                 return false;
 
-            // Positive - should be equal to or greater than zero
+            // Positive - should be equal to or greater than zero (Int64.MaxValue overflow)
             if (!isNegative && parsedLong < 0)
                 return false;
 
