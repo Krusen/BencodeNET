@@ -11,18 +11,26 @@ namespace BencodeNET.Objects
     /// A class representing a bencoded string, i.e. a byte-string.
     /// The underlying value is a <see cref="byte"/> array.
     /// </summary>
-    public sealed class BString : BObject<byte[]>, IComparable<BString>
+    public sealed class BString : BObject<IReadOnlyList<byte>>, IComparable<BString>
     {
         /// <summary>
         /// The maximum number of digits that can be handled as the length part of a bencoded string.
         /// </summary>
         internal const int LengthMaxDigits = 10;
 
-        public override byte[] Value { get; }
+        /// <summary>
+        /// The underlying bytes of the string.
+        /// </summary>
+        public override IReadOnlyList<byte> Value => _value;
+        private readonly byte[] _value;
+
+        /// <summary>
+        /// Gets the length of the string in bytes.
+        /// </summary>
+        public int Length => _value.Length;
 
         private static readonly Encoding DefaultEncoding = Encoding.UTF8;
 
-        private Encoding _encoding;
         /// <summary>
         /// Gets or sets the encoding used as the default with <c>ToString()</c>.
         /// </summary>
@@ -32,48 +40,81 @@ namespace BencodeNET.Objects
             get { return _encoding; }
             set { _encoding = value ?? DefaultEncoding; }
         }
+        private Encoding _encoding;
 
-        public BString(IEnumerable<byte> bytes)
-            : this(bytes, null)
-        { }
-
-        public BString(IEnumerable<byte> bytes, Encoding encoding)
+        /// <summary>
+        /// Creates a <see cref="BString"/> from bytes with the specified encoding.
+        /// </summary>
+        /// <param name="bytes">The bytes representing the data.</param>
+        /// <param name="encoding">The encoding of the bytes. Defaults to <see cref="System.Text.Encoding.UTF8"/>.</param>
+        public BString(IEnumerable<byte> bytes, Encoding encoding = null)
         {
             if (bytes == null) throw new ArgumentNullException(nameof(bytes));
 
             _encoding = encoding ?? DefaultEncoding;
-            Value = bytes as byte[] ?? bytes.ToArray();
+            _value = bytes as byte[] ?? bytes.ToArray();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BString"/> class using
-        /// <c>Encoding.UTF8</c> to convert the string to bytes.
-        /// </summary>
-        /// <param name="str"></param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public BString(string str)
-            : this(str, null)
-        { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="BString"/> class using
-        /// the specified encoding to convert the string to bytes.
+        /// Creates a <see cref="BString"/> using the specified encoding to convert the string to bytes.
         /// </summary>
         /// <param name="str">The string.</param>
         /// <param name="encoding">The encoding used to convert the string to bytes.</param>
         /// <exception cref="ArgumentNullException">If </exception>
-        public BString(string str, Encoding encoding)
+        public BString(string str, Encoding encoding = null)
         {
             if (str == null) throw new ArgumentNullException(nameof(str));
 
             _encoding = encoding ?? DefaultEncoding;
-            Value = _encoding.GetBytes(str);
+            _value = _encoding.GetBytes(str);
         }
 
         /// <summary>
-        /// Gets the length of the byte-representation of the string.
+        /// Encodes the string and returns the result as a string using
+        /// the current value of the <see cref="Encoding"/> property.
         /// </summary>
-        public int Length => Value.Length;
+        /// <returns>
+        /// The object bencoded and converted to a string using
+        /// the current value of the <see cref="Encoding"/> property.
+        /// </returns>
+        public override string Encode()
+        {
+            return Encode(_encoding);
+        }
+
+        /// <summary>
+        /// Encodes the byte-string to the specified stream and returns a reference to the stream.
+        /// </summary>
+        /// <typeparam name="TStream">The type of stream.</typeparam>
+        /// <param name="stream">The stream to encode the byte-string to.</param>
+        /// <returns>The supplied stream.</returns>
+        public override TStream EncodeToStream<TStream>(TStream stream)
+        {
+            using (var bstream = new BencodeStream(stream, leaveOpen: true))
+            {
+                bstream.Write(_value.Length);
+                bstream.Write(':');
+                bstream.Write(_value);
+                return stream;
+            }
+        }
+
+        /// <summary>
+        /// Encodes the byte-string to the specified stream and returns a reference to the stream.
+        /// </summary>
+        /// <typeparam name="TStream">The type of stream.</typeparam>
+        /// <param name="stream">The stream to encode the byte-string to.</param>
+        /// <returns>The supplied stream.</returns>
+        public override async Task<TStream> EncodeToStreamAsync<TStream>(TStream stream)
+        {
+            using (var bstream = new BencodeStream(stream, leaveOpen: true))
+            {
+                await bstream.WriteAsync(_value.Length).ConfigureAwait(false);
+                await bstream.WriteAsync(':').ConfigureAwait(false);
+                await bstream.WriteAsync(_value).ConfigureAwait(false);
+                return stream;
+            }
+        }
 
         public static implicit operator BString(string value)
         {
@@ -111,7 +152,7 @@ namespace BencodeNET.Objects
 
         public override int GetHashCode()
         {
-            var bytesToHash = Math.Min(Value.Length, 32);
+            var bytesToHash = Math.Min(Value.Count, 32);
 
             long hashValue = 0;
             for (var i = 0; i < bytesToHash; i++)
@@ -170,53 +211,6 @@ namespace BencodeNET.Objects
         public string ToString(Encoding encoding)
         {
             return encoding.GetString(Value.ToArray());
-        }
-
-        /// <summary>
-        /// Encodes the object and returns the result as a string using
-        /// the current value of the Encoding property.
-        /// </summary>
-        /// <returns>
-        /// The object bencoded and converted to a string using
-        /// the current value of the Encoding property.
-        /// </returns>
-        public override string Encode()
-        {
-            return Encode(_encoding);
-        }
-
-        /// <summary>
-        /// Encodes the byte-string to the specified stream and returns a reference to the stream.
-        /// </summary>
-        /// <typeparam name="TStream">The type of stream.</typeparam>
-        /// <param name="stream">The stream to encode the byte-string to.</param>
-        /// <returns>The supplied stream.</returns>
-        public override TStream EncodeToStream<TStream>(TStream stream)
-        {
-            using (var bstream = new BencodeStream(stream, leaveOpen:true))
-            {
-                bstream.Write(Length);
-                bstream.Write(':');
-                bstream.Write(Value);
-                return stream;
-            }
-        }
-
-        /// <summary>
-        /// Encodes the byte-string to the specified stream and returns a reference to the stream.
-        /// </summary>
-        /// <typeparam name="TStream">The type of stream.</typeparam>
-        /// <param name="stream">The stream to encode the byte-string to.</param>
-        /// <returns>The supplied stream.</returns>
-        public override async Task<TStream> EncodeToStreamAsync<TStream>(TStream stream)
-        {
-            using (var bstream = new BencodeStream(stream, leaveOpen:true))
-            {
-                await bstream.WriteAsync(Length).ConfigureAwait(false);
-                await bstream.WriteAsync(':').ConfigureAwait(false);
-                await bstream.WriteAsync(Value).ConfigureAwait(false);
-                return stream;
-            }
         }
     }
 }
