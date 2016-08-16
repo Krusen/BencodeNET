@@ -13,14 +13,25 @@ namespace BencodeNET.Objects
         /// </summary>
         internal const int MaxDigits = 19;
 
+        /// <summary>
+        /// The underlying value.
+        /// </summary>
         public override long Value { get; }
 
+        /// <summary>
+        /// Create a <see cref="BNumber"/> from a <see cref="long"/>.
+        /// </summary>
         public BNumber(long value)
         {
             Value = value;
         }
 
-        // TODO: Doc. about expecting a unix format
+        /// <summary>
+        /// Create a <see cref="BNumber"/> from a <see cref="DateTime"/>.
+        /// </summary>
+        /// <remarks>
+        /// Bencode dates are stored in unix format (seconds since epoch).
+        /// </remarks>
         public BNumber(DateTime? datetime)
         {
             if (datetime == null)
@@ -29,6 +40,7 @@ namespace BencodeNET.Objects
             Value = datetime.Value.Subtract(Epoch).Ticks / TimeSpan.TicksPerSecond;
         }
 
+#pragma warning disable 1591
         public static implicit operator int(BNumber bint)
         {
             return (int)bint.Value;
@@ -70,6 +82,7 @@ namespace BencodeNET.Objects
         {
             return !(bnumber == other);
         }
+#pragma warning restore 1591
 
         public override bool Equals(object other)
         {
@@ -77,6 +90,9 @@ namespace BencodeNET.Objects
             return Value == bnumber?.Value;
         }
 
+        /// <summary>
+        /// Returns the hash code for this instance.
+        /// </summary>
         public override int GetHashCode()
         {
             return Value.GetHashCode();
@@ -110,6 +126,12 @@ namespace BencodeNET.Objects
             return Value.ToString(format, formatProvider);
         }
 
+        /// <summary>
+        /// Writes the object as bencode to the specified stream.
+        /// </summary>
+        /// <typeparam name="T">The type of <see cref="System.IO.Stream"/></typeparam>
+        /// <param name="stream"></param>
+        /// <returns>The passed <paramref name="stream"/></returns>
         public override T EncodeToStream<T>(T stream)
         {
             using (var bstream = new BencodeStream(stream, leaveOpen:true))
@@ -121,6 +143,12 @@ namespace BencodeNET.Objects
             }
         }
 
+        /// <summary>
+        /// Asynchronously writes the object as bencode to the specified stream.
+        /// </summary>
+        /// <typeparam name="T">The type of <see cref="System.IO.Stream"/></typeparam>
+        /// <param name="stream"></param>
+        /// <returns>The passed <paramref name="stream"/></returns>
         public override async Task<TStream> EncodeToStreamAsync<TStream>(TStream stream)
         {
             using (var bstream = new BencodeStream(stream, leaveOpen: true))
