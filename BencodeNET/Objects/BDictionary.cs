@@ -35,7 +35,8 @@ namespace BencodeNET.Objects
         /// In the case the existing and new value are both <see cref="BDictionary"/> they will be merged recursively.
         /// </summary>
         /// <param name="dictionary"></param>
-        public void MergeWith(BDictionary dictionary)
+        /// <param name="existingKeyAction"></param>
+        public void MergeWith(BDictionary dictionary, ExistingKeyAction existingKeyAction = ExistingKeyAction.Merge)
         {
             foreach (var field in dictionary)
             {
@@ -44,6 +45,9 @@ namespace BencodeNET.Objects
                     Add(field);
                     continue;
                 }
+
+                if (existingKeyAction == ExistingKeyAction.Skip)
+                    continue;
 
                 // Replace strings and numbers
                 if (field.Value is BString || field.Value is BNumber)
@@ -57,7 +61,7 @@ namespace BencodeNET.Objects
                 if (newList != null)
                 {
                     var existingList = Get<BList>(field.Key);
-                    if (existingList == null)
+                    if (existingList == null || existingKeyAction == ExistingKeyAction.Replace)
                     {
                         this[field.Key] = field.Value;
                         continue;
@@ -71,7 +75,7 @@ namespace BencodeNET.Objects
                 if (newDictionary != null)
                 {
                     var existingDictionary = Get<BDictionary>(field.Key);
-                    if (existingDictionary == null)
+                    if (existingDictionary == null || existingKeyAction == ExistingKeyAction.Replace)
                     {
                         this[field.Key] = field.Value;
                         continue;
@@ -191,5 +195,12 @@ namespace BencodeNET.Objects
         }
 
         #endregion
+    }
+
+    public enum ExistingKeyAction
+    {
+        Merge,
+        Replace,
+        Skip
     }
 }

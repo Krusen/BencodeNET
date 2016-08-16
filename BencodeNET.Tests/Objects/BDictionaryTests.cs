@@ -91,18 +91,48 @@ namespace BencodeNET.Tests.Objects
         }
 
         [Fact]
-        public void MergeWith_ListAppendedToExistingKeyOfSameType()
+        public void MergeWith_ExistingKeyOptionMerge_ListAppendedToExistingKeyOfSameType()
         {
             var dict1 = new BDictionary {{"key", new BList {"item1"}}};
             var dict2 = new BDictionary {{"key", new BList {"item2", "item3"}}};
 
-            dict1.MergeWith(dict2);
+            dict1.MergeWith(dict2, ExistingKeyAction.Merge);
 
             dict1.Should().HaveCount(1);
             dict1["key"].Should().BeOfType<BList>();
             dict1.Get<BList>("key").Should()
                 .HaveCount(3)
                 .And.ContainInOrder((BString) "item1", (BString) "item2", (BString) "item3");
+        }
+
+        [Fact]
+        public void MergeWith_ExistingKeyOption_Replace_ListReplacesExistingKeyOfSameType()
+        {
+            var dict1 = new BDictionary {{"key", new BList {"item1"}}};
+            var dict2 = new BDictionary {{"key", new BList {"item2", "item3"}}};
+
+            dict1.MergeWith(dict2, ExistingKeyAction.Replace);
+
+            dict1.Should().HaveCount(1);
+            dict1["key"].Should().BeOfType<BList>();
+            dict1.Get<BList>("key").Should()
+                .HaveCount(2)
+                .And.ContainInOrder((BString) "item2", (BString) "item3");
+        }
+
+        [Fact]
+        public void MergeWith_ExistingKeyOption_Skip_ListIsSkippedForExistingKeyOfSameType()
+        {
+            var dict1 = new BDictionary {{"key", new BList {"item1"}}};
+            var dict2 = new BDictionary {{"key", new BList {"item2", "item3"}}};
+
+            dict1.MergeWith(dict2, ExistingKeyAction.Skip);
+
+            dict1.Should().HaveCount(1);
+            dict1["key"].Should().BeOfType<BList>();
+            dict1.Get<BList>("key").Should()
+                .HaveCount(1)
+                .And.ContainInOrder((BString) "item1");
         }
 
         [Fact]
@@ -135,15 +165,39 @@ namespace BencodeNET.Tests.Objects
         }
 
         [Fact]
-        public void MergeWith_DictionaryMergedWithExistingKeyOfSameType()
+        public void MergeWith_ExistingKeyOption_Merge_DictionaryMergedWithExistingKeyOfSameType()
         {
             var dict1 = new BDictionary {{"main", new BDictionary {{"key", "value"}}}};
             var dict2 = new BDictionary {{"main", new BDictionary {{"key2", "value2"}}}};
 
-            dict1.MergeWith(dict2);
+            dict1.MergeWith(dict2, ExistingKeyAction.Merge);
 
             dict1.Should().HaveCount(1);
             dict1.Get<BDictionary>("main").Should().HaveCount(2).And.ContainKeys("key", "key2");
+        }
+
+        [Fact]
+        public void MergeWith_ExistingKeyOption_Replace_DictionaryReplacesExistingKeyOfSameType()
+        {
+            var dict1 = new BDictionary {{"main", new BDictionary {{"key", "value"}}}};
+            var dict2 = new BDictionary {{"main", new BDictionary {{"key2", "value2"}}}};
+
+            dict1.MergeWith(dict2, ExistingKeyAction.Replace);
+
+            dict1.Should().HaveCount(1);
+            dict1.Get<BDictionary>("main").Should().HaveCount(1).And.ContainKey("key2");
+        }
+
+        [Fact]
+        public void MergeWith_ExistingKeyOption_Skip_DictionarySkippedForExistingKeyOfSameType()
+        {
+            var dict1 = new BDictionary {{"main", new BDictionary {{"key", "value"}}}};
+            var dict2 = new BDictionary {{"main", new BDictionary {{"key2", "value2"}}}};
+
+            dict1.MergeWith(dict2, ExistingKeyAction.Skip);
+
+            dict1.Should().HaveCount(1);
+            dict1.Get<BDictionary>("main").Should().HaveCount(1).And.ContainKey("key");
         }
 
         [Fact]

@@ -176,7 +176,7 @@ namespace BencodeNET.Torrents
             torrent[TorrentFields.Info] = CreateInfo(Encoding);
 
             if (ExtraFields != null)
-                torrent.MergeWith(ExtraFields);
+                torrent.MergeWith(ExtraFields, ExistingKeyAction.Merge);
 
             return torrent;
         }
