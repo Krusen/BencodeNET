@@ -18,6 +18,17 @@ namespace BencodeNET.Torrents
     public class Torrent : BObject
     {
         /// <summary>
+        /// Add any custom fields to this <see cref="BDictionary"/> and they will
+        /// be merged with the torrent data when encoded.
+        /// </summary>
+        /// <remarks>
+        /// Existing keys will be overwritten with the values from this property.
+        /// In the case the existing and new value are both <see cref="BList"/> the new list will be appended to the existing list.
+        /// In the case the existing and new value are both <see cref="BDictionary"/> they will be merged recursively.
+        /// </remarks>
+        public virtual BDictionary ExtraFields { get; set; }
+
+        /// <summary>
         /// A list of list of trackers (announce URLs).
         /// Lists are processed in order of first to last. Trackers in a list are processed randomly.
         /// </summary>
@@ -163,6 +174,9 @@ namespace BencodeNET.Torrents
                 torrent[TorrentFields.CreationDate] = (BNumber)CreationDate;
 
             torrent[TorrentFields.Info] = CreateInfo(Encoding);
+
+            if (ExtraFields != null)
+                torrent.MergeWith(ExtraFields);
 
             return torrent;
         }
