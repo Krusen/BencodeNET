@@ -9,8 +9,8 @@ namespace BencodeNET.Objects
         string Encode();
         string Encode(Encoding encoding);
         T EncodeToStream<T>(T stream) where T : Stream;
-        void EncodeToFile(string path);
         Task<T> EncodeToStreamAsync<T>(T stream) where T : Stream;
+        void EncodeToFile(string path);
         Task EncodeToFileAsync(string path);
     }
 }
