@@ -24,9 +24,55 @@ namespace BencodeNET.Objects
             Add(new BString(key), new BNumber(value));
         }
 
-        public T Get<T>(string key) where T : class, IBObject
+        public T Get<T>(BString key) where T : class, IBObject
         {
             return this[key] as T;
+        }
+
+        public void MergeWith(BDictionary dictionary)
+        {
+            foreach (var field in dictionary)
+            {
+                if (!ContainsKey(field.Key))
+                {
+                    Add(field);
+                    continue;
+                }
+
+                // Replace strings and numbers
+                if (field.Value is BString || field.Value is BNumber)
+                {
+                    this[field.Key] = field.Value;
+                    continue;
+                }
+
+                // Append list to existing list or replace other types
+                var newList = field.Value as BList;
+                if (newList != null)
+                {
+                    var existingList = Get<BList>(field.Key);
+                    if (existingList == null)
+                    {
+                        this[field.Key] = field.Value;
+                        continue;
+                    }
+                    existingList.AddRange(newList);
+                    continue;
+                }
+
+                // Merge dictionary with existing or replace other types
+                var newDictionary = field.Value as BDictionary;
+                if (newDictionary != null)
+                {
+                    var existingDictionary = Get<BDictionary>(field.Key);
+                    if (existingDictionary == null)
+                    {
+                        this[field.Key] = field.Value;
+                        continue;
+                    }
+                    existingDictionary.MergeWith(newDictionary);
+                }
+            }
         }
 
         public override T EncodeToStream<T>(T stream)

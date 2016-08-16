@@ -41,6 +41,137 @@ namespace BencodeNET.Tests.Objects
         }
 
         [Fact]
+        public void MergeWith_StringReplacesExistingKey()
+        {
+            var dict1 = new BDictionary {{"key", "value"}};
+            var dict2 = new BDictionary {{"key", "replaced value"}};
+
+            dict1.MergeWith(dict2);
+
+            dict1.Should().HaveCount(1);
+            dict1["key"].Should().Be((BString)"replaced value");
+        }
+
+        [Fact]
+        public void MergeWith_StringWithNewKeyIsAdded()
+        {
+            var dict1 = new BDictionary {{"key", "value"}};
+            var dict2 = new BDictionary {{"another key", "value"}};
+
+            dict1.MergeWith(dict2);
+
+            dict1.Should().HaveCount(2);
+            dict1["key"].Should().Be((BString)"value");
+            dict1["another key"].Should().Be((BString)"value");
+        }
+
+        [Fact]
+        public void MergeWith_NumberReplacesExistingKey()
+        {
+            var dict1 = new BDictionary {{"key", 1}};
+            var dict2 = new BDictionary {{"key", 42}};
+
+            dict1.MergeWith(dict2);
+
+            dict1.Should().HaveCount(1);
+            dict1["key"].Should().Be((BNumber) 42);
+        }
+
+        [Fact]
+        public void MergeWith_NumberWithNewKeyIsAdded()
+        {
+            var dict1 = new BDictionary {{"key", 1}};
+            var dict2 = new BDictionary {{"another key", 42}};
+
+            dict1.MergeWith(dict2);
+
+            dict1.Should().HaveCount(2);
+            dict1["key"].Should().Be((BNumber) 1);
+            dict1["another key"].Should().Be((BNumber) 42);
+        }
+
+        [Fact]
+        public void MergeWith_ListAppendedToExistingKeyOfSameType()
+        {
+            var dict1 = new BDictionary {{"key", new BList {"item1"}}};
+            var dict2 = new BDictionary {{"key", new BList {"item2", "item3"}}};
+
+            dict1.MergeWith(dict2);
+
+            dict1.Should().HaveCount(1);
+            dict1["key"].Should().BeOfType<BList>();
+            dict1.Get<BList>("key").Should()
+                .HaveCount(3)
+                .And.ContainInOrder((BString) "item1", (BString) "item2", (BString) "item3");
+        }
+
+        [Fact]
+        public void MergeWith_ListReplacesExistingKeyOfDifferentType()
+        {
+            var dict1 = new BDictionary {{"key", "value"}};
+            var dict2 = new BDictionary {{"key", new BList {"item1", "item2"}}};
+
+            dict1.MergeWith(dict2);
+
+            dict1.Should().HaveCount(1);
+            dict1["key"].Should().BeOfType<BList>();
+            dict1.Get<BList>("key").Should()
+                .HaveCount(2)
+                .And.ContainInOrder((BString) "item1", (BString) "item2");
+        }
+
+        [Fact]
+        public void MergeWith_ListWithNewKeyIsAdded()
+        {
+            var list = new BList {1, 2, 3};
+            var dict1 = new BDictionary {{"key", 1}};
+            var dict2 = new BDictionary {{"another key", list}};
+
+            dict1.MergeWith(dict2);
+
+            dict1.Should().HaveCount(2);
+            dict1["key"].Should().Be((BNumber) 1);
+            dict1["another key"].Should().Be(list);
+        }
+
+        [Fact]
+        public void MergeWith_DictionaryMergedWithExistingKeyOfSameType()
+        {
+            var dict1 = new BDictionary {{"main", new BDictionary {{"key", "value"}}}};
+            var dict2 = new BDictionary {{"main", new BDictionary {{"key2", "value2"}}}};
+
+            dict1.MergeWith(dict2);
+
+            dict1.Should().HaveCount(1);
+            dict1.Get<BDictionary>("main").Should().HaveCount(2).And.ContainKeys("key", "key2");
+        }
+
+        [Fact]
+        public void MergeWith_DictionaryReplacesExistingKeyOfDifferentType()
+        {
+            var dict1 = new BDictionary {{"main", new BList {"item1"}}};
+            var dict2 = new BDictionary {{"main", new BDictionary {{"key", "value"}}}};
+
+            dict1.MergeWith(dict2);
+
+            dict1.Should().HaveCount(1);
+            dict1.Get<BDictionary>("main").Should().HaveCount(1).And.ContainKey("key");
+        }
+
+        [Fact]
+        public void MergeWith_DictionaryWithNewKeyIsAdded()
+        {
+            var dict1 = new BDictionary { { "main", new BDictionary { { "key", "value" } } } };
+            var dict2 = new BDictionary { { "main2", new BDictionary { { "key2", "value2" } } } };
+
+            dict1.MergeWith(dict2);
+
+            dict1.Should().HaveCount(2);
+            dict1.Get<BDictionary>("main").Should().HaveCount(1).And.ContainKeys("key");
+            dict1.Get<BDictionary>("main2").Should().HaveCount(1).And.ContainKeys("key2");
+        }
+
+        [Fact]
         public void Equals_WithKeysAddedInSameOrder_AreEqual()
         {
             var bdict1 = new BDictionary
