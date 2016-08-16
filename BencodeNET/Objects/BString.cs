@@ -7,6 +7,10 @@ using BencodeNET.IO;
 
 namespace BencodeNET.Objects
 {
+    /// <summary>
+    /// A class representing a bencoded string, i.e. a byte-string.
+    /// The underlying value is a <see cref="byte"/> array.
+    /// </summary>
     public sealed class BString : BObject<byte[]>, IComparable<BString>
     {
         /// <summary>
@@ -57,7 +61,7 @@ namespace BencodeNET.Objects
         /// </summary>
         /// <param name="str">The string.</param>
         /// <param name="encoding">The encoding used to convert the string to bytes.</param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">If </exception>
         public BString(string str, Encoding encoding)
         {
             if (str == null) throw new ArgumentNullException(nameof(str));
@@ -67,7 +71,7 @@ namespace BencodeNET.Objects
         }
 
         /// <summary>
-        /// Gets the length in bytes of the string.
+        /// Gets the length of the byte-representation of the string.
         /// </summary>
         public int Length => Value.Length;
 
@@ -182,10 +186,10 @@ namespace BencodeNET.Objects
         }
 
         /// <summary>
-        /// Encodes the object to the specified stream and returns a reference to the stream.
+        /// Encodes the byte-string to the specified stream and returns a reference to the stream.
         /// </summary>
         /// <typeparam name="TStream">The type of stream.</typeparam>
-        /// <param name="stream">The stream to encode the object to.</param>
+        /// <param name="stream">The stream to encode the byte-string to.</param>
         /// <returns>The supplied stream.</returns>
         public override TStream EncodeToStream<TStream>(TStream stream)
         {
@@ -198,6 +202,12 @@ namespace BencodeNET.Objects
             }
         }
 
+        /// <summary>
+        /// Encodes the byte-string to the specified stream and returns a reference to the stream.
+        /// </summary>
+        /// <typeparam name="TStream">The type of stream.</typeparam>
+        /// <param name="stream">The stream to encode the byte-string to.</param>
+        /// <returns>The supplied stream.</returns>
         public override async Task<TStream> EncodeToStreamAsync<TStream>(TStream stream)
         {
             using (var bstream = new BencodeStream(stream, leaveOpen:true))

@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace BencodeNET.Objects
 {
+    /// <summary>
+    /// Abstract base class with default implementation of most methods of <see cref="IBObject"/>.
+    /// </summary>
     public abstract class BObject : IBObject
     {
         internal BObject()
