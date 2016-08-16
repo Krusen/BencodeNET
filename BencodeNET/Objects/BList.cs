@@ -57,6 +57,14 @@ namespace BencodeNET.Objects
             Add((IBObject) new BNumber(value));
         }
 
+        public void AddRange(BList list)
+        {
+            foreach (var obj in list)
+            {
+                Add(obj);
+            }
+        }
+
         public override T EncodeToStream<T>(T stream)
         {
             stream.Write('l');

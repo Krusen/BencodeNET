@@ -17,6 +17,18 @@ namespace BencodeNET.Tests.Objects
         }
 
         [Fact]
+        public void AddRange_AppendsList()
+        {
+            var blist1 = new BList {"item1", "item2"};
+            var blist2 = new BList {"item3", "item4"};
+
+            blist1.AddRange(blist2);
+
+            blist1.Should().HaveCount(4);
+            blist1.Should().ContainInOrder((BString) "item1", (BString) "item2", (BString) "item3", (BString) "item4");
+        }
+
+        [Fact]
         public void Indexer_Set_Null_ThrowsArgumentNullException()
         {
             var blist = new BList {0};
