@@ -12,10 +12,10 @@ namespace BencodeNET.Objects
         { }
 
         /// <summary>
-        /// Encodes the object and returns the result as a string using <c>Encoding.UTF8</c>.
+        /// Encodes the object and returns the result as a string using <see cref="Encoding.UTF8"/>.
         /// </summary>
         /// <returns>
-        /// The object bencoded and converted to a string using <c>Encoding.UTF8</c>.
+        /// The object bencoded and converted to a string using <see cref="Encoding.UTF8"/>.
         /// </returns>
         public virtual string Encode()
         {
@@ -53,6 +53,10 @@ namespace BencodeNET.Objects
         /// <returns>The supplied stream.</returns>
         public abstract Task<TStream> EncodeToStreamAsync<TStream>(TStream stream) where TStream : Stream;
 
+        /// <summary>
+        /// Encodes the object to the specified file path.
+        /// </summary>
+        /// <param name="path">The file path to write the encoded object to.</param>
         public virtual void EncodeToFile(string path)
         {
             using (var stream = File.OpenWrite(path))
@@ -61,6 +65,11 @@ namespace BencodeNET.Objects
             }
         }
 
+        /// <summary>
+        /// Encodes the object asynchronously to the specified file path.
+        /// </summary>
+        /// <param name="path">The file path to write the encoded object to.</param>
+        /// <returns></returns>
         public virtual Task EncodeToFileAsync(string path)
         {
             using (var stream = File.OpenWrite(path))
@@ -104,14 +113,14 @@ namespace BencodeNET.Objects
         }
     }
 
-    public abstract class BObject<TY> : BObject
+    public abstract class BObject<T> : BObject
     {
         internal BObject()
         { }
 
         /// <summary>
-        /// The underlying value of the BObject.
+        /// The underlying value of the <see cref="BObject&lt;T&gt;"/>.
         /// </summary>
-        public abstract TY Value { get; }
+        public abstract T Value { get; }
     }
 }
