@@ -11,6 +11,20 @@ namespace BencodeNET.Tests.Objects
     {
         private static readonly DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
+        [Fact]
+        public void Constructor_DateTime_ValueIsUnixFormat()
+        {
+            var bnumber = new BNumber(new DateTime(2016, 1, 1));
+            bnumber.Value.Should().Be(1451606400);
+        }
+
+        [Fact]
+        public void Constructor_DateTime_NullParameter_ValueIsZero()
+        {
+            var bnumber = new BNumber((DateTime?)null);
+            bnumber.Value.Should().Be(0);
+        }
+
         [Theory]
         [InlineAutoMockedData(0, 0)]
         [InlineAutoMockedData(42, 42)]

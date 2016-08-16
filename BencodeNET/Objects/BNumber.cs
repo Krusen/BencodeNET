@@ -34,10 +34,7 @@ namespace BencodeNET.Objects
         /// </remarks>
         public BNumber(DateTime? datetime)
         {
-            if (datetime == null)
-                Value = 0;
-
-            Value = datetime.Value.Subtract(Epoch).Ticks / TimeSpan.TicksPerSecond;
+            Value = datetime?.Subtract(Epoch).Ticks / TimeSpan.TicksPerSecond ?? 0;
         }
 
 #pragma warning disable 1591
