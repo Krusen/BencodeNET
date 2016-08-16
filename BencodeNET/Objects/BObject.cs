@@ -8,7 +8,6 @@ namespace BencodeNET.Objects
 {
     public abstract class BObject : IBObject
     {
-
         internal BObject()
         { }
 
