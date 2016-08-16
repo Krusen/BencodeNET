@@ -29,6 +29,12 @@ namespace BencodeNET.Objects
             return this[key] as T;
         }
 
+        /// <summary>
+        /// Existing keys on this instance will be overwritten with the values from the passed <see cref="BDictionary"/>.
+        /// In the case the existing and new value are both <see cref="BList"/> the new list will be appended to the existing list.
+        /// In the case the existing and new value are both <see cref="BDictionary"/> they will be merged recursively.
+        /// </summary>
+        /// <param name="dictionary"></param>
         public void MergeWith(BDictionary dictionary)
         {
             foreach (var field in dictionary)
