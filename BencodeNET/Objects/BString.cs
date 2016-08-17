@@ -8,7 +8,7 @@ using BencodeNET.IO;
 namespace BencodeNET.Objects
 {
     /// <summary>
-    /// Represents bencoded string, i.e. a byte-string.
+    /// Represents a bencoded string, i.e. a byte-string.
     /// It isn't necessarily human-readable.
     /// </summary>
     /// <remarks>
