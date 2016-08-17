@@ -8,9 +8,12 @@ using BencodeNET.IO;
 namespace BencodeNET.Objects
 {
     /// <summary>
-    /// A class representing a bencoded string, i.e. a byte-string.
-    /// The underlying value is a <see cref="byte"/> array.
+    /// Represents bencoded string, i.e. a byte-string.
+    /// It isn't necessarily human-readable.
     /// </summary>
+    /// <remarks>
+    /// The underlying value is a <see cref="byte"/> array.
+    /// </remarks>
     public sealed class BString : BObject<IReadOnlyList<byte>>, IComparable<BString>
     {
         /// <summary>

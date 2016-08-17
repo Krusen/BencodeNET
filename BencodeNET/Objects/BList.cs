@@ -7,6 +7,12 @@ using System.Threading.Tasks;
 
 namespace BencodeNET.Objects
 {
+    /// <summary>
+    /// Represents a bencoded list of <see cref="IBObject"/>.
+    /// </summary>
+    /// <remarks>
+    /// The underlying value is a <see cref="IList{IBObject}"/>.
+    /// </remarks>
     public sealed class BList : BList<IBObject>
     {
         public override IList<IBObject> Value { get; }
@@ -90,6 +96,12 @@ namespace BencodeNET.Objects
         }
     }
 
+    /// <summary>
+    /// Represents a bencoded list of <see cref="IBObject"/> of type <typeparamref name="T"/>.
+    /// </summary>
+    /// <remarks>
+    /// The underlying value is a <see cref="IList{T}"/>.
+    /// </remarks>
     public class BList<T> : BObject<IList<T>>, IList<T> where T : IBObject
     {
         public override IList<T> Value { get; }

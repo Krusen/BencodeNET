@@ -5,6 +5,12 @@ using System.Threading.Tasks;
 
 namespace BencodeNET.Objects
 {
+    /// <summary>
+    /// Represents a bencoded dictionary of <see cref="BString"/> keys and <see cref="IBObject"/> values.
+    /// </summary>
+    /// <remarks>
+    /// The underlying value is a <see cref="IDictionary{BString,IBObject}"/>.
+    /// </remarks>
     public sealed class BDictionary : BObject<IDictionary<BString, IBObject>>, IDictionary<BString, IBObject>
     {
         public override IDictionary<BString, IBObject> Value { get; }

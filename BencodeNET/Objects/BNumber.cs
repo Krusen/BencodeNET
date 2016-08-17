@@ -4,6 +4,12 @@ using BencodeNET.IO;
 
 namespace BencodeNET.Objects
 {
+    /// <summary>
+    /// Represents a bencoded number (integer).
+    /// </summary>
+    /// <remarks>
+    /// The underlying value is a <see cref="long"/>.
+    /// </remarks>
     public sealed class BNumber : BObject<long>, IComparable<BNumber>
     {
         private static readonly DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
