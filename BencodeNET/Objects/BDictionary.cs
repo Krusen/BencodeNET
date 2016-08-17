@@ -36,16 +36,19 @@ namespace BencodeNET.Objects
         }
 
         /// <summary>
-        /// Existing keys on this instance will be overwritten with the values from the passed <see cref="BDictionary"/>.
-        /// In the case the existing and new value are both <see cref="BList"/> the new list will be appended to the existing list.
-        /// In the case the existing and new value are both <see cref="BDictionary"/> they will be merged recursively.
+        /// Merges this instance with another <see cref="BDictionary"/>.
         /// </summary>
-        /// <param name="dictionary"></param>
-        /// <param name="existingKeyAction"></param>
+        /// <remarks>
+        /// By default existing keys are either overwritten (<see cref="BString"/> and <see cref="BNumber"/>) or merged if possible (<see cref="BList"/> and <see cref="BDictionary"/>).
+        /// This behavior can be changed with the <paramref name="existingKeyAction"/> parameter.
+        /// </remarks>
+        /// <param name="dictionary">The dictionary to merge into this instance.</param>
+        /// <param name="existingKeyAction">Decides how to handle the values of existing keys.</param>
         public void MergeWith(BDictionary dictionary, ExistingKeyAction existingKeyAction = ExistingKeyAction.Merge)
         {
             foreach (var field in dictionary)
             {
+                // Add non-existing key
                 if (!ContainsKey(field.Key))
                 {
                     Add(field);
@@ -203,10 +206,25 @@ namespace BencodeNET.Objects
         #endregion
     }
 
+    /// <summary>
+    /// Specifices the action to take when encountering an already existing key when merging two <see cref="BDictionary"/>.
+    /// </summary>
     public enum ExistingKeyAction
     {
+        /// <summary>
+        /// Merges the values of existing keys for <see cref="BList"/> and <see cref="BDictionary"/>.
+        /// Overwrites existing keys for <see cref="BString"/> and <see cref="BNumber"/>.
+        /// </summary>
         Merge,
+
+        /// <summary>
+        /// Replaces the values of all existing keys.
+        /// </summary>
         Replace,
+
+        /// <summary>
+        /// Leaves all existing keys as they were.
+        /// </summary>
         Skip
     }
 }
