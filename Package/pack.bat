@@ -1,1 +1,0 @@
-nuget pack BencodeNET.nuspec

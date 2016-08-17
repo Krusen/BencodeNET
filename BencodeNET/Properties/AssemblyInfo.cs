@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("BencodeNET.Tests")]
+[assembly: AssemblyProduct("BencodeNET")]
 [assembly: AssemblyTrademark("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
@@ -16,4 +16,4 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("2cd467b2-efd7-4000-90aa-a252fd729ab7")]
+[assembly: Guid("f36bb49e-1b21-418b-a4a1-c05430a8f5ba")]

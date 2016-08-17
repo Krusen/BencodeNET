@@ -1,0 +1,23 @@
+﻿{
+  "version": "1.0.0-*",
+  "dependencies": {
+    "BencodeNET": {"target": "project"},
+    "NETStandard.Library": "1.6.0"
+  },
+  "frameworks": {
+    "net45": {
+      "dependencies": {
+        "xunit": "2.1.0",
+        "xunit.abstractions": "2.0.0",
+        "xunit.assert": "2.1.0",
+        "xunit.extensibility.core": "2.1.0",
+        "xunit.runner.visualstudio": "2.1.0",
+        "NSubstitute": "2.0.0-rc",
+        "FluentAssertions": "4.13.0",
+        "AutoFixture": "3.50.1",
+        "AutoFixture.AutoNSubstitute": "3.50.1",
+        "AutoFixture.Xunit2": "3.50.1"
+      }
+    }
+  }
+}
