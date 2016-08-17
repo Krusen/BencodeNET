@@ -15,19 +15,31 @@ namespace BencodeNET.Objects
     /// </remarks>
     public sealed class BList : BList<IBObject>
     {
-        public override IList<IBObject> Value { get; }
+        /// <summary>
+        /// The underlying list.
+        /// </summary>
+        public override IList<IBObject> Value { get; } = new List<IBObject>();
 
+        /// <summary>
+        /// Creates an empty list.
+        /// </summary>
         public BList()
-        {
-            Value = new List<IBObject>();
-        }
+        { }
 
+        /// <summary>
+        /// Creates a list from strings using <see cref="Encoding.UTF8"/>.
+        /// </summary>
+        /// <param name="strings"></param>
         public BList(IEnumerable<string> strings)
             : this(strings, Encoding.UTF8)
         { }
 
+        /// <summary>
+        /// Creates a list from strings using the specified encoding.
+        /// </summary>
+        /// <param name="strings"></param>
+        /// <param name="encoding"></param>
         public BList(IEnumerable<string> strings, Encoding encoding)
-            : this()
         {
             foreach (var str in strings)
             {
@@ -35,34 +47,55 @@ namespace BencodeNET.Objects
             }
         }
 
+        /// <summary>
+        /// Creates a list from en <see cref="IEnumerable{T}"/> of <see cref="IBObject"/>.
+        /// </summary>
+        /// <param name="objects"></param>
         public BList(IEnumerable<IBObject> objects)
-        {
-            foreach (var obj in objects)
-            {
-                Add(obj);
-            }
-        }
+            : base(objects)
+        { }
 
+        /// <summary>
+        /// Adds a string to the list using <see cref="Encoding.UTF8"/>.
+        /// </summary>
+        /// <param name="value"></param>
         public void Add(string value)
         {
             Add(new BString(value));
         }
 
+        /// <summary>
+        /// Adds a string to the list using the specified encoding.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="encoding"></param>
         public void Add(string value, Encoding encoding)
         {
             Add(new BString(value, encoding));
         }
 
+        /// <summary>
+        /// Adds an integer to the list.
+        /// </summary>
+        /// <param name="value"></param>
         public void Add(int value)
         {
             Add((IBObject) new BNumber(value));
         }
 
+        /// <summary>
+        /// Adds a long to the list.
+        /// </summary>
+        /// <param name="value"></param>
         public void Add(long value)
         {
             Add((IBObject) new BNumber(value));
         }
 
+        /// <summary>
+        /// Appends a list to the end of this instance.
+        /// </summary>
+        /// <param name="list"></param>
         public void AddRange(BList list)
         {
             foreach (var obj in list)
@@ -71,28 +104,44 @@ namespace BencodeNET.Objects
             }
         }
 
-        public override T EncodeToStream<T>(T stream)
-        {
-            stream.Write('l');
-            foreach (var item in this)
-                item.EncodeToStream(stream);
-            stream.Write('e');
-            return stream;
-        }
-
+        /// <summary>
+        /// Assumes all elements are <see cref="BString"/> and returns
+        /// an enumerable of their string representation.
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<string> AsStrings()
         {
             return AsStrings(Encoding.UTF8);
         }
 
+        /// <summary>
+        /// Assumes all elements are <see cref="BString"/> and returns
+        /// an enumerable of their string representation using the specified encoding.
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<string> AsStrings(Encoding encoding)
         {
             return As<BString>().Select(x => x.ToString(encoding));
         }
 
+        /// <summary>
+        /// Attempts to cast all elements to the specified type.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        /// <exception cref="InvalidCastException">
+        /// If any element cannot be cast to <typeparamref name="T"/>.
+        /// </exception>
         public BList<T> As<T>() where T : IBObject
         {
-            return new BList<T>(this);
+            try
+            {
+                return new BList<T>(this.Cast<T>());
+            }
+            catch (InvalidCastException ex)
+            {
+                throw new InvalidCastException($"Not all elements are of type '{typeof(T).FullName}'.", ex);
+            }
         }
     }
 
@@ -104,25 +153,34 @@ namespace BencodeNET.Objects
     /// </remarks>
     public class BList<T> : BObject<IList<T>>, IList<T> where T : IBObject
     {
+        /// <summary>
+        /// The underlying list.
+        /// </summary>
         public override IList<T> Value { get; }
 
+        /// <summary>
+        /// Creates an empty list.
+        /// </summary>
         public BList()
         {
             Value = new List<T>();
         }
 
-        public BList(IEnumerable<IBObject> list)
+        /// <summary>
+        /// Creates a list from the specified objects.
+        /// </summary>
+        /// <param name="objects"></param>
+        public BList(IEnumerable<T> objects)
         {
-            try
-            {
-                Value = list.Cast<T>().ToList();
-            }
-            catch (InvalidCastException ex)
-            {
-                throw new InvalidCastException($"Not all elements are of type '{typeof(T).FullName}'.", ex);
-            }
+            Value = objects.ToList();
         }
 
+        /// <summary>
+        /// Writes the list and its objects as bencode to the specified stream.
+        /// </summary>
+        /// <typeparam name="TStream">The type of <see cref="System.IO.Stream"/></typeparam>
+        /// <param name="stream"></param>
+        /// <returns>The passed <paramref name="stream"/></returns>
         public override TStream EncodeToStream<TStream>(TStream stream)
         {
             stream.Write('l');
@@ -134,6 +192,12 @@ namespace BencodeNET.Objects
             return stream;
         }
 
+        /// <summary>
+        /// Asynchronously writes the list and its objects as bencode to the specified stream.
+        /// </summary>
+        /// <typeparam name="T">The type of <see cref="System.IO.Stream"/></typeparam>
+        /// <param name="stream"></param>
+        /// <returns>The passed <paramref name="stream"/></returns>
         public override async Task<TStream> EncodeToStreamAsync<TStream>(TStream stream)
         {
             await stream.WriteAsync('l').ConfigureAwait(false);
