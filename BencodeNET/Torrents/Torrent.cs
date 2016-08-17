@@ -158,7 +158,7 @@ namespace BencodeNET.Torrents
 
             if (Trackers?.Count > 1)
             {
-                torrent[TorrentFields.AnnounceList] = new BList(Trackers.Select(x => new BList(x)));
+                torrent[TorrentFields.AnnounceList] = new BList(Trackers.Select(x => new BList(x, Encoding)));
             }
 
             if (Encoding != null)
