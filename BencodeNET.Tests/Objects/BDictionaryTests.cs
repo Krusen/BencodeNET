@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using BencodeNET.Objects;
 using FluentAssertions;
 using Xunit;
@@ -226,7 +227,7 @@ namespace BencodeNET.Tests.Objects
         }
 
         [Fact]
-        public void Equals_WithKeysAddedInSameOrder_AreEqual()
+        public void SequenceEqual_WithKeysAddedInSameOrder_AreEqual()
         {
             var bdict1 = new BDictionary
             {
@@ -242,87 +243,11 @@ namespace BencodeNET.Tests.Objects
                 {"key", "value"}
             };
 
-            bdict1.Equals(bdict2).Should().BeTrue();
-            bdict2.Equals(bdict1).Should().BeTrue();
+            bdict1.SequenceEqual(bdict2).Should().BeTrue();
         }
 
         [Fact]
-        public void Equals_WithKeysAddedInDifferentOrder_AreEqual()
-        {
-            var bdict1 = new BDictionary
-            {
-                {"foobar", "Hello World!"},
-                {"number", 747},
-                {"key", "value"}
-            };
-
-            var bdict2 = new BDictionary
-            {
-                {"key", "value"},
-                {"foobar", "Hello World!"},
-                {"number", 747}
-            };
-
-            bdict1.Equals(bdict2).Should().BeTrue();
-            bdict2.Equals(bdict1).Should().BeTrue();
-        }
-
-        [Fact]
-        public void Equals_WithDifferentKeys_AreNotEqual()
-        {
-            var bdict1 = new BDictionary
-            {
-                {"foobar", "Hello World!"},
-            };
-
-            var bdict2 = new BDictionary
-            {
-                {"key", "Hello World!"},
-            };
-
-            bdict1.Equals(bdict2).Should().BeFalse();
-            bdict2.Equals(bdict1).Should().BeFalse();
-        }
-
-        [Fact]
-        public void Equals_WithDifferentValues_AreNotEqual()
-        {
-            var bdict1 = new BDictionary
-            {
-                {"foobar", "Hello World!"},
-            };
-
-            var bdict2 = new BDictionary
-            {
-                {"foobar", "Another world..."},
-            };
-
-            bdict1.Equals(bdict2).Should().BeFalse();
-            bdict2.Equals(bdict1).Should().BeFalse();
-        }
-
-        [Fact]
-        public void EqualsOperator_WithKeysAddedInSameOrder_AreEqual()
-        {
-            var bdict1 = new BDictionary
-            {
-                {"foobar", "Hello World!"},
-                {"number", 747},
-                {"key", "value"}
-            };
-
-            var bdict2 = new BDictionary
-            {
-                {"foobar", "Hello World!"},
-                {"number", 747},
-                {"key", "value"}
-            };
-
-            (bdict1 == bdict2).Should().BeTrue();
-        }
-
-        [Fact]
-        public void EqualsOperator_WithKeysAddedInDifferentOrder_AreEqual()
+        public void SequenceEqual_WithKeysAddedInDifferentOrder_AreEqual()
         {
             var bdict1 = new BDictionary
             {
@@ -338,11 +263,11 @@ namespace BencodeNET.Tests.Objects
                 {"number", 747}
             };
 
-            (bdict1 == bdict2).Should().BeTrue();
+            bdict1.SequenceEqual(bdict2).Should().BeTrue();
         }
 
         [Fact]
-        public void EqualsOperator_WithDifferentKeys_AreNotEqual()
+        public void SequenceEqual_WithDifferentKeys_AreNotEqual()
         {
             var bdict1 = new BDictionary
             {
@@ -354,11 +279,11 @@ namespace BencodeNET.Tests.Objects
                 {"key", "Hello World!"},
             };
 
-            (bdict1 == bdict2).Should().BeFalse();
+            bdict1.SequenceEqual(bdict2).Should().BeFalse();
         }
 
         [Fact]
-        public void EqualsOperator_WithDifferentValues_AreNotEqual()
+        public void SequenceEqual_WithDifferentValues_AreNotEqual()
         {
             var bdict1 = new BDictionary
             {
@@ -370,7 +295,7 @@ namespace BencodeNET.Tests.Objects
                 {"foobar", "Another world..."},
             };
 
-            (bdict1 == bdict2).Should().BeFalse();
+            bdict1.SequenceEqual(bdict2).Should().BeFalse();
         }
 
         [Fact]

@@ -80,40 +80,6 @@ namespace BencodeNET.Objects
                 return EncodeToStreamAsync(stream);
             }
         }
-
-        public static bool operator ==(BObject first, BObject second)
-        {
-            if (ReferenceEquals(first, null))
-                return ReferenceEquals(second, null);
-
-            return first.Equals(second);
-        }
-
-        public static bool operator !=(BObject first, BObject second)
-        {
-            return !(first == second);
-        }
-
-        public override bool Equals(object other)
-        {
-            var obj = other as BObject;
-            if (obj == null)
-                return false;
-
-            using (var ms1 = EncodeToStream(new MemoryStream()))
-            using (var ms2 = obj.EncodeToStream(new MemoryStream()))
-            {
-                var bytes1 = ms1.ToArray();
-                var bytes2 = ms2.ToArray();
-
-                return bytes1.SequenceEqual(bytes2);
-            }
-        }
-
-        public override int GetHashCode()
-        {
-            throw new NotImplementedException();
-        }
     }
 
     public abstract class BObject<T> : BObject

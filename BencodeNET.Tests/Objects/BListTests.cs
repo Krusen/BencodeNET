@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 using BencodeNET.Objects;
 using FluentAssertions;
@@ -37,7 +38,7 @@ namespace BencodeNET.Tests.Objects
         }
 
         [Fact]
-        public void Equals_SameOrder_AreEqual()
+        public void SequenceEqual_SameOrder_AreEqual()
         {
             var blist1 = new BList
             {
@@ -51,12 +52,11 @@ namespace BencodeNET.Tests.Objects
                 "bar"
             };
 
-            blist1.Equals(blist2).Should().BeTrue();
-            blist2.Equals(blist1).Should().BeTrue();
+            blist1.SequenceEqual(blist2).Should().BeTrue();
         }
 
         [Fact]
-        public void Equals_DifferentOrder_AreNotEqual()
+        public void SequenceEqual_DifferentOrder_AreNotEqual()
         {
             var blist1 = new BList
             {
@@ -70,86 +70,7 @@ namespace BencodeNET.Tests.Objects
                 "foo"
             };
 
-            blist1.Equals(blist2).Should().BeFalse();
-            blist2.Equals(blist1).Should().BeFalse();
-        }
-
-        [Fact]
-        public void EqualsOperator_SameOrder_AreEqual()
-        {
-            var blist1 = new BList
-            {
-                "foo",
-                "bar"
-            };
-
-            var blist2 = new BList
-            {
-                "foo",
-                "bar"
-            };
-
-            (blist1 == blist2).Should().BeTrue();
-        }
-
-        [Fact]
-        public void EqualsOperator_DifferentOrder_AreNotEqual()
-        {
-            var blist1 = new BList
-            {
-                "foo",
-                "bar"
-            };
-
-            var blist2 = new BList
-            {
-                "bar",
-                "foo"
-            };
-
-            (blist1 == blist2).Should().BeFalse();
-        }
-
-        [Fact]
-        public void GetHashCode_TheSameForEqualLists()
-        {
-            var blist1 = new BList
-            {
-                "asdf",
-                "qwer"
-            };
-
-            var blist2 = new BList
-            {
-                "asdf",
-                "qwer"
-            };
-
-            var hash1 = blist1.GetHashCode();
-            var hash2 = blist2.GetHashCode();
-
-            hash1.Should().Be(hash2);
-        }
-
-        [Fact]
-        public void GetHashCode_NotTheSameForDifferentLists()
-        {
-            var blist1 = new BList
-            {
-                "asdf",
-                "qwer"
-            };
-
-            var blist2 = new BList
-            {
-                "asdf",
-                666
-            };
-
-            var hash1 = blist1.GetHashCode();
-            var hash2 = blist2.GetHashCode();
-
-            hash1.Should().NotBe(hash2);
+            blist1.SequenceEqual(blist2).Should().BeFalse();
         }
 
         [Fact]
