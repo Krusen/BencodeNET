@@ -46,10 +46,10 @@ namespace BencodeNET.Objects
         /// <summary>
         /// Writes the number as bencode to the specified stream.
         /// </summary>
-        /// <typeparam name="T">The type of <see cref="System.IO.Stream"/></typeparam>
+        /// <typeparam name="TStream">The type of <see cref="System.IO.Stream"/></typeparam>
         /// <param name="stream"></param>
         /// <returns>The passed <paramref name="stream"/></returns>
-        public override T EncodeToStream<T>(T stream)
+        public override TStream EncodeToStream<TStream>(TStream stream)
         {
             using (var bstream = new BencodeStream(stream, leaveOpen: true))
             {
