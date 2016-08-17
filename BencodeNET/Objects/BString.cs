@@ -195,27 +195,26 @@ namespace BencodeNET.Objects
 #pragma warning restore 1591
 
         /// <summary>
-        /// Encodes this byte-string as bencode and returns the encoded string.
-        /// Uses the current value of the <see cref="Encoding"/> property.
+        /// Converts the underlying bytes to a string representation using the current value of the <see cref="Encoding"/> property.
         /// </summary>
         /// <returns>
-        /// This byte-string as a bencoded string.
+        /// A <see cref="System.String" /> that represents this instance.
         /// </returns>
         public override string ToString()
         {
-            return Encode(_encoding);
+            return _encoding.GetString(Value.ToArray());
         }
 
         /// <summary>
-        /// Encodes this byte-string as bencode and returns the encoded string.
-        /// Uses the current value of the <see cref="Encoding"/> property.
+        /// Converts the underlying bytes to a string representation using the specified encoding.
         /// </summary>
+        /// <param name="encoding">The encoding to use to convert the underlying byte array to a <see cref="System.String" />.</param>
         /// <returns>
-        /// This byte-string as a bencoded string.
+        /// A <see cref="System.String" /> that represents this instance.
         /// </returns>
         public string ToString(Encoding encoding)
         {
-            return Encode(encoding);
+            return encoding.GetString(Value.ToArray());
         }
     }
 }
