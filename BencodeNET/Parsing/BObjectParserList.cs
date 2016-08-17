@@ -9,7 +9,6 @@ namespace BencodeNET.Parsing
     {
         private IDictionary<Type, IBObjectParser> Parsers { get; } = new Dictionary<Type, IBObjectParser>();
 
-        // TODO: Add type check (IBObject) here, for easier understanding of exception?
         public void Add(Type type, IBObjectParser parser)
         {
             AddOrReplace(type, parser);
