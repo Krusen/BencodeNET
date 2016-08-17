@@ -4,6 +4,9 @@ using System.Threading.Tasks;
 
 namespace BencodeNET.Objects
 {
+    /// <summary>
+    /// Represent a bencode value that can be encoded to bencode.
+    /// </summary>
     public interface IBObject
     {
         /// <summary>

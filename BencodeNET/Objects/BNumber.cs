@@ -37,6 +37,40 @@ namespace BencodeNET.Objects
             Value = datetime?.Subtract(Epoch).Ticks / TimeSpan.TicksPerSecond ?? 0;
         }
 
+        /// <summary>
+        /// Writes the number as bencode to the specified stream.
+        /// </summary>
+        /// <typeparam name="T">The type of <see cref="System.IO.Stream"/></typeparam>
+        /// <param name="stream"></param>
+        /// <returns>The passed <paramref name="stream"/></returns>
+        public override T EncodeToStream<T>(T stream)
+        {
+            using (var bstream = new BencodeStream(stream, leaveOpen: true))
+            {
+                bstream.Write('i');
+                bstream.Write(Value);
+                bstream.Write('e');
+                return stream;
+            }
+        }
+
+        /// <summary>
+        /// Asynchronously writes the number as bencode to the specified stream.
+        /// </summary>
+        /// <typeparam name="T">The type of <see cref="System.IO.Stream"/></typeparam>
+        /// <param name="stream"></param>
+        /// <returns>The passed <paramref name="stream"/></returns>
+        public override async Task<TStream> EncodeToStreamAsync<TStream>(TStream stream)
+        {
+            using (var bstream = new BencodeStream(stream, leaveOpen: true))
+            {
+                await bstream.WriteAsync('i').ConfigureAwait(false);
+                await bstream.WriteAsync(Value).ConfigureAwait(false);
+                await bstream.WriteAsync('e').ConfigureAwait(false);
+                return stream;
+            }
+        }
+
 #pragma warning disable 1591
         public static implicit operator int(BNumber bint)
         {
@@ -79,7 +113,6 @@ namespace BencodeNET.Objects
         {
             return !(bnumber == other);
         }
-#pragma warning restore 1591
 
         public override bool Equals(object other)
         {
@@ -122,39 +155,6 @@ namespace BencodeNET.Objects
         {
             return Value.ToString(format, formatProvider);
         }
-
-        /// <summary>
-        /// Writes the object as bencode to the specified stream.
-        /// </summary>
-        /// <typeparam name="T">The type of <see cref="System.IO.Stream"/></typeparam>
-        /// <param name="stream"></param>
-        /// <returns>The passed <paramref name="stream"/></returns>
-        public override T EncodeToStream<T>(T stream)
-        {
-            using (var bstream = new BencodeStream(stream, leaveOpen:true))
-            {
-                bstream.Write('i');
-                bstream.Write(Value);
-                bstream.Write('e');
-                return stream;
-            }
-        }
-
-        /// <summary>
-        /// Asynchronously writes the object as bencode to the specified stream.
-        /// </summary>
-        /// <typeparam name="T">The type of <see cref="System.IO.Stream"/></typeparam>
-        /// <param name="stream"></param>
-        /// <returns>The passed <paramref name="stream"/></returns>
-        public override async Task<TStream> EncodeToStreamAsync<TStream>(TStream stream)
-        {
-            using (var bstream = new BencodeStream(stream, leaveOpen: true))
-            {
-                await bstream.WriteAsync('i').ConfigureAwait(false);
-                await bstream.WriteAsync(Value).ConfigureAwait(false);
-                await bstream.WriteAsync('e').ConfigureAwait(false);
-                return stream;
-            }
-        }
+#pragma warning restore 1591
     }
 }

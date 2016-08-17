@@ -70,12 +70,11 @@ namespace BencodeNET.Objects
         }
 
         /// <summary>
-        /// Encodes the string and returns the result as a string using
-        /// the current value of the <see cref="Encoding"/> property.
+        /// Encodes this byte-string as bencode and returns the encoded string.
+        /// Uses the current value of the <see cref="Encoding"/> property.
         /// </summary>
         /// <returns>
-        /// The object bencoded and converted to a string using
-        /// the current value of the <see cref="Encoding"/> property.
+        /// This byte-string as a bencoded string.
         /// </returns>
         public override string Encode()
         {
@@ -83,11 +82,11 @@ namespace BencodeNET.Objects
         }
 
         /// <summary>
-        /// Encodes the byte-string to the specified stream and returns a reference to the stream.
+        /// Writes the byte-string as bencode to the specified stream.
         /// </summary>
         /// <typeparam name="TStream">The type of stream.</typeparam>
         /// <param name="stream">The stream to encode the byte-string to.</param>
-        /// <returns>The supplied stream.</returns>
+        /// <returns>The used stream.</returns>
         public override TStream EncodeToStream<TStream>(TStream stream)
         {
             using (var bstream = new BencodeStream(stream, leaveOpen: true))
@@ -100,11 +99,11 @@ namespace BencodeNET.Objects
         }
 
         /// <summary>
-        /// Encodes the byte-string to the specified stream and returns a reference to the stream.
+        /// Asynchronously writes the byte-string as bencode to the specified stream.
         /// </summary>
         /// <typeparam name="TStream">The type of stream.</typeparam>
         /// <param name="stream">The stream to encode the byte-string to.</param>
-        /// <returns>The supplied stream.</returns>
+        /// <returns>The used stream.</returns>
         public override async Task<TStream> EncodeToStreamAsync<TStream>(TStream stream)
         {
             using (var bstream = new BencodeStream(stream, leaveOpen: true))
@@ -116,6 +115,7 @@ namespace BencodeNET.Objects
             }
         }
 
+#pragma warning disable 1591
         public static implicit operator BString(string value)
         {
             return new BString(value);
@@ -189,28 +189,30 @@ namespace BencodeNET.Objects
 
             return 0;
         }
+#pragma warning restore 1591
 
         /// <summary>
-        /// Converts the underlying bytes to a string representation using the current value of the Encoding property.
+        /// Encodes this byte-string as bencode and returns the encoded string.
+        /// Uses the current value of the <see cref="Encoding"/> property.
         /// </summary>
         /// <returns>
-        /// A <see cref="System.String" /> that represents this instance.
+        /// This byte-string as a bencoded string.
         /// </returns>
         public override string ToString()
         {
-            return _encoding.GetString(Value.ToArray());
+            return Encode(_encoding);
         }
 
         /// <summary>
-        /// Converts the underlying bytes to a string representation using the specified encoding.
+        /// Encodes this byte-string as bencode and returns the encoded string.
+        /// Uses the current value of the <see cref="Encoding"/> property.
         /// </summary>
-        /// <param name="encoding">The encoding to use to convert the underlying byte array to a <see cref="System.String" />.</param>
         /// <returns>
-        /// A <see cref="System.String" /> that represents this instance.
+        /// This byte-string as a bencoded string.
         /// </returns>
         public string ToString(Encoding encoding)
         {
-            return encoding.GetString(Value.ToArray());
+            return Encode(encoding);
         }
     }
 }
