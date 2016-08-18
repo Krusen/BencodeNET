@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace BencodeNET.Objects
@@ -13,23 +14,63 @@ namespace BencodeNET.Objects
     /// </remarks>
     public sealed class BDictionary : BObject<IDictionary<BString, IBObject>>, IDictionary<BString, IBObject>
     {
-        public override IDictionary<BString, IBObject> Value { get; }
+        /// <summary>
+        /// The underlying dictionary.
+        /// </summary>
+        public override IDictionary<BString, IBObject> Value { get; } = new SortedDictionary<BString, IBObject>();
 
+        /// <summary>
+        /// Creates an empty dictionary.
+        /// </summary>
         public BDictionary()
+        { }
+
+        /// <summary>
+        /// Creates a dictionary from key-value pairs.
+        /// </summary>
+        /// <param name="keyValuePairs"></param>
+        public BDictionary(IEnumerable<KeyValuePair<BString, IBObject>> keyValuePairs)
         {
-            Value = new SortedDictionary<BString, IBObject>();
+            Value = new SortedDictionary<BString, IBObject>(keyValuePairs.ToDictionary(x => x.Key, x => x.Value));
         }
 
+        /// <summary>
+        /// Creates a dictionary with an initial value of the supplied dictionary.
+        /// </summary>
+        /// <param name="dictionary"></param>
+        public BDictionary(IDictionary<BString, IBObject> dictionary)
+        {
+            Value = dictionary;
+        }
+
+        /// <summary>
+        /// Adds the specified key and value to the dictionary as <see cref="BString"/>.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public void Add(string key, string value)
         {
             Add(new BString(key), new BString(value));
         }
 
+        /// <summary>
+        /// Adds the specified key and value to the dictionary as <see cref="BNumber"/>.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public void Add(string key, long value)
         {
             Add(new BString(key), new BNumber(value));
         }
 
+        /// <summary>
+        /// Gets the value associated with the specified key and casts it as <typeparamref name="T"/>.
+        /// If the key does not exist or the value is not of the specified type null is returned.
+        /// </summary>
+        /// <typeparam name="T">The type to cast the value to.</typeparam>
+        /// <param name="key">The key to get the associated value of.</param>
+        /// <returns>The associated value of the specified key or null if the key does not exist.
+        /// If the value is not of the specified type null is returned as well.</returns>
         public T Get<T>(BString key) where T : class, IBObject
         {
             return this[key] as T;
@@ -94,7 +135,13 @@ namespace BencodeNET.Objects
             }
         }
 
-        public override T EncodeToStream<T>(T stream)
+        /// <summary>
+        /// Writes the dictionary and its content as bencode to the specified stream.
+        /// </summary>
+        /// <typeparam name="TStream">The type of stream.</typeparam>
+        /// <param name="stream">The stream to write to.</param>
+        /// <returns>The used stream.</returns>
+        public override TStream EncodeToStream<TStream>(TStream stream)
         {
             stream.Write('d');
             foreach (var kvPair in this)
@@ -106,6 +153,12 @@ namespace BencodeNET.Objects
             return stream;
         }
 
+        /// <summary>
+        /// Asynchronously writes the dictionary and its content as bencode to the specified stream.
+        /// </summary>
+        /// <typeparam name="TStream">The type of stream.</typeparam>
+        /// <param name="stream">The stream to write to.</param>
+        /// <returns>The used stream.</returns>
         public override async Task<TStream> EncodeToStreamAsync<TStream>(TStream stream)
         {
             await stream.WriteAsync('d').ConfigureAwait(false);
@@ -133,12 +186,7 @@ namespace BencodeNET.Objects
         /// </summary>
         public IBObject this[BString key]
         {
-            get
-            {
-                if (!ContainsKey(key))
-                    return null;
-                return Value[key];
-            }
+            get { return ContainsKey(key) ? Value[key] : null; }
             set
             {
                 if (value == null) throw new ArgumentNullException(nameof(value));

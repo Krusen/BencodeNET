@@ -41,23 +41,23 @@ namespace BencodeNET.Objects
         }
 
         /// <summary>
-        /// Encodes the object to the specified stream and returns a reference to the stream.
+        /// Writes the object as bencode to the specified stream.
         /// </summary>
         /// <typeparam name="TStream">The type of stream.</typeparam>
-        /// <param name="stream">The stream to encode the object to.</param>
-        /// <returns>The supplied stream.</returns>
+        /// <param name="stream">The stream to write to.</param>
+        /// <returns>The used stream.</returns>
         public abstract TStream EncodeToStream<TStream>(TStream stream) where TStream : Stream;
 
         /// <summary>
-        /// Encodes the object to the specified stream and returns a reference to the stream.
+        /// Asynchronously writes the object as bencode to the specified stream.
         /// </summary>
         /// <typeparam name="TStream">The type of stream.</typeparam>
-        /// <param name="stream">The stream to encode the object to.</param>
-        /// <returns>The supplied stream.</returns>
+        /// <param name="stream">The stream to write to.</param>
+        /// <returns>The used stream.</returns>
         public abstract Task<TStream> EncodeToStreamAsync<TStream>(TStream stream) where TStream : Stream;
 
         /// <summary>
-        /// Encodes the object to the specified file path.
+        /// Writes the object as bencode to the specified file path.
         /// </summary>
         /// <param name="path">The file path to write the encoded object to.</param>
         public virtual void EncodeToFile(string path)
@@ -69,7 +69,7 @@ namespace BencodeNET.Objects
         }
 
         /// <summary>
-        /// Encodes the object asynchronously to the specified file path.
+        /// Asynchronously writes the object as bencode to the specified file path.
         /// </summary>
         /// <param name="path">The file path to write the encoded object to.</param>
         /// <returns></returns>
@@ -82,13 +82,17 @@ namespace BencodeNET.Objects
         }
     }
 
+    /// <summary>
+    /// Base class of bencode objects with a specific underlying value type.
+    /// </summary>
+    /// <typeparam name="T">Type of the underlying value.</typeparam>
     public abstract class BObject<T> : BObject
     {
         internal BObject()
         { }
 
         /// <summary>
-        /// The underlying value of the <see cref="BObject&lt;T&gt;"/>.
+        /// The underlying value of the <see cref="BObject{T}"/>.
         /// </summary>
         public abstract T Value { get; }
     }

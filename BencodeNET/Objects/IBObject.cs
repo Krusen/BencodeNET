@@ -27,29 +27,29 @@ namespace BencodeNET.Objects
         string Encode(Encoding encoding);
 
         /// <summary>
-        /// Encodes the object to the specified stream and returns a reference to the stream.
+        /// Writes the object as bencode to the specified stream.
         /// </summary>
         /// <typeparam name="TStream">The type of stream.</typeparam>
-        /// <param name="stream">The stream to encode the object to.</param>
-        /// <returns>The supplied stream.</returns>
-        T EncodeToStream<T>(T stream) where T : Stream;
+        /// <param name="stream">The stream to write to.</param>
+        /// <returns>The used stream.</returns>
+        TStream EncodeToStream<TStream>(TStream stream) where TStream : Stream;
 
         /// <summary>
-        /// Encodes the object to the specified stream and returns a reference to the stream.
+        /// Asynchronously writes the object as bencode to the specified stream.
         /// </summary>
         /// <typeparam name="TStream">The type of stream.</typeparam>
-        /// <param name="stream">The stream to encode the object to.</param>
-        /// <returns>The supplied stream.</returns>
-        Task<T> EncodeToStreamAsync<T>(T stream) where T : Stream;
+        /// <param name="stream">The stream to write to.</param>
+        /// <returns>The used stream.</returns>
+        Task<TStream> EncodeToStreamAsync<TStream>(TStream stream) where TStream : Stream;
 
         /// <summary>
-        /// Encodes the object to the specified file path.
+        /// Writes the object as bencode to the specified file path.
         /// </summary>
         /// <param name="path">The file path to write the encoded object to.</param>
         void EncodeToFile(string path);
 
         /// <summary>
-        /// Encodes the object asynchronously to the specified file path.
+        /// Asynchronously writes the object as bencode to the specified file path.
         /// </summary>
         /// <param name="path">The file path to write the encoded object to.</param>
         /// <returns></returns>

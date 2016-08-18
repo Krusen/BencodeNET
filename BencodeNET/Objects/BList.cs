@@ -130,7 +130,7 @@ namespace BencodeNET.Objects
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         /// <exception cref="InvalidCastException">
-        /// If any element cannot be cast to <typeparamref name="T"/>.
+        /// An element is not of type <typeparamref name="T"/>.
         /// </exception>
         public BList<T> As<T>() where T : IBObject
         {
@@ -178,9 +178,9 @@ namespace BencodeNET.Objects
         /// <summary>
         /// Writes the list and its objects as bencode to the specified stream.
         /// </summary>
-        /// <typeparam name="TStream">The type of <see cref="System.IO.Stream"/></typeparam>
-        /// <param name="stream"></param>
-        /// <returns>The passed <paramref name="stream"/></returns>
+        /// <typeparam name="TStream">The type of stream.</typeparam>
+        /// <param name="stream">The stream to write to.</param>
+        /// <returns>The used stream.</returns>
         public override TStream EncodeToStream<TStream>(TStream stream)
         {
             stream.Write('l');
@@ -195,9 +195,9 @@ namespace BencodeNET.Objects
         /// <summary>
         /// Asynchronously writes the list and its objects as bencode to the specified stream.
         /// </summary>
-        /// <typeparam name="T">The type of <see cref="System.IO.Stream"/></typeparam>
-        /// <param name="stream"></param>
-        /// <returns>The passed <paramref name="stream"/></returns>
+        /// <typeparam name="TStream">The type of stream.</typeparam>
+        /// <param name="stream">The stream to write to.</param>
+        /// <returns>The used stream.</returns>
         public override async Task<TStream> EncodeToStreamAsync<TStream>(TStream stream)
         {
             await stream.WriteAsync('l').ConfigureAwait(false);

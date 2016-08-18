@@ -46,9 +46,9 @@ namespace BencodeNET.Objects
         /// <summary>
         /// Writes the number as bencode to the specified stream.
         /// </summary>
-        /// <typeparam name="TStream">The type of <see cref="System.IO.Stream"/></typeparam>
-        /// <param name="stream"></param>
-        /// <returns>The passed <paramref name="stream"/></returns>
+        /// <typeparam name="TStream">The type of stream.</typeparam>
+        /// <param name="stream">The stream to write to.</param>
+        /// <returns>The used stream.</returns>
         public override TStream EncodeToStream<TStream>(TStream stream)
         {
             using (var bstream = new BencodeStream(stream, leaveOpen: true))
@@ -63,9 +63,9 @@ namespace BencodeNET.Objects
         /// <summary>
         /// Asynchronously writes the number as bencode to the specified stream.
         /// </summary>
-        /// <typeparam name="T">The type of <see cref="System.IO.Stream"/></typeparam>
-        /// <param name="stream"></param>
-        /// <returns>The passed <paramref name="stream"/></returns>
+        /// <typeparam name="TStream">The type of stream.</typeparam>
+        /// <param name="stream">The stream to write to.</param>
+        /// <returns>The used stream.</returns>
         public override async Task<TStream> EncodeToStreamAsync<TStream>(TStream stream)
         {
             using (var bstream = new BencodeStream(stream, leaveOpen: true))

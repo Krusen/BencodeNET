@@ -63,7 +63,7 @@ namespace BencodeNET.Objects
         /// </summary>
         /// <param name="str">The string.</param>
         /// <param name="encoding">The encoding used to convert the string to bytes.</param>
-        /// <exception cref="ArgumentNullException">If </exception>
+        /// <exception cref="ArgumentNullException"></exception>
         public BString(string str, Encoding encoding = null)
         {
             if (str == null) throw new ArgumentNullException(nameof(str));
@@ -88,7 +88,7 @@ namespace BencodeNET.Objects
         /// Writes the byte-string as bencode to the specified stream.
         /// </summary>
         /// <typeparam name="TStream">The type of stream.</typeparam>
-        /// <param name="stream">The stream to encode the byte-string to.</param>
+        /// <param name="stream">The stream to write to.</param>
         /// <returns>The used stream.</returns>
         public override TStream EncodeToStream<TStream>(TStream stream)
         {
@@ -105,7 +105,7 @@ namespace BencodeNET.Objects
         /// Asynchronously writes the byte-string as bencode to the specified stream.
         /// </summary>
         /// <typeparam name="TStream">The type of stream.</typeparam>
-        /// <param name="stream">The stream to encode the byte-string to.</param>
+        /// <param name="stream">The stream to write to.</param>
         /// <returns>The used stream.</returns>
         public override async Task<TStream> EncodeToStreamAsync<TStream>(TStream stream)
         {
