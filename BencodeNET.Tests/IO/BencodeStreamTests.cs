@@ -646,21 +646,6 @@ namespace BencodeNET.Tests.IO
         }
 
         [Fact]
-        public async Task PeekAfterSeek()
-        {
-            var str = "abcdefghijkl";
-            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(str)))
-            using (var bs = new BencodeStream(ms))
-            {
-                Assert.Equal(0, bs.Position);
-                Assert.Equal('a', await bs.PeekCharAsync());
-                bs.Seek(1, SeekOrigin.Current);
-                Assert.Equal(1, bs.Position);
-                Assert.Equal('b', await bs.PeekCharAsync());
-            }
-        }
-
-        [Fact]
         public void EndOfStream()
         {
             var str = "Hello World!";

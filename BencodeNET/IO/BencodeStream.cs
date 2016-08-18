@@ -15,8 +15,6 @@ namespace BencodeNET.IO
         private bool _hasPeeked;
         private int _peekedByte;
 
-        public bool EndOfStream => Position >= Length;
-
         public BencodeStream(string str) : this(str, Encoding.UTF8)
         { }
 
@@ -37,10 +35,29 @@ namespace BencodeNET.IO
             _leaveOpen = leaveOpen;
         }
 
-        public void Skip(int offset)
+        public Stream InnerStream => _stream;
+
+        public long Length => _stream.Length;
+
+        public long Position
         {
-            Seek(offset, SeekOrigin.Current);
+            get { return _stream.Position; }
+            set
+            {
+                _hasPeeked = false;
+                _stream.Position = value;
+            }
         }
+
+        public bool EndOfStream => Position >= Length;
+
+        public long Seek(long offset, SeekOrigin origin)
+        {
+            _hasPeeked = false;
+            return _stream.Seek(offset, origin);
+        }
+
+        #region Read
 
         // TODO: Documentation - this is cheap to call several times, only reads the first time until next Read()
         public int Peek()
@@ -240,6 +257,10 @@ namespace BencodeNET.IO
             return (char)value;
         }
 
+        #endregion
+
+        #region Write
+
         public void Write(int number)
         {
             var bytes = Encoding.ASCII.GetBytes(number.ToString());
@@ -284,33 +305,11 @@ namespace BencodeNET.IO
             return _stream.WriteAsync(bytes, 0, bytes.Length);
         }
 
+        #endregion
+
         public void Flush()
         {
             _stream.Flush();
-        }
-
-        public long Seek(long offset, SeekOrigin origin)
-        {
-            _hasPeeked = false;
-            return _stream.Seek(offset, origin);
-        }
-
-        public bool CanRead => _stream.CanRead;
-
-        public bool CanSeek => _stream.CanSeek;
-
-        public bool CanWrite => _stream.CanWrite;
-
-        public long Length => _stream.Length;
-
-        public long Position
-        {
-            get { return _stream.Position; }
-            set
-            {
-                _hasPeeked = false;
-                _stream.Position = value;
-            }
         }
 
         public void Dispose()
@@ -332,10 +331,5 @@ namespace BencodeNET.IO
         {
             return new BencodeStream(stream);
         }
-
-        //public static implicit operator Stream(BencodeStream stream)
-        //{
-        //    return stream._stream;
-        //}
     }
 }
