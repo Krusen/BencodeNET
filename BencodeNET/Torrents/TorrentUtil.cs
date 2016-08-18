@@ -19,7 +19,7 @@ namespace BencodeNET.Torrents
             using (var sha1 = SHA1.Create())
             using (var stream = new MemoryStream())
             {
-                info.EncodeToStream(stream);
+                info.EncodeTo(stream);
                 stream.Position = 0;
 
                 return sha1.ComputeHash(stream);

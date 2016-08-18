@@ -182,7 +182,7 @@ namespace BencodeNET.Objects
             stream.Write('l');
             foreach (var item in this)
             {
-                item.EncodeToStream(stream);
+                item.EncodeTo(stream);
             }
             stream.Write('e');
         }
@@ -192,7 +192,7 @@ namespace BencodeNET.Objects
             await stream.WriteAsync('l').ConfigureAwait(false);
             foreach (var item in this)
             {
-                await item.EncodeToStreamAsync(stream).ConfigureAwait(false);
+                await item.EncodeToAsync(stream).ConfigureAwait(false);
             }
             await stream.WriteAsync('e').ConfigureAwait(false);
         }

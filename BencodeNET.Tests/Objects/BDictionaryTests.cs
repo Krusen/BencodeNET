@@ -307,7 +307,7 @@ namespace BencodeNET.Tests.Objects
                 {"number", 747}
             };
 
-            var bencode = bdict.Encode();
+            var bencode = bdict.EncodeAsString();
 
             bencode.Should().Be("d6:foobar12:Hello World!6:numberi747ee");
         }
@@ -322,7 +322,7 @@ namespace BencodeNET.Tests.Objects
                 {"key", "value"}
             };
 
-            var bencode = bdict.Encode();
+            var bencode = bdict.EncodeAsString();
 
             bencode.Should().Be("d6:foobar12:Hello World!3:key5:value6:numberi747ee");
         }
@@ -331,7 +331,7 @@ namespace BencodeNET.Tests.Objects
         public void CanEncode_EmptyDictionary()
         {
             var bdict = new BDictionary();
-            var bencode = bdict.Encode();
+            var bencode = bdict.EncodeAsString();
             bencode.Should().Be("de");
         }
 
@@ -361,7 +361,7 @@ namespace BencodeNET.Tests.Objects
                 }
             };
 
-            var bencode = bdict.Encode();
+            var bencode = bdict.EncodeAsString();
 
             bencode.Should()
                 .Be("d6:A Listl3:foo3:bari123ed9:more spam9:more eggsee6:foobard7:numbersli1ei2ei3eee4:spam3:egge");

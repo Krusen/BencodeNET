@@ -79,9 +79,9 @@ namespace BencodeNET.Objects
         /// <returns>
         /// This byte-string as a bencoded string.
         /// </returns>
-        public override string Encode()
+        public override string EncodeAsString()
         {
-            return Encode(_encoding);
+            return EncodeAsString(_encoding);
         }
 
 #pragma warning disable 1591

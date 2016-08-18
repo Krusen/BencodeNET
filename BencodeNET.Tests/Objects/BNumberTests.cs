@@ -83,7 +83,7 @@ namespace BencodeNET.Tests.Objects
         public void CanEncode(long value)
         {
             var bnumber = new BNumber(value);
-            var bencode = bnumber.Encode();
+            var bencode = bnumber.EncodeAsString();
             bencode.Should().Be($"i{value}e");
         }
 
@@ -96,7 +96,7 @@ namespace BencodeNET.Tests.Objects
         public void CanEncode_Negative(long value)
         {
             var bnumber = new BNumber(value);
-            var bencode = bnumber.Encode();
+            var bencode = bnumber.EncodeAsString();
             bencode.Should().Be($"i{value}e");
         }
 
@@ -104,7 +104,7 @@ namespace BencodeNET.Tests.Objects
         public void CanEncode_Zero()
         {
             var bnumber = new BNumber(0);
-            var bencode = bnumber.Encode();
+            var bencode = bnumber.EncodeAsString();
             bencode.Should().Be("i0e");
         }
 
@@ -112,7 +112,7 @@ namespace BencodeNET.Tests.Objects
         public void CanEncode_Int64MinValue()
         {
             var bnumber = new BNumber(-9223372036854775808);
-            var bencode = bnumber.Encode();
+            var bencode = bnumber.EncodeAsString();
             bencode.Should().Be("i-9223372036854775808e");
         }
 
@@ -120,7 +120,7 @@ namespace BencodeNET.Tests.Objects
         public void CanEncode_Int64MaxValue()
         {
             var bnumber = new BNumber(9223372036854775807);
-            var bencode = bnumber.Encode();
+            var bencode = bnumber.EncodeAsString();
             bencode.Should().Be("i9223372036854775807e");
         }
 
@@ -131,7 +131,7 @@ namespace BencodeNET.Tests.Objects
 
             using (var stream = new MemoryStream())
             {
-                bnumber.EncodeToStream(stream);
+                bnumber.EncodeTo(stream);
 
                 stream.Length.Should().Be(4);
                 stream.AsString().Should().Be("i42e");
@@ -145,7 +145,7 @@ namespace BencodeNET.Tests.Objects
 
             using (var stream = new MemoryStream())
             {
-                await bnumber.EncodeToStreamAsync(stream);
+                await bnumber.EncodeToAsync(stream);
 
                 stream.Length.Should().Be(4);
                 stream.AsString().Should().Be("i42e");

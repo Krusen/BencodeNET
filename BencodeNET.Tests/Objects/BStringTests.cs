@@ -154,7 +154,7 @@ namespace BencodeNET.Tests.Objects
         public void CanEncode(string str, int length)
         {
             var bstring = new BString(str);
-            var bencode = bstring.Encode();
+            var bencode = bstring.EncodeAsString();
             bencode.Should().Be($"{length}:{str}");
         }
 
@@ -162,7 +162,7 @@ namespace BencodeNET.Tests.Objects
         public void CanEncode_EmptyString()
         {
             var bstring = new BString("");
-            var bencode = bstring.Encode();
+            var bencode = bstring.EncodeAsString();
             bencode.Should().Be("0:");
         }
 
@@ -170,7 +170,7 @@ namespace BencodeNET.Tests.Objects
         public void CanEncode_UTF8()
         {
             var bstring = new BString("æøå äö èéê ñ", Encoding.UTF8);
-            var bencode = bstring.Encode();
+            var bencode = bstring.EncodeAsString();
             bencode.Should().Be("21:æøå äö èéê ñ");
         }
 
@@ -180,7 +180,7 @@ namespace BencodeNET.Tests.Objects
             var encoding = Encoding.GetEncoding("ISO-8859-1");
             var bstring = new BString("æøå äö èéê ñ", encoding);
 
-            var bencode = bstring.Encode(encoding);
+            var bencode = bstring.EncodeAsString(encoding);
 
             bencode.Should().Be("12:æøå äö èéê ñ");
         }
@@ -192,7 +192,7 @@ namespace BencodeNET.Tests.Objects
             var bytes = encoding.GetBytes("æøå äö èéê ñ");
             var bstring = new BString(bytes);
 
-            var bencode = bstring.Encode(encoding);
+            var bencode = bstring.EncodeAsString(encoding);
 
             bencode.Should().Be("12:æøå äö èéê ñ");
         }
@@ -201,7 +201,7 @@ namespace BencodeNET.Tests.Objects
         public void CanEncode_NumbersAndSpecialCharacters()
         {
             var bstring = new BString("123:?!#{}'|<>");
-            var bencode = bstring.Encode();
+            var bencode = bstring.EncodeAsString();
             bencode.Should().Be("13:123:?!#{}'|<>");
         }
 
@@ -229,7 +229,7 @@ namespace BencodeNET.Tests.Objects
 
             using (var stream = new MemoryStream())
             {
-                bstring.EncodeToStream(stream);
+                bstring.EncodeTo(stream);
 
                 stream.Length.Should().Be(14);
                 stream.AsString().Should().Be("11:hello world");
@@ -243,7 +243,7 @@ namespace BencodeNET.Tests.Objects
 
             using (var stream = new MemoryStream())
             {
-                await bstring.EncodeToStreamAsync(stream);
+                await bstring.EncodeToAsync(stream);
 
                 stream.Length.Should().Be(14);
                 stream.AsString().Should().Be("11:hello world");

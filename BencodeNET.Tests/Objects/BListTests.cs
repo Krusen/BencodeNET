@@ -77,7 +77,7 @@ namespace BencodeNET.Tests.Objects
         public void CanEncode_Simple()
         {
             var blist = new BList {"hello world", 987, "foobar"};
-            var bencode = blist.Encode();
+            var bencode = blist.EncodeAsString();
             bencode.Should().Be("l11:hello worldi987e6:foobare");
         }
 
@@ -85,7 +85,7 @@ namespace BencodeNET.Tests.Objects
         public void CanEncode_EmptyList()
         {
             var blist = new BList();
-            var bencode = blist.Encode();
+            var bencode = blist.EncodeAsString();
             bencode.Should().Be("le");
         }
 
@@ -93,7 +93,7 @@ namespace BencodeNET.Tests.Objects
         public void CanEncode_UTF8()
         {
             var blist = new BList { "æøå äö èéê ñ" };
-            var bencode = blist.Encode();
+            var bencode = blist.EncodeAsString();
             bencode.Should().Be("l21:æøå äö èéê ñe");
         }
 
@@ -103,7 +103,7 @@ namespace BencodeNET.Tests.Objects
             var encoding = Encoding.GetEncoding("ISO-8859-1");
             var blist = new BList { new BString("æøå äö èéê ñ", encoding) };
 
-            var bencode = blist.Encode(encoding);
+            var bencode = blist.EncodeAsString(encoding);
 
             bencode.Should().Be("l12:æøå äö èéê ñe");
         }
@@ -133,7 +133,7 @@ namespace BencodeNET.Tests.Objects
 
             };
 
-            var bencode = blist.Encode();
+            var bencode = blist.EncodeAsString();
 
             bencode.Should().Be("l4:spami666el3:foo3:bari123ed9:more spam9:more eggsee6:foobard7:numbersli1ei2ei3eeee");
         }

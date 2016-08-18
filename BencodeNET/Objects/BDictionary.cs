@@ -142,8 +142,8 @@ namespace BencodeNET.Objects
             stream.Write('d');
             foreach (var kvPair in this)
             {
-                kvPair.Key.EncodeToStream(stream);
-                kvPair.Value.EncodeToStream(stream);
+                kvPair.Key.EncodeTo(stream);
+                kvPair.Value.EncodeTo(stream);
             }
             stream.Write('e');
         }
@@ -153,8 +153,8 @@ namespace BencodeNET.Objects
             await stream.WriteAsync('d').ConfigureAwait(false);
             foreach (var kvPair in this)
             {
-                await kvPair.Key.EncodeToStreamAsync(stream).ConfigureAwait(false);
-                await kvPair.Value.EncodeToStreamAsync(stream).ConfigureAwait(false);
+                await kvPair.Key.EncodeToAsync(stream).ConfigureAwait(false);
+                await kvPair.Value.EncodeToAsync(stream).ConfigureAwait(false);
             }
             await stream.WriteAsync('e').ConfigureAwait(false);
         }

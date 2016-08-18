@@ -19,9 +19,9 @@ namespace BencodeNET.Objects
         /// <returns>
         /// The object bencoded and converted to a string using <see cref="Encoding.UTF8"/>.
         /// </returns>
-        public virtual string Encode()
+        public virtual string EncodeAsString()
         {
-            return Encode(Encoding.UTF8);
+            return EncodeAsString(Encoding.UTF8);
         }
 
         /// <summary>
@@ -31,9 +31,9 @@ namespace BencodeNET.Objects
         /// <returns>
         /// The object bencoded and converted to a string using the specified encoding.
         /// </returns>
-        public virtual string Encode(Encoding encoding)
+        public virtual string EncodeAsString(Encoding encoding)
         {
-            using (var stream = EncodeToStream(new MemoryStream()))
+            using (var stream = EncodeTo(new MemoryStream()))
             {
                 return encoding.GetString(stream.ToArray());
             }
@@ -45,20 +45,9 @@ namespace BencodeNET.Objects
         /// <typeparam name="TStream">The type of stream.</typeparam>
         /// <param name="stream">The stream to write to.</param>
         /// <returns>The used stream.</returns>
-        public TStream EncodeToStream<TStream>(TStream stream) where TStream : Stream
+        public TStream EncodeTo<TStream>(TStream stream) where TStream : Stream
         {
             EncodeObject(new BencodeStream(stream));
-            return stream;
-        }
-
-        /// <summary>
-        /// Writes the object as bencode to the specified stream.
-        /// </summary>
-        /// <param name="stream">The stream to write to.</param>
-        /// <returns>The used stream.</returns>
-        public BencodeStream EncodeToStream(BencodeStream stream)
-        {
-            EncodeObject(stream);
             return stream;
         }
 
@@ -68,9 +57,20 @@ namespace BencodeNET.Objects
         /// <typeparam name="TStream">The type of stream.</typeparam>
         /// <param name="stream">The stream to write to.</param>
         /// <returns>The used stream.</returns>
-        public async Task<TStream> EncodeToStreamAsync<TStream>(TStream stream) where TStream : Stream
+        public async Task<TStream> EncodeToAsync<TStream>(TStream stream) where TStream : Stream
         {
             await EncodeObjectAsync(new BencodeStream(stream));
+            return stream;
+        }
+
+        /// <summary>
+        /// Writes the object as bencode to the specified stream.
+        /// </summary>
+        /// <param name="stream">The stream to write to.</param>
+        /// <returns>The used stream.</returns>
+        public BencodeStream EncodeTo(BencodeStream stream)
+        {
+            EncodeObject(stream);
             return stream;
         }
 
@@ -79,40 +79,40 @@ namespace BencodeNET.Objects
         /// </summary>
         /// <param name="stream">The stream to write to.</param>
         /// <returns>The used stream.</returns>
-        public async Task<BencodeStream> EncodeToStreamAsync(BencodeStream stream)
+        public async Task<BencodeStream> EncodeToAsync(BencodeStream stream)
         {
             await EncodeObjectAsync(stream);
             return stream;
         }
 
-        protected abstract void EncodeObject(BencodeStream stream);
-
-        protected abstract Task EncodeObjectAsync(BencodeStream stream);
-
         /// <summary>
         /// Writes the object as bencode to the specified file path.
         /// </summary>
-        /// <param name="path">The file path to write the encoded object to.</param>
-        public virtual void EncodeToFile(string path)
+        /// <param name="filePath">The file path to write the encoded object to.</param>
+        public virtual void EncodeTo(string filePath)
         {
-            using (var stream = File.OpenWrite(path))
+            using (var stream = File.OpenWrite(filePath))
             {
-                EncodeToStream(stream);
+                EncodeTo(stream);
             }
         }
 
         /// <summary>
         /// Asynchronously writes the object as bencode to the specified file path.
         /// </summary>
-        /// <param name="path">The file path to write the encoded object to.</param>
+        /// <param name="filePath">The file path to write the encoded object to.</param>
         /// <returns></returns>
-        public virtual Task EncodeToFileAsync(string path)
+        public virtual Task EncodeToAsync(string filePath)
         {
-            using (var stream = File.OpenWrite(path))
+            using (var stream = File.OpenWrite(filePath))
             {
-                return EncodeToStreamAsync(stream);
+                return EncodeToAsync(stream);
             }
         }
+
+        protected abstract void EncodeObject(BencodeStream stream);
+
+        protected abstract Task EncodeObjectAsync(BencodeStream stream);
     }
 
     /// <summary>

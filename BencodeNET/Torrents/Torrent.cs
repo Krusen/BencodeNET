@@ -193,7 +193,7 @@ namespace BencodeNET.Torrents
         protected override void EncodeObject(BencodeStream stream)
         {
             var torrent = ToBDictionary();
-            torrent.EncodeToStream(stream);
+            torrent.EncodeTo(stream);
         }
 
         /// <summary>
@@ -205,7 +205,7 @@ namespace BencodeNET.Torrents
         protected override Task EncodeObjectAsync(BencodeStream stream)
         {
             var torrent = ToBDictionary();
-            return torrent.EncodeToStreamAsync(stream);
+            return torrent.EncodeToAsync(stream);
         }
 
         /// <summary>
@@ -299,8 +299,8 @@ namespace BencodeNET.Torrents
             if (obj == null)
                 return false;
 
-            using (var ms1 = EncodeToStream(new MemoryStream()))
-            using (var ms2 = obj.EncodeToStream(new MemoryStream()))
+            using (var ms1 = EncodeTo(new MemoryStream()))
+            using (var ms2 = obj.EncodeTo(new MemoryStream()))
             {
                 var bytes1 = ms1.ToArray();
                 var bytes2 = ms2.ToArray();
