@@ -1,8 +1,7 @@
-﻿using System;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using BencodeNET.IO;
 
 namespace BencodeNET.Objects
 {
@@ -46,7 +45,22 @@ namespace BencodeNET.Objects
         /// <typeparam name="TStream">The type of stream.</typeparam>
         /// <param name="stream">The stream to write to.</param>
         /// <returns>The used stream.</returns>
-        public abstract TStream EncodeToStream<TStream>(TStream stream) where TStream : Stream;
+        public TStream EncodeToStream<TStream>(TStream stream) where TStream : Stream
+        {
+            EncodeObject(new BencodeStream(stream));
+            return stream;
+        }
+
+        /// <summary>
+        /// Writes the object as bencode to the specified stream.
+        /// </summary>
+        /// <param name="stream">The stream to write to.</param>
+        /// <returns>The used stream.</returns>
+        public BencodeStream EncodeToStream(BencodeStream stream)
+        {
+            EncodeObject(stream);
+            return stream;
+        }
 
         /// <summary>
         /// Asynchronously writes the object as bencode to the specified stream.
@@ -54,7 +68,26 @@ namespace BencodeNET.Objects
         /// <typeparam name="TStream">The type of stream.</typeparam>
         /// <param name="stream">The stream to write to.</param>
         /// <returns>The used stream.</returns>
-        public abstract Task<TStream> EncodeToStreamAsync<TStream>(TStream stream) where TStream : Stream;
+        public async Task<TStream> EncodeToStreamAsync<TStream>(TStream stream) where TStream : Stream
+        {
+            await EncodeObjectAsync(new BencodeStream(stream));
+            return stream;
+        }
+
+        /// <summary>
+        /// Asynchronously writes the object as bencode to the specified stream.
+        /// </summary>
+        /// <param name="stream">The stream to write to.</param>
+        /// <returns>The used stream.</returns>
+        public async Task<BencodeStream> EncodeToStreamAsync(BencodeStream stream)
+        {
+            await EncodeObjectAsync(stream);
+            return stream;
+        }
+
+        protected abstract void EncodeObject(BencodeStream stream);
+
+        protected abstract Task EncodeObjectAsync(BencodeStream stream);
 
         /// <summary>
         /// Writes the object as bencode to the specified file path.

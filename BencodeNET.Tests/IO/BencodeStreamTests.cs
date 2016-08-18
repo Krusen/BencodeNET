@@ -685,12 +685,5 @@ namespace BencodeNET.Tests.IO
                 Assert.Equal(-1, await bs.ReadAsync());
             }
         }
-
-        private BencodeStream BencodeStreamFrom(string str)
-        {
-            //return new BencodeStream();
-            // TODO:
-            return null;
-        }
     }
 }

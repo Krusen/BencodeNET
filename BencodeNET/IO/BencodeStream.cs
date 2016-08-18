@@ -313,11 +313,6 @@ namespace BencodeNET.IO
             }
         }
 
-        public virtual void Close()
-        {
-            Dispose(true);
-        }
-
         public void Dispose()
         {
             Dispose(true);

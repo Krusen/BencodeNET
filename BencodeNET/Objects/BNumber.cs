@@ -10,7 +10,7 @@ namespace BencodeNET.Objects
     /// <remarks>
     /// The underlying value is a <see cref="long"/>.
     /// </remarks>
-    public sealed class BNumber : BObject<long>, IComparable<BNumber>
+    public class BNumber : BObject<long>, IComparable<BNumber>
     {
         private static readonly DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
@@ -43,41 +43,21 @@ namespace BencodeNET.Objects
             Value = datetime?.Subtract(Epoch).Ticks / TimeSpan.TicksPerSecond ?? 0;
         }
 
-        /// <summary>
-        /// Writes the number as bencode to the specified stream.
-        /// </summary>
-        /// <typeparam name="TStream">The type of stream.</typeparam>
-        /// <param name="stream">The stream to write to.</param>
-        /// <returns>The used stream.</returns>
-        public override TStream EncodeToStream<TStream>(TStream stream)
-        {
-            using (var bstream = new BencodeStream(stream, leaveOpen: true))
-            {
-                bstream.Write('i');
-                bstream.Write(Value);
-                bstream.Write('e');
-                return stream;
-            }
-        }
-
-        /// <summary>
-        /// Asynchronously writes the number as bencode to the specified stream.
-        /// </summary>
-        /// <typeparam name="TStream">The type of stream.</typeparam>
-        /// <param name="stream">The stream to write to.</param>
-        /// <returns>The used stream.</returns>
-        public override async Task<TStream> EncodeToStreamAsync<TStream>(TStream stream)
-        {
-            using (var bstream = new BencodeStream(stream, leaveOpen: true))
-            {
-                await bstream.WriteAsync('i').ConfigureAwait(false);
-                await bstream.WriteAsync(Value).ConfigureAwait(false);
-                await bstream.WriteAsync('e').ConfigureAwait(false);
-                return stream;
-            }
-        }
-
 #pragma warning disable 1591
+        protected override void EncodeObject(BencodeStream stream)
+        {
+            stream.Write('i');
+            stream.Write(Value);
+            stream.Write('e');
+        }
+
+        protected override async Task EncodeObjectAsync(BencodeStream stream)
+        {
+            await stream.WriteAsync('i').ConfigureAwait(false);
+            await stream.WriteAsync(Value).ConfigureAwait(false);
+            await stream.WriteAsync('e').ConfigureAwait(false);
+        }
+
         public static implicit operator int(BNumber bint)
         {
             return (int)bint.Value;

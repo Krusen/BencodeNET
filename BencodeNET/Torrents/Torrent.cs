@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BencodeNET.IO;
 
 namespace BencodeNET.Torrents
 {
@@ -189,10 +190,10 @@ namespace BencodeNET.Torrents
         /// <typeparam name="T"></typeparam>
         /// <param name="stream"></param>
         /// <returns></returns>
-        public override T EncodeToStream<T>(T stream)
+        protected override void EncodeObject(BencodeStream stream)
         {
             var torrent = ToBDictionary();
-            return torrent.EncodeToStream(stream);
+            torrent.EncodeToStream(stream);
         }
 
         /// <summary>
@@ -201,7 +202,7 @@ namespace BencodeNET.Torrents
         /// <typeparam name="T"></typeparam>
         /// <param name="stream"></param>
         /// <returns>The stream that was passed to the method</returns>
-        public override Task<T> EncodeToStreamAsync<T>(T stream)
+        protected override Task EncodeObjectAsync(BencodeStream stream)
         {
             var torrent = ToBDictionary();
             return torrent.EncodeToStreamAsync(stream);

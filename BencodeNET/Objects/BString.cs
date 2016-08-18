@@ -14,7 +14,7 @@ namespace BencodeNET.Objects
     /// <remarks>
     /// The underlying value is a <see cref="byte"/> array.
     /// </remarks>
-    public sealed class BString : BObject<IReadOnlyList<byte>>, IComparable<BString>
+    public class BString : BObject<IReadOnlyList<byte>>, IComparable<BString>
     {
         /// <summary>
         /// The maximum number of digits that can be handled as the length part of a bencoded string.
@@ -84,41 +84,21 @@ namespace BencodeNET.Objects
             return Encode(_encoding);
         }
 
-        /// <summary>
-        /// Writes the byte-string as bencode to the specified stream.
-        /// </summary>
-        /// <typeparam name="TStream">The type of stream.</typeparam>
-        /// <param name="stream">The stream to write to.</param>
-        /// <returns>The used stream.</returns>
-        public override TStream EncodeToStream<TStream>(TStream stream)
-        {
-            using (var bstream = new BencodeStream(stream, leaveOpen: true))
-            {
-                bstream.Write(_value.Length);
-                bstream.Write(':');
-                bstream.Write(_value);
-                return stream;
-            }
-        }
-
-        /// <summary>
-        /// Asynchronously writes the byte-string as bencode to the specified stream.
-        /// </summary>
-        /// <typeparam name="TStream">The type of stream.</typeparam>
-        /// <param name="stream">The stream to write to.</param>
-        /// <returns>The used stream.</returns>
-        public override async Task<TStream> EncodeToStreamAsync<TStream>(TStream stream)
-        {
-            using (var bstream = new BencodeStream(stream, leaveOpen: true))
-            {
-                await bstream.WriteAsync(_value.Length).ConfigureAwait(false);
-                await bstream.WriteAsync(':').ConfigureAwait(false);
-                await bstream.WriteAsync(_value).ConfigureAwait(false);
-                return stream;
-            }
-        }
-
 #pragma warning disable 1591
+        protected override void EncodeObject(BencodeStream stream)
+        {
+            stream.Write(_value.Length);
+            stream.Write(':');
+            stream.Write(_value);
+        }
+
+        protected override async Task EncodeObjectAsync(BencodeStream stream)
+        {
+            await stream.WriteAsync(_value.Length).ConfigureAwait(false);
+            await stream.WriteAsync(':').ConfigureAwait(false);
+            await stream.WriteAsync(_value).ConfigureAwait(false);
+        }
+
         public static implicit operator BString(string value)
         {
             return new BString(value);

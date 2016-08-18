@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BencodeNET.IO;
 
 namespace BencodeNET.Objects
 {
@@ -135,13 +136,8 @@ namespace BencodeNET.Objects
             }
         }
 
-        /// <summary>
-        /// Writes the dictionary and its content as bencode to the specified stream.
-        /// </summary>
-        /// <typeparam name="TStream">The type of stream.</typeparam>
-        /// <param name="stream">The stream to write to.</param>
-        /// <returns>The used stream.</returns>
-        public override TStream EncodeToStream<TStream>(TStream stream)
+#pragma warning disable 1591
+        protected override void EncodeObject(BencodeStream stream)
         {
             stream.Write('d');
             foreach (var kvPair in this)
@@ -150,16 +146,9 @@ namespace BencodeNET.Objects
                 kvPair.Value.EncodeToStream(stream);
             }
             stream.Write('e');
-            return stream;
         }
 
-        /// <summary>
-        /// Asynchronously writes the dictionary and its content as bencode to the specified stream.
-        /// </summary>
-        /// <typeparam name="TStream">The type of stream.</typeparam>
-        /// <param name="stream">The stream to write to.</param>
-        /// <returns>The used stream.</returns>
-        public override async Task<TStream> EncodeToStreamAsync<TStream>(TStream stream)
+        protected override async Task EncodeObjectAsync(BencodeStream stream)
         {
             await stream.WriteAsync('d').ConfigureAwait(false);
             foreach (var kvPair in this)
@@ -168,7 +157,6 @@ namespace BencodeNET.Objects
                 await kvPair.Value.EncodeToStreamAsync(stream).ConfigureAwait(false);
             }
             await stream.WriteAsync('e').ConfigureAwait(false);
-            return stream;
         }
 
         #region IDictionary<BString, IBObject> Members
@@ -252,6 +240,7 @@ namespace BencodeNET.Objects
         }
 
         #endregion
+#pragma warning restore 1591
     }
 
     /// <summary>

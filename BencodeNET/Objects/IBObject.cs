@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using BencodeNET.IO;
 
 namespace BencodeNET.Objects
 {
@@ -35,12 +36,26 @@ namespace BencodeNET.Objects
         TStream EncodeToStream<TStream>(TStream stream) where TStream : Stream;
 
         /// <summary>
+        /// Writes the object as bencode to the specified stream.
+        /// </summary>
+        /// <param name="stream">The stream to write to.</param>
+        /// <returns>The used stream.</returns>
+        BencodeStream EncodeToStream(BencodeStream stream);
+
+        /// <summary>
         /// Asynchronously writes the object as bencode to the specified stream.
         /// </summary>
         /// <typeparam name="TStream">The type of stream.</typeparam>
         /// <param name="stream">The stream to write to.</param>
         /// <returns>The used stream.</returns>
         Task<TStream> EncodeToStreamAsync<TStream>(TStream stream) where TStream : Stream;
+
+        /// <summary>
+        /// Asynchronously writes the object as bencode to the specified stream.
+        /// </summary>
+        /// <param name="stream">The stream to write to.</param>
+        /// <returns>The used stream.</returns>
+        Task<BencodeStream> EncodeToStreamAsync(BencodeStream stream);
 
         /// <summary>
         /// Writes the object as bencode to the specified file path.
