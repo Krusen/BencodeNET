@@ -39,6 +39,7 @@ namespace BencodeNET.IO
         public BencodeStream(Stream stream, bool leaveOpen = false)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
+            if (!stream.CanSeek) throw new ArgumentException("Only seekable streams are supported.", nameof(stream));
 
             InnerStream = stream;
             LeaveOpen = leaveOpen;
