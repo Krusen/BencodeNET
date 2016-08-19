@@ -26,15 +26,12 @@ namespace BencodeNET.IO
         public BencodeStream(byte[] bytes) : this(new MemoryStream(bytes), false)
         { }
 
-        public BencodeStream(Stream stream) : this(stream, false)
-        { }
-
         /// <summary>
         /// Creates a new <see cref="BencodeStream"/> using the specified stream.
         /// </summary>
         /// <param name="stream">The underlying stream to use.</param>
         /// <param name="leaveOpen">Indicates if the specified stream should be left open when this <see cref="BencodeStream"/> is disposed.</param>
-        public BencodeStream(Stream stream, bool leaveOpen)
+        public BencodeStream(Stream stream, bool leaveOpen = false)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
