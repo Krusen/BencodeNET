@@ -7,7 +7,7 @@ namespace BencodeNET.IO
 {
     /// <summary>
     /// A wrapper for <see cref="Stream"/> that makes it easier and faster to work
-    /// with bencode  and to read/write one byte at a time. Also has methods for peeking
+    /// with bencode and to read/write one byte at a time. Also has methods for peeking
     /// at the next byte (caching the read) and for reading the previous byte in stream.
     /// </summary>
     public class BencodeStream : IDisposable
@@ -17,9 +17,20 @@ namespace BencodeNET.IO
         private bool _hasPeeked;
         private int _peekedByte;
 
+        /// <summary>
+        /// Creates a new <see cref="BencodeStream"/> by converting the string
+        /// to bytes using <see cref="Encoding.UTF8"/> and storing them in a <see cref="MemoryStream"/>.
+        /// </summary>
+        /// <param name="str"></param>
         public BencodeStream(string str) : this(str, Encoding.UTF8)
         { }
 
+        /// <summary>
+        /// Creates a new <see cref="BencodeStream"/> by converting the string
+        /// to bytes using the specified encoding and storing them in a <see cref="MemoryStream"/>.
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="encoding"></param>
         public BencodeStream(string str, Encoding encoding) : this(encoding.GetBytes(str))
         { }
 
@@ -92,7 +103,12 @@ namespace BencodeNET.IO
 
         #region Read
 
-        // TODO: Documentation - this is cheap to call several times, only reads the first time until next Read()
+        /// <summary>
+        /// Reads the next byte in the stream without advancing the position.
+        /// This can safely be called multiple times as the read byte is cached until the position
+        /// in the stream is changed or a read operation is performed.
+        /// </summary>
+        /// <returns>The next byte in the stream.</returns>
         public int Peek()
         {
             if (_hasPeeked)
@@ -108,6 +124,12 @@ namespace BencodeNET.IO
             return _peekedByte;
         }
 
+        /// <summary>
+        /// Reads the next char in the stream without advancing the position.
+        /// This can safely be called multiple times as the read char is cached until the position
+        /// in the stream is changed or a read operation is performed.
+        /// </summary>
+        /// <returns>The next char in the stream.</returns>
         public char PeekChar()
         {
             if (Peek() == -1)
@@ -115,6 +137,12 @@ namespace BencodeNET.IO
             return (char) Peek();
         }
 
+        /// <summary>
+        /// Reads the next byte in the stream.
+        /// If a <see cref="Peek"/> or a <see cref="PeekChar"/> has been performed
+        /// the peeked value is returned and the position is incremented by 1.
+        /// </summary>
+        /// <returns>The next býte in the stream.</returns>
         public int Read()
         {
             if (!_hasPeeked)
@@ -128,6 +156,12 @@ namespace BencodeNET.IO
             return _peekedByte;
         }
 
+        /// <summary>
+        /// Reads the next char in the stream.
+        /// If a <see cref="Peek"/> or a <see cref="PeekChar"/> has been performed
+        /// the peeked value is returned and the position is incremented by 1.
+        /// </summary>
+        /// <returns>The next char in the stream.</returns>
         public char ReadChar()
         {
             var value = Read();
@@ -136,6 +170,11 @@ namespace BencodeNET.IO
             return (char) value;
         }
 
+        /// <summary>
+        /// Reads the specified amount of bytes from the stream.
+        /// </summary>
+        /// <param name="bytesToRead">The number of bytes to read.</param>
+        /// <returns>The read bytes.</returns>
         public byte[] Read(int bytesToRead)
         {
             if (bytesToRead < 0) throw new ArgumentOutOfRangeException(nameof(bytesToRead));
@@ -166,6 +205,10 @@ namespace BencodeNET.IO
             return bytes;
         }
 
+        /// <summary>
+        /// Reads the previous byte in the stream and decrements the position by 1.
+        /// </summary>
+        /// <returns>The previous byte in stream.</returns>
         public int ReadPrevious()
         {
             if (InnerStream.Position == 0)
@@ -184,6 +227,10 @@ namespace BencodeNET.IO
             return bytes[0];
         }
 
+        /// <summary>
+        /// Reads the previous char in the stream and decrements the position by 1.
+        /// </summary>
+        /// <returns>The previous char in the stream.</returns>
         public char ReadPreviousChar()
         {
             var value = ReadPrevious();
@@ -192,6 +239,12 @@ namespace BencodeNET.IO
             return (char)value;
         }
 
+        /// <summary>
+        /// Asynchronously reads the next byte in the stream without advancing the position.
+        /// This can safely be called multiple times as the read byte is cached until the position
+        /// in the stream is changed or a read operation is performed.
+        /// </summary>
+        /// <returns>The next byte in the stream.</returns>
         public async Task<int> PeekAsync()
         {
             if (_hasPeeked)
@@ -207,11 +260,23 @@ namespace BencodeNET.IO
             return _peekedByte;
         }
 
+        /// <summary>
+        /// Asynchronously reads the next char in the stream without advancing the position.
+        /// This can safely be called multiple times as the read char is cached until the position
+        /// in the stream is changed or a read operation is performed.
+        /// </summary>
+        /// <returns>The next char in the stream.</returns>
         public async Task<char> PeekCharAsync()
         {
             return (char)await PeekAsync().ConfigureAwait(false);
         }
 
+        /// <summary>
+        /// Asynchronously reads the next byte in the stream.
+        /// If a <see cref="Peek"/> or a <see cref="PeekChar"/> has been performed
+        /// the peeked value is returned and the position is incremented by 1.
+        /// </summary>
+        /// <returns>The next býte in the stream.</returns>
         public Task<int> ReadAsync()
         {
             if (!_hasPeeked)
@@ -226,6 +291,12 @@ namespace BencodeNET.IO
             return Task.FromResult(_peekedByte);
         }
 
+        /// <summary>
+        /// Asynchronously reads the next char in the stream.
+        /// If a <see cref="Peek"/> or a <see cref="PeekChar"/> has been performed
+        /// the peeked value is returned and the position is incremented by 1.
+        /// </summary>
+        /// <returns>The next char in the stream.</returns>
         public async Task<char> ReadCharAsync()
         {
             var value = await ReadAsync().ConfigureAwait(false);
@@ -234,6 +305,11 @@ namespace BencodeNET.IO
             return (char)value;
         }
 
+        /// <summary>
+        /// Asynchronously reads the specified amount of bytes from the stream.
+        /// </summary>
+        /// <param name="bytesToRead">The number of bytes to read.</param>
+        /// <returns>The read bytes.</returns>
         public async Task<byte[]> ReadAsync(int bytesToRead)
         {
             if (bytesToRead < 0) throw new ArgumentOutOfRangeException(nameof(bytesToRead));
@@ -264,6 +340,10 @@ namespace BencodeNET.IO
             return bytes;
         }
 
+        /// <summary>
+        /// Asynchronously reads the previous byte in the stream and decrements the position by 1.
+        /// </summary>
+        /// <returns>The previous byte in stream.</returns>
         public async Task<int> ReadPreviousAsync()
         {
             if (InnerStream.Position == 0)
@@ -282,6 +362,10 @@ namespace BencodeNET.IO
             return bytes[0];
         }
 
+        /// <summary>
+        /// Asynchronously reads the previous char in the stream and decrements the position by 1.
+        /// </summary>
+        /// <returns>The previous char in the stream.</returns>
         public async Task<char> ReadPreviousCharAsync()
         {
             var value = await ReadPreviousAsync().ConfigureAwait(false);
@@ -294,48 +378,102 @@ namespace BencodeNET.IO
 
         #region Write
 
+        /// <summary>
+        /// Writes a number to the stream.
+        /// </summary>
+        /// <param name="number">The number to write to the stream.</param>
         public void Write(int number)
         {
             var bytes = Encoding.ASCII.GetBytes(number.ToString());
             Write(bytes);
         }
 
+        /// <summary>
+        /// Writes the number to the stream.
+        /// </summary>
+        /// <param name="number">The number to write to the stream.</param>
         public void Write(long number)
         {
             var bytes = Encoding.ASCII.GetBytes(number.ToString());
             Write(bytes);
         }
 
+        /// <summary>
+        /// Writes a char to the stream.
+        /// </summary>
+        /// <param name="c">The char to write to the stream.</param>
         public void Write(char c)
         {
             InnerStream.Write(c);
         }
 
+        /// <summary>
+        /// Writes an array of bytes to the stream.
+        /// </summary>
+        /// <param name="bytes">The bytes to write to the stream.</param>
         public void Write(byte[] bytes)
         {
-            InnerStream.Write(bytes, 0, bytes.Length);
+            Write(bytes, 0, bytes.Length);
         }
 
+        /// <summary>
+        /// Writes a sequence of bytes to the stream and advances the position by the number of bytes written.
+        /// </summary>
+        /// <param name="buffer">An array of bytes to copy from.</param>
+        /// <param name="offset">The zero-based offset in <paramref name="buffer"/> to start copying from to the stream.</param>
+        /// <param name="count">The number of bytes to be written to the stream</param>
+        public void Write(byte[] buffer, int offset, int count)
+        {
+            InnerStream.Write(buffer, offset, count);
+        }
+
+        /// <summary>
+        /// Asynchronously writes a number to the stream.
+        /// </summary>
+        /// <param name="number">The number to write to the stream.</param>
         public Task WriteAsync(int number)
         {
             var bytes = Encoding.ASCII.GetBytes(number.ToString());
             return WriteAsync(bytes);
         }
 
+        /// <summary>
+        /// Asynchronously writes the number to the stream.
+        /// </summary>
+        /// <param name="number">The number to write to the stream.</param>
         public Task WriteAsync(long number)
         {
             var bytes = Encoding.ASCII.GetBytes(number.ToString());
             return WriteAsync(bytes);
         }
 
+        /// <summary>
+        /// Asynchronously writes a char to the stream.
+        /// </summary>
+        /// <param name="c">The char to write to the stream.</param>
         public Task WriteAsync(char c)
         {
             return InnerStream.WriteAsync(c);
         }
 
+        /// <summary>
+        /// Asynchronously writes an array of bytes to the stream.
+        /// </summary>
+        /// <param name="bytes">The bytes to write to the stream.</param>
         public Task WriteAsync(byte[] bytes)
         {
-            return InnerStream.WriteAsync(bytes, 0, bytes.Length);
+            return WriteAsync(bytes, 0, bytes.Length);
+        }
+
+        /// <summary>
+        /// Asynchronously wsrites a sequence of bytes to the stream and advances the position by the number of bytes written.
+        /// </summary>
+        /// <param name="buffer">An array of bytes to copy from.</param>
+        /// <param name="offset">The zero-based offset in <paramref name="buffer"/> to start copying from to the stream.</param>
+        /// <param name="count">The number of bytes to be written to the stream</param>
+        public Task WriteAsync(byte[] bytes, int offset, int count)
+        {
+            return InnerStream.WriteAsync(bytes, offset, count);
         }
 
         #endregion
