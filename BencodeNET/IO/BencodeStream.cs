@@ -23,6 +23,11 @@ namespace BencodeNET.IO
         public BencodeStream(string str, Encoding encoding) : this(encoding.GetBytes(str))
         { }
 
+        /// <summary>
+        /// Creates a new <see cref="BencodeStream"/> from the specified bytes
+        /// using a <see cref="MemoryStream"/> as the <see cref="InnerStream"/>.
+        /// </summary>
+        /// <param name="bytes"></param>
         public BencodeStream(byte[] bytes) : this(new MemoryStream(bytes), false)
         { }
 
