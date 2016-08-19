@@ -5,6 +5,11 @@ using System.Threading.Tasks;
 
 namespace BencodeNET.IO
 {
+    /// <summary>
+    /// A wrapper for <see cref="Stream"/> that makes it easier and faster to work
+    /// with bencode  and to read/write one byte at a time. Also has methods for peeking
+    /// at the next byte (caching the read) and for reading the previous byte in stream.
+    /// </summary>
     public class BencodeStream : IDisposable
     {
         private static readonly byte[] _emptyByteArray = new byte[0];
@@ -24,6 +29,11 @@ namespace BencodeNET.IO
         public BencodeStream(Stream stream) : this(stream, false)
         { }
 
+        /// <summary>
+        /// Creates a new <see cref="BencodeStream"/> using the specified stream.
+        /// </summary>
+        /// <param name="stream">The underlying stream to use.</param>
+        /// <param name="leaveOpen">Indicates if the specified stream should be left open when this <see cref="BencodeStream"/> is disposed.</param>
         public BencodeStream(Stream stream, bool leaveOpen)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
@@ -32,12 +42,24 @@ namespace BencodeNET.IO
             LeaveOpen = leaveOpen;
         }
 
+        /// <summary>
+        /// The inner stream that this <see cref="BencodeStream"/> is working with.
+        /// </summary>
         public Stream InnerStream { get; protected set; }
 
+        /// <summary>
+        /// If true <see cref="InnerStream"/> will not be disposed when this <see cref="BencodeStream"/> is disposed.
+        /// </summary>
         public bool LeaveOpen { get; }
 
+        /// <summary>
+        /// Gets the lenght in bytes of the stream.
+        /// </summary>
         public long Length => InnerStream.Length;
 
+        /// <summary>
+        /// Gets or sets the position within the stream.
+        /// </summary>
         public long Position
         {
             get { return InnerStream.Position; }
@@ -48,8 +70,17 @@ namespace BencodeNET.IO
             }
         }
 
+        /// <summary>
+        /// Indicates if the current position is at or after the end of the stream.
+        /// </summary>
         public bool EndOfStream => Position >= Length;
 
+        /// <summary>
+        /// Sets the position within the stream.
+        /// </summary>
+        /// <param name="offset">A byte offset relative to the <paramref name="origin"/> parameter.</param>
+        /// <param name="origin">A value indicating the reference point used to obtain the new position.</param>
+        /// <returns></returns>
         public long Seek(long offset, SeekOrigin origin)
         {
             _hasPeeked = false;
@@ -306,16 +337,27 @@ namespace BencodeNET.IO
 
         #endregion
 
+        /// <summary>
+        /// Clears all buffers for this stream and causes any buffered data to be written.
+        /// </summary>
         public void Flush()
         {
             InnerStream.Flush();
         }
 
+        /// <summary>
+        /// Releases all resources used by the <see cref="BencodeStream"/>.
+        /// <see cref="InnerStream"/> is also disposed unless <see cref="LeaveOpen"/> is true.
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);
         }
 
+        /// <summary>
+        /// Disposes of <see cref="InnerStream"/> unless <see cref="LeaveOpen"/> is true.
+        /// </summary>
+        /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)
@@ -326,9 +368,11 @@ namespace BencodeNET.IO
             }
         }
 
+#pragma warning disable 1591
         public static implicit operator BencodeStream(Stream stream)
         {
             return new BencodeStream(stream);
         }
+#pragma warning restore 1591
     }
 }
