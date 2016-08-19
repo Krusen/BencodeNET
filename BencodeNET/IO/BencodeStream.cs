@@ -12,7 +12,7 @@ namespace BencodeNET.IO
     /// </summary>
     public class BencodeStream : IDisposable
     {
-        private static readonly byte[] _emptyByteArray = new byte[0];
+        private static readonly byte[] EmptyByteArray = new byte[0];
 
         private bool _hasPeeked;
         private int _peekedByte;
@@ -136,7 +136,7 @@ namespace BencodeNET.IO
         public byte[] Read(int bytesToRead)
         {
             if (bytesToRead < 0) throw new ArgumentOutOfRangeException(nameof(bytesToRead));
-            if (bytesToRead == 0) return _emptyByteArray;
+            if (bytesToRead == 0) return EmptyByteArray;
 
             var bytes = new byte[bytesToRead];
 
@@ -145,7 +145,7 @@ namespace BencodeNET.IO
             if (_hasPeeked)
             {
                 if (_peekedByte == -1)
-                    return _emptyByteArray;
+                    return EmptyByteArray;
 
                 bytes[0] = (byte)_peekedByte;
                 offset = 1;
@@ -234,7 +234,7 @@ namespace BencodeNET.IO
         public async Task<byte[]> ReadAsync(int bytesToRead)
         {
             if (bytesToRead < 0) throw new ArgumentOutOfRangeException(nameof(bytesToRead));
-            if (bytesToRead == 0) return _emptyByteArray;
+            if (bytesToRead == 0) return EmptyByteArray;
 
             var bytes = new byte[bytesToRead];
 
@@ -243,7 +243,7 @@ namespace BencodeNET.IO
             if (_hasPeeked)
             {
                 if (_peekedByte == -1)
-                    return _emptyByteArray;
+                    return EmptyByteArray;
 
                 bytes[0] = (byte)_peekedByte;
                 offset = 1;
