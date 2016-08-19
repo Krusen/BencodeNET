@@ -7,10 +7,7 @@ namespace BencodeNET.IO
 {
     public class BencodeStream : IDisposable
     {
-        private readonly byte[] _emptyByteArray = new byte[0];
-
-        private Stream _stream;
-        private readonly bool _leaveOpen;
+        private static readonly byte[] _emptyByteArray = new byte[0];
 
         private bool _hasPeeked;
         private int _peekedByte;
@@ -31,21 +28,23 @@ namespace BencodeNET.IO
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-            _stream = stream;
-            _leaveOpen = leaveOpen;
+            InnerStream = stream;
+            LeaveOpen = leaveOpen;
         }
 
-        public Stream InnerStream => _stream;
+        public Stream InnerStream { get; protected set; }
 
-        public long Length => _stream.Length;
+        public bool LeaveOpen { get; }
+
+        public long Length => InnerStream.Length;
 
         public long Position
         {
-            get { return _stream.Position; }
+            get { return InnerStream.Position; }
             set
             {
                 _hasPeeked = false;
-                _stream.Position = value;
+                InnerStream.Position = value;
             }
         }
 
@@ -54,7 +53,7 @@ namespace BencodeNET.IO
         public long Seek(long offset, SeekOrigin origin)
         {
             _hasPeeked = false;
-            return _stream.Seek(offset, origin);
+            return InnerStream.Seek(offset, origin);
         }
 
         #region Read
@@ -65,12 +64,12 @@ namespace BencodeNET.IO
             if (_hasPeeked)
                 return _peekedByte;
 
-            _peekedByte = _stream.ReadByte();
+            _peekedByte = InnerStream.ReadByte();
             _hasPeeked = true;
 
             // Only seek backwards if not at end of stream
             if (_peekedByte > -1)
-                _stream.Seek(-1, SeekOrigin.Current);
+                InnerStream.Seek(-1, SeekOrigin.Current);
 
             return _peekedByte;
         }
@@ -85,13 +84,13 @@ namespace BencodeNET.IO
         public int Read()
         {
             if (!_hasPeeked)
-                return _stream.ReadByte();
+                return InnerStream.ReadByte();
 
             if (_peekedByte == -1)
                 return _peekedByte;
 
             _hasPeeked = false;
-            _stream.Seek(1, SeekOrigin.Current);
+            InnerStream.Seek(1, SeekOrigin.Current);
             return _peekedByte;
         }
 
@@ -124,9 +123,9 @@ namespace BencodeNET.IO
             _hasPeeked = false;
 
             if (offset > 0)
-                _stream.Seek(offset, SeekOrigin.Current);
+                InnerStream.Seek(offset, SeekOrigin.Current);
 
-            var readBytes = _stream.Read(bytes, offset, bytesToRead-offset) + offset;
+            var readBytes = InnerStream.Read(bytes, offset, bytesToRead-offset) + offset;
             if (readBytes != bytesToRead)
                 Array.Resize(ref bytes, readBytes);
 
@@ -135,16 +134,16 @@ namespace BencodeNET.IO
 
         public int ReadPrevious()
         {
-            if (_stream.Position == 0)
+            if (InnerStream.Position == 0)
                 return -1;
 
             _hasPeeked = false;
 
-            _stream.Position -= 1;
+            InnerStream.Position -= 1;
 
             var bytes = new byte[1];
 
-            var readBytes = _stream.Read(bytes, 0, 1);
+            var readBytes = InnerStream.Read(bytes, 0, 1);
             if (readBytes == 0)
                 return -1;
 
@@ -164,12 +163,12 @@ namespace BencodeNET.IO
             if (_hasPeeked)
                 return _peekedByte;
 
-            _peekedByte = await _stream.ReadByteAsync().ConfigureAwait(false);
+            _peekedByte = await InnerStream.ReadByteAsync().ConfigureAwait(false);
             _hasPeeked = true;
 
             // Only seek backwards if not at end of stream
             if (_peekedByte > -1)
-                _stream.Seek(-1, SeekOrigin.Current);
+                InnerStream.Seek(-1, SeekOrigin.Current);
 
             return _peekedByte;
         }
@@ -182,13 +181,13 @@ namespace BencodeNET.IO
         public Task<int> ReadAsync()
         {
             if (!_hasPeeked)
-                return _stream.ReadByteAsync();
+                return InnerStream.ReadByteAsync();
 
             if (_peekedByte == -1)
                 return Task.FromResult(_peekedByte);
 
             _hasPeeked = false;
-            _stream.Seek(1, SeekOrigin.Current);
+            InnerStream.Seek(1, SeekOrigin.Current);
 
             return Task.FromResult(_peekedByte);
         }
@@ -222,9 +221,9 @@ namespace BencodeNET.IO
             _hasPeeked = false;
 
             if (offset > 0)
-                _stream.Seek(offset, SeekOrigin.Current);
+                InnerStream.Seek(offset, SeekOrigin.Current);
 
-            var readBytes = offset + await _stream.ReadAsync(bytes, offset, bytesToRead - offset).ConfigureAwait(false);
+            var readBytes = offset + await InnerStream.ReadAsync(bytes, offset, bytesToRead - offset).ConfigureAwait(false);
             if (readBytes != bytesToRead)
                 Array.Resize(ref bytes, readBytes);
 
@@ -233,16 +232,16 @@ namespace BencodeNET.IO
 
         public async Task<int> ReadPreviousAsync()
         {
-            if (_stream.Position == 0)
+            if (InnerStream.Position == 0)
                 return -1;
 
             _hasPeeked = false;
 
-            _stream.Position -= 1;
+            InnerStream.Position -= 1;
 
             var bytes = new byte[1];
 
-            var readBytes = await _stream.ReadAsync(bytes, 0, 1).ConfigureAwait(false);
+            var readBytes = await InnerStream.ReadAsync(bytes, 0, 1).ConfigureAwait(false);
             if (readBytes == 0)
                 return -1;
 
@@ -275,12 +274,12 @@ namespace BencodeNET.IO
 
         public void Write(char c)
         {
-            _stream.Write(c);
+            InnerStream.Write(c);
         }
 
         public void Write(byte[] bytes)
         {
-            _stream.Write(bytes, 0, bytes.Length);
+            InnerStream.Write(bytes, 0, bytes.Length);
         }
 
         public Task WriteAsync(int number)
@@ -297,19 +296,19 @@ namespace BencodeNET.IO
 
         public Task WriteAsync(char c)
         {
-            return _stream.WriteAsync(c);
+            return InnerStream.WriteAsync(c);
         }
 
         public Task WriteAsync(byte[] bytes)
         {
-            return _stream.WriteAsync(bytes, 0, bytes.Length);
+            return InnerStream.WriteAsync(bytes, 0, bytes.Length);
         }
 
         #endregion
 
         public void Flush()
         {
-            _stream.Flush();
+            InnerStream.Flush();
         }
 
         public void Dispose()
@@ -321,9 +320,9 @@ namespace BencodeNET.IO
         {
             if (disposing)
             {
-                if (_stream != null && !_leaveOpen)
-                    _stream.Dispose();
-                _stream = null;
+                if (InnerStream != null && !LeaveOpen)
+                    InnerStream.Dispose();
+                InnerStream = null;
             }
         }
 
