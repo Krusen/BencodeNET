@@ -24,6 +24,13 @@ namespace BencodeNET.Parsing
         IBObject Parse(string bencodedString);
 
         /// <summary>
+        /// Parses a bencoded array of bytes into an <see cref="IBObject"/>.
+        /// </summary>
+        /// <param name="bytes">The bencoded bytes to parse.</param>
+        /// <returns>The parsed object.</returns>
+        IBObject Parse(byte[] bytes);
+
+        /// <summary>
         /// Parses a stream into an <see cref="IBObject"/>.
         /// </summary>
         /// <param name="stream">The stream to parse.</param>
@@ -72,6 +79,8 @@ namespace BencodeNET.Parsing
         /// <param name="bencodedString">The bencoded string to parse.</param>
         /// <returns>The parsed object.</returns>
         T Parse<T>(string bencodedString) where T : class, IBObject;
+
+        T Parse<T>(byte[] bytes) where T : class, IBObject;
 
         /// <summary>
         /// Parses a stream into an <see cref="IBObject"/> of type <typeparamref name="T"/>.

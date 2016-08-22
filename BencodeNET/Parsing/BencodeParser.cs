@@ -63,6 +63,14 @@ namespace BencodeNET.Parsing
             }
         }
 
+        public IBObject Parse(byte[] bytes)
+        {
+            using (var stream = new MemoryStream(bytes))
+            {
+                return Parse(stream);
+            }
+        }
+
         public IBObject Parse(Stream stream)
         {
             return Parse(new BencodeStream(stream));
@@ -140,6 +148,14 @@ namespace BencodeNET.Parsing
         public T Parse<T>(string bencodedString) where T : class, IBObject
         {
             using (var stream = bencodedString.AsStream(Encoding))
+            {
+                return Parse<T>(stream);
+            }
+        }
+
+        public T Parse<T>(byte[] bytes) where T : class, IBObject
+        {
+            using (var stream = new MemoryStream(bytes))
             {
                 return Parse<T>(stream);
             }
