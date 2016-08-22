@@ -40,6 +40,19 @@ namespace BencodeNET.Objects
         }
 
         /// <summary>
+        /// Encodes the object and returns the raw bytes.
+        /// </summary>
+        /// <returns>The raw bytes of the bencoded object.</returns>
+        public virtual byte[] EncodeAsBytes()
+        {
+            using (var stream = new MemoryStream())
+            {
+                EncodeTo(stream);
+                return stream.ToArray();
+            }
+        }
+
+        /// <summary>
         /// Writes the object as bencode to the specified stream.
         /// </summary>
         /// <typeparam name="TStream">The type of stream.</typeparam>

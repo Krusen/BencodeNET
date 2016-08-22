@@ -28,6 +28,12 @@ namespace BencodeNET.Objects
         string EncodeAsString(Encoding encoding);
 
         /// <summary>
+        /// Encodes the object and returns the raw bytes.
+        /// </summary>
+        /// <returns>The raw bytes of the bencoded object.</returns>
+        byte[] EncodeAsBytes();
+
+        /// <summary>
         /// Writes the object as bencode to the specified stream.
         /// </summary>
         /// <typeparam name="TStream">The type of stream.</typeparam>
