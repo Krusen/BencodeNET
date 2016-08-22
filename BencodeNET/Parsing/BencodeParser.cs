@@ -55,7 +55,7 @@ namespace BencodeNET.Parsing
 
         public BObjectParserList Parsers { get; }
 
-        public IBObject Parse(string bencodedString)
+        public IBObject ParseString(string bencodedString)
         {
             using (var stream = bencodedString.AsStream(Encoding))
             {
@@ -100,9 +100,9 @@ namespace BencodeNET.Parsing
             throw new BencodeParsingException("Invalid first character - valid characters are: 0-9, 'i', 'l' and 'd'", stream.Position);
         }
 
-        public IBObject ParseFromFile(string path)
+        public IBObject Parse(string filePath)
         {
-            using (var stream = File.OpenRead(path))
+            using (var stream = File.OpenRead(filePath))
             {
                 return Parse(stream);
             }
@@ -137,15 +137,15 @@ namespace BencodeNET.Parsing
             throw new BencodeParsingException("Invalid first character - valid characters are: 0-9, 'i', 'l' and 'd'", stream.Position);
         }
 
-        public Task<IBObject> ParseFromFileAsync(string path)
+        public Task<IBObject> ParseFromAsync(string filePath)
         {
-            using (var stream = File.OpenRead(path))
+            using (var stream = File.OpenRead(filePath))
             {
                 return ParseAsync(stream);
             }
         }
 
-        public T Parse<T>(string bencodedString) where T : class, IBObject
+        public T ParseString<T>(string bencodedString) where T : class, IBObject
         {
             using (var stream = bencodedString.AsStream(Encoding))
             {
@@ -176,9 +176,9 @@ namespace BencodeNET.Parsing
             return parser.Parse(stream);
         }
 
-        public T ParseFromFile<T>(string path) where T : class, IBObject
+        public T Parse<T>(string filePath) where T : class, IBObject
         {
-            using (var stream = File.OpenRead(path))
+            using (var stream = File.OpenRead(filePath))
             {
                 return Parse<T>(stream);
             }
@@ -199,9 +199,9 @@ namespace BencodeNET.Parsing
             return parser.ParseAsync(stream);
         }
 
-        public Task<T> ParseFromFileAsync<T>(string path) where T : class, IBObject
+        public Task<T> ParseAsync<T>(string filePath) where T : class, IBObject
         {
-            using (var stream = File.OpenRead(path))
+            using (var stream = File.OpenRead(filePath))
             {
                 return ParseAsync<T>(stream);
             }

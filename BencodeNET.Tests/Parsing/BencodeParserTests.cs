@@ -29,7 +29,7 @@ namespace BencodeNET.Tests.Parsing
         {
             var bparser = new BencodeParser();
             bparser.Parsers.AddOrReplace(stringParser);
-            bparser.Parse(bencode);
+            bparser.ParseString(bencode);
 
             stringParser.Received(1).Parse(Arg.Any<BencodeStream>());
         }
@@ -40,7 +40,7 @@ namespace BencodeNET.Tests.Parsing
         {
             var bparser = new BencodeParser();
             bparser.Parsers.AddOrReplace(numberParser);
-            bparser.Parse(bencode);
+            bparser.ParseString(bencode);
 
             numberParser.Received(1).Parse(Arg.Any<BencodeStream>());
         }
@@ -51,7 +51,7 @@ namespace BencodeNET.Tests.Parsing
         {
             var bparser = new BencodeParser();
             bparser.Parsers.AddOrReplace(listParser);
-            bparser.Parse(bencode);
+            bparser.ParseString(bencode);
 
             listParser.Received(1).Parse(Arg.Any<BencodeStream>());
         }
@@ -62,7 +62,7 @@ namespace BencodeNET.Tests.Parsing
         {
             var bparser = new BencodeParser();
             bparser.Parsers.AddOrReplace(dictionaryParser);
-            bparser.Parse(bencode);
+            bparser.ParseString(bencode);
 
             dictionaryParser.Received(1).Parse(Arg.Any<BencodeStream>());
         }
@@ -122,7 +122,7 @@ namespace BencodeNET.Tests.Parsing
         public void InvalidFirstChars_ThrowsParsingException(string bencode)
         {
             var bparser = new BencodeParser();
-            Action action = () => bparser.Parse(bencode);
+            Action action = () => bparser.ParseString(bencode);
 
             action.ShouldThrow<BencodeParsingException>();
         }
@@ -133,7 +133,7 @@ namespace BencodeNET.Tests.Parsing
             var bencode = "l4:spam3:egge";
 
             var bparser = new BencodeParser();
-            var blist = bparser.Parse(bencode) as BList;
+            var blist = bparser.ParseString(bencode) as BList;
 
             blist.Should().HaveCount(2);
             blist[0].Should().BeOfType<BString>();
@@ -148,7 +148,7 @@ namespace BencodeNET.Tests.Parsing
             var bencode = "l4:spam3:egge";
 
             var bparser = new BencodeParser();
-            var blist = bparser.Parse<BList>(bencode);
+            var blist = bparser.ParseString<BList>(bencode);
 
             blist.Should().HaveCount(2);
             blist[0].Should().BeOfType<BString>();
@@ -163,7 +163,7 @@ namespace BencodeNET.Tests.Parsing
             var bencode = "d4:spam3:egg3:fooi42ee";
 
             var bparser = new BencodeParser();
-            var bdictionary = bparser.Parse<BDictionary>(bencode);
+            var bdictionary = bparser.ParseString<BDictionary>(bencode);
 
             bdictionary.Should().HaveCount(2);
             bdictionary.Should().ContainKey("spam");
