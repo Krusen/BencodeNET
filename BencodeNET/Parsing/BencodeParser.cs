@@ -9,12 +9,22 @@ using BencodeNET.Objects;
 
 namespace BencodeNET.Parsing
 {
+    /// <summary>
+    /// Main class used for parsing bencode.
+    /// </summary>
     public class BencodeParser : IBencodeParser
     {
+        /// <summary>
+        /// Creates an instance using <see cref="System.Text.Encoding.UTF8"/> and the default parsers.
+        /// </summary>
         public BencodeParser()
             : this(Encoding.UTF8)
         { }
 
+        /// <summary>
+        /// Creates an instance using the specified encoding and the default parsers.
+        /// </summary>
+        /// <param name="encoding">The encoding to use when parsing.</param>
         public BencodeParser(Encoding encoding)
         {
             Encoding = encoding;
@@ -29,15 +39,31 @@ namespace BencodeNET.Parsing
             };
         }
 
+        /// <summary>
+        /// Creates an instance using <see cref="System.Text.Encoding.UTF8"/> and the default parsers plus the specified parsers.
+        /// Existing default parsers for the same type will be replaced by the new parsers.
+        /// </summary>
+        /// <param name="parsers">The new parsers to add or replace.</param>
         public BencodeParser(IEnumerable<KeyValuePair<Type, IBObjectParser>> parsers)
-            : this(Encoding.UTF8, parsers)
+            : this(parsers, Encoding.UTF8)
         { }
 
+        /// <summary>
+        /// Creates an instance using <see cref="System.Text.Encoding.UTF8"/> and the default parsers plus the specified parsers.
+        /// Existing default parsers for the same type will be replaced by the new parsers.
+        /// </summary>
+        /// <param name="parsers">The new parsers to add or replace.</param>
         public BencodeParser(IDictionary<Type, IBObjectParser> parsers)
-            : this(Encoding.UTF8, parsers)
+            : this(parsers, Encoding.UTF8)
         { }
 
-        public BencodeParser(Encoding encoding, IEnumerable<KeyValuePair<Type, IBObjectParser>> parsers)
+        /// <summary>
+        /// Creates an instance using the specified encoding and the default parsers plus the specified parsers.
+        /// Existing default parsers for the same type will be replaced by the new parsers.
+        /// </summary>
+        /// <param name="parsers">The new parsers to add or replace.</param>
+        /// <param name="encoding">The encoding to use when parsing.</param>
+        public BencodeParser(IEnumerable<KeyValuePair<Type, IBObjectParser>> parsers, Encoding encoding)
         {
             Encoding = encoding;
 
@@ -47,14 +73,31 @@ namespace BencodeNET.Parsing
             }
         }
 
-        public BencodeParser(Encoding encoding, IDictionary<Type, IBObjectParser> parsers)
-            : this(encoding, (IEnumerable<KeyValuePair<Type, IBObjectParser>>)parsers)
+        /// <summary>
+        /// Creates an instance using the specified encoding and the default parsers plus the specified parsers.
+        /// Existing default parsers for the same type will be replaced by the new parsers.
+        /// </summary>
+        /// <param name="parsers">The new parsers to add or replace.</param>
+        /// <param name="encoding">The encoding to use when parsing.</param>
+        public BencodeParser(IDictionary<Type, IBObjectParser> parsers, Encoding encoding)
+            : this((IEnumerable<KeyValuePair<Type, IBObjectParser>>)parsers, encoding)
         { }
 
+        /// <summary>
+        /// The encoding use for parsing.
+        /// </summary>
         public Encoding Encoding { get; protected set; }
 
+        /// <summary>
+        /// The parsers used by this instance when parsing bencoded.
+        /// </summary>
         public BObjectParserList Parsers { get; }
 
+        /// <summary>
+        /// Parses a bencoded string into an <see cref="IBObject"/>.
+        /// </summary>
+        /// <param name="bencodedString">The bencoded string to parse.</param>
+        /// <returns>The parsed object.</returns>
         public IBObject ParseString(string bencodedString)
         {
             using (var stream = bencodedString.AsStream(Encoding))
@@ -63,6 +106,11 @@ namespace BencodeNET.Parsing
             }
         }
 
+        /// <summary>
+        /// Parses a bencoded array of bytes into an <see cref="IBObject"/>.
+        /// </summary>
+        /// <param name="bytes">The bencoded bytes to parse.</param>
+        /// <returns>The parsed object.</returns>
         public IBObject Parse(byte[] bytes)
         {
             using (var stream = new MemoryStream(bytes))
@@ -71,11 +119,21 @@ namespace BencodeNET.Parsing
             }
         }
 
+        /// <summary>
+        /// Parses a stream into an <see cref="IBObject"/>.
+        /// </summary>
+        /// <param name="stream">The stream to parse.</param>
+        /// <returns>The parsed object.</returns>
         public IBObject Parse(Stream stream)
         {
             return Parse(new BencodeStream(stream));
         }
 
+        /// <summary>
+        /// Parses a <see cref="BencodeStream"/> into an <see cref="IBObject"/>.
+        /// </summary>
+        /// <param name="stream">The stream to parse.</param>
+        /// <returns>The parsed object.</returns>
         public IBObject Parse(BencodeStream stream)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
@@ -100,6 +158,11 @@ namespace BencodeNET.Parsing
             throw new BencodeParsingException("Invalid first character - valid characters are: 0-9, 'i', 'l' and 'd'", stream.Position);
         }
 
+        /// <summary>
+        /// Parses a bencoded file into an <see cref="IBObject"/>.
+        /// </summary>
+        /// <param name="filePath">The path to the file to parse.</param>
+        /// <returns>The parsed object.</returns>
         public IBObject Parse(string filePath)
         {
             using (var stream = File.OpenRead(filePath))
@@ -108,11 +171,21 @@ namespace BencodeNET.Parsing
             }
         }
 
+        /// <summary>
+        /// Asynchronously parses a stream into an <see cref="IBObject"/>.
+        /// </summary>
+        /// <param name="stream">The stream to parse.</param>
+        /// <returns>The parsed object.</returns>
         public Task<IBObject> ParseAsync(Stream stream)
         {
             return ParseAsync(new BencodeStream(stream));
         }
 
+        /// <summary>
+        /// Asynchronously parses a <see cref="BencodeStream"/> into an <see cref="IBObject"/>.
+        /// </summary>
+        /// <param name="stream">The stream to parse.</param>
+        /// <returns>The parsed object.</returns>
         public Task<IBObject> ParseAsync(BencodeStream stream)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
@@ -137,6 +210,11 @@ namespace BencodeNET.Parsing
             throw new BencodeParsingException("Invalid first character - valid characters are: 0-9, 'i', 'l' and 'd'", stream.Position);
         }
 
+        /// <summary>
+        /// Asynchronously parses a bencoded file into an <see cref="IBObject"/>.
+        /// </summary>
+        /// <param name="filePath">The path to the file to parse.</param>
+        /// <returns>The parsed object.</returns>
         public Task<IBObject> ParseFromAsync(string filePath)
         {
             using (var stream = File.OpenRead(filePath))
@@ -145,6 +223,12 @@ namespace BencodeNET.Parsing
             }
         }
 
+        /// <summary>
+        /// Parses a bencoded string into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
+        /// <param name="bencodedString">The bencoded string to parse.</param>
+        /// <returns>The parsed object.</returns>
         public T ParseString<T>(string bencodedString) where T : class, IBObject
         {
             using (var stream = bencodedString.AsStream(Encoding))
@@ -153,6 +237,12 @@ namespace BencodeNET.Parsing
             }
         }
 
+        /// <summary>
+        /// Parses a bencoded array of bytes into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
+        /// <param name="bytes">The bencoded bytes to parse.</param>
+        /// <returns>The parsed object.</returns>
         public T Parse<T>(byte[] bytes) where T : class, IBObject
         {
             using (var stream = new MemoryStream(bytes))
@@ -161,11 +251,23 @@ namespace BencodeNET.Parsing
             }
         }
 
+        /// <summary>
+        /// Parses a stream into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
+        /// <param name="stream">The bencoded string to parse.</param>
+        /// <returns>The parsed object.</returns>
         public T Parse<T>(Stream stream) where T : class, IBObject
         {
             return Parse<T>(new BencodeStream(stream));
         }
 
+        /// <summary>
+        /// Parses a <see cref="BencodeStream"/> into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
+        /// <param name="stream">The bencoded string to parse.</param>
+        /// <returns>The parsed object.</returns>
         public T Parse<T>(BencodeStream stream) where T : class, IBObject
         {
             var parser = Parsers.Get<T>();
@@ -176,6 +278,11 @@ namespace BencodeNET.Parsing
             return parser.Parse(stream);
         }
 
+        /// <summary>
+        /// Parses a bencoded file into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
+        /// </summary>
+        /// <param name="filePath">The path to the file to parse.</param>
+        /// <returns>The parsed object.</returns>
         public T Parse<T>(string filePath) where T : class, IBObject
         {
             using (var stream = File.OpenRead(filePath))
@@ -184,11 +291,23 @@ namespace BencodeNET.Parsing
             }
         }
 
+        /// <summary>
+        /// Asynchronously parses a stream into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
+        /// <param name="stream">The bencoded string to parse.</param>
+        /// <returns>The parsed object.</returns>
         public Task<T> ParseAsync<T>(Stream stream) where T : class, IBObject
         {
             return ParseAsync<T>(new BencodeStream(stream));
         }
 
+        /// <summary>
+        /// Asynchronously parses a <see cref="BencodeStream"/> into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
+        /// <param name="stream">The bencoded string to parse.</param>
+        /// <returns>The parsed object.</returns>
         public Task<T> ParseAsync<T>(BencodeStream stream) where T : class, IBObject
         {
             var parser = Parsers.Get<T>();
@@ -199,6 +318,11 @@ namespace BencodeNET.Parsing
             return parser.ParseAsync(stream);
         }
 
+        /// <summary>
+        /// Asynchronously parses a bencoded file into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
+        /// </summary>
+        /// <param name="filePath">The path to the file to parse.</param>
+        /// <returns>The parsed object.</returns>
         public Task<T> ParseAsync<T>(string filePath) where T : class, IBObject
         {
             using (var stream = File.OpenRead(filePath))

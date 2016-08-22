@@ -80,6 +80,12 @@ namespace BencodeNET.Parsing
         /// <returns>The parsed object.</returns>
         T ParseString<T>(string bencodedString) where T : class, IBObject;
 
+        /// <summary>
+        /// Parses a bencoded array of bytes into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
+        /// <param name="bytes">The bencoded bytes to parse.</param>
+        /// <returns>The parsed object.</returns>
         T Parse<T>(byte[] bytes) where T : class, IBObject;
 
         /// <summary>
