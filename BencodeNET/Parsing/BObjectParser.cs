@@ -14,6 +14,11 @@ namespace BencodeNET.Parsing
             return Parse(bencodedString);
         }
 
+        IBObject IBObjectParser.Parse(byte[] bytes)
+        {
+            return Parse(bytes);
+        }
+
         IBObject IBObjectParser.Parse(Stream stream)
         {
             return Parse(stream);
@@ -27,6 +32,14 @@ namespace BencodeNET.Parsing
         public virtual T Parse(string bencodedString)
         {
             using (var stream = bencodedString.AsStream(Encoding))
+            {
+                return Parse(stream);
+            }
+        }
+
+        public virtual T Parse(byte[] bytes)
+        {
+            using (var stream = new MemoryStream(bytes))
             {
                 return Parse(stream);
             }
