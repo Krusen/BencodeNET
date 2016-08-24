@@ -8,7 +8,6 @@ using Xunit;
 namespace BencodeNET.Tests.Parsing
 {
     // TODO: Other encoding tests
-    // TODO: Test both string, stream and bencodestream parse methods
     public class BStringParserTests
     {
         private BStringParser Parser { get; }
