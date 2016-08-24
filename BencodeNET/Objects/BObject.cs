@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 using BencodeNET.IO;
 
 namespace BencodeNET.Objects
@@ -65,18 +64,6 @@ namespace BencodeNET.Objects
         }
 
         /// <summary>
-        /// Asynchronously writes the object as bencode to the specified stream.
-        /// </summary>
-        /// <typeparam name="TStream">The type of stream.</typeparam>
-        /// <param name="stream">The stream to write to.</param>
-        /// <returns>The used stream.</returns>
-        public async Task<TStream> EncodeToAsync<TStream>(TStream stream) where TStream : Stream
-        {
-            await EncodeObjectAsync(new BencodeStream(stream));
-            return stream;
-        }
-
-        /// <summary>
         /// Writes the object as bencode to the specified stream.
         /// </summary>
         /// <param name="stream">The stream to write to.</param>
@@ -84,17 +71,6 @@ namespace BencodeNET.Objects
         public BencodeStream EncodeTo(BencodeStream stream)
         {
             EncodeObject(stream);
-            return stream;
-        }
-
-        /// <summary>
-        /// Asynchronously writes the object as bencode to the specified stream.
-        /// </summary>
-        /// <param name="stream">The stream to write to.</param>
-        /// <returns>The used stream.</returns>
-        public async Task<BencodeStream> EncodeToAsync(BencodeStream stream)
-        {
-            await EncodeObjectAsync(stream);
             return stream;
         }
 
@@ -110,22 +86,7 @@ namespace BencodeNET.Objects
             }
         }
 
-        /// <summary>
-        /// Asynchronously writes the object as bencode to the specified file path.
-        /// </summary>
-        /// <param name="filePath">The file path to write the encoded object to.</param>
-        /// <returns></returns>
-        public virtual Task EncodeToAsync(string filePath)
-        {
-            using (var stream = File.OpenWrite(filePath))
-            {
-                return EncodeToAsync(stream);
-            }
-        }
-
         protected abstract void EncodeObject(BencodeStream stream);
-
-        protected abstract Task EncodeObjectAsync(BencodeStream stream);
     }
 
     /// <summary>

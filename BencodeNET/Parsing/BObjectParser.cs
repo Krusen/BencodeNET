@@ -1,6 +1,5 @@
 using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 using BencodeNET.IO;
 using BencodeNET.Objects;
 
@@ -25,17 +24,7 @@ namespace BencodeNET.Parsing
             return Parse(stream);
         }
 
-        Task<IBObject> IBObjectParser.ParseAsync(Stream stream)
-        {
-            return ParseAsync(stream).FromDerived<IBObject, T>();
-        }
-
-        Task<IBObject> IBObjectParser.ParseAsync(BencodeStream stream)
-        {
-            return ParseAsync(stream).FromDerived<IBObject, T>();
-        }
-
-        public T Parse(string bencodedString)
+        public virtual T Parse(string bencodedString)
         {
             using (var stream = bencodedString.AsStream(Encoding))
             {
@@ -43,18 +32,11 @@ namespace BencodeNET.Parsing
             }
         }
 
-        public T Parse(Stream stream)
+        public virtual T Parse(Stream stream)
         {
             return Parse(new BencodeStream(stream));
         }
 
         public abstract T Parse(BencodeStream stream);
-
-        public Task<T> ParseAsync(Stream stream)
-        {
-            return ParseAsync(new BencodeStream(stream));
-        }
-
-        public abstract Task<T> ParseAsync(BencodeStream stream);
     }
 }

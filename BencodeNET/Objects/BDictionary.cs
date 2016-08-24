@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using BencodeNET.IO;
 
 namespace BencodeNET.Objects
@@ -146,17 +145,6 @@ namespace BencodeNET.Objects
                 kvPair.Value.EncodeTo(stream);
             }
             stream.Write('e');
-        }
-
-        protected override async Task EncodeObjectAsync(BencodeStream stream)
-        {
-            await stream.WriteAsync('d').ConfigureAwait(false);
-            foreach (var kvPair in this)
-            {
-                await kvPair.Key.EncodeToAsync(stream).ConfigureAwait(false);
-                await kvPair.Value.EncodeToAsync(stream).ConfigureAwait(false);
-            }
-            await stream.WriteAsync('e').ConfigureAwait(false);
         }
 
         #region IDictionary<BString, IBObject> Members

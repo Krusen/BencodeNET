@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using BencodeNET.IO;
 using BencodeNET.Objects;
 using BencodeNET.Torrents;
@@ -25,12 +24,6 @@ namespace BencodeNET.Parsing
         public override Torrent Parse(BencodeStream stream)
         {
             var data = BencodeParser.Parse<BDictionary>(stream);
-            return CreateTorrent(data);
-        }
-
-        public override async Task<Torrent> ParseAsync(BencodeStream stream)
-        {
-            var data = await BencodeParser.ParseAsync<BDictionary>(stream);
             return CreateTorrent(data);
         }
 

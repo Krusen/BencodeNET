@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text;
-using System.Threading.Tasks;
 using BencodeNET.Exceptions;
 using BencodeNET.IO;
 using BencodeNET.Objects;
@@ -44,33 +43,6 @@ namespace BencodeNET.Parsing
             }
 
             if (stream.ReadChar() != 'e')
-                throw new BencodeParsingException<BList>("Missing end character 'e'.", stream.Position);
-
-            return list;
-        }
-
-        public override async Task<BList> ParseAsync(BencodeStream stream)
-        {
-            if (stream == null) throw new ArgumentNullException(nameof(stream));
-
-            if (stream.Length < MinimumLength)
-                throw new BencodeParsingException<BList>($"Minimum valid length is {MinimumLength} (an empty list: 'le')", stream.Position);
-
-            // Lists must start with 'l'
-            if (await stream.ReadCharAsync().ConfigureAwait(false) != 'l')
-                throw new BencodeParsingException<BList>(
-                    $"Must begin with 'l' but began with '{await stream.ReadPreviousCharAsync().ConfigureAwait(false)}'.", stream.Position);
-
-            var list = new BList();
-            // Loop until next character is the end character 'e' or end of stream
-            while (await stream.PeekAsync().ConfigureAwait(false) != 'e' && await stream.PeekAsync().ConfigureAwait(false) != -1)
-            {
-                // Decode next object in stream
-                var bObject = await BencodeParser.ParseAsync(stream).ConfigureAwait(false);
-                list.Add(bObject);
-            }
-
-            if (await stream.ReadCharAsync().ConfigureAwait(false) != 'e')
                 throw new BencodeParsingException<BList>("Missing end character 'e'.", stream.Position);
 
             return list;

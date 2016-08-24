@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Threading.Tasks;
 using BencodeNET.Objects;
 using FluentAssertions;
 using Xunit;
@@ -132,20 +131,6 @@ namespace BencodeNET.Tests.Objects
             using (var stream = new MemoryStream())
             {
                 bnumber.EncodeTo(stream);
-
-                stream.Length.Should().Be(4);
-                stream.AsString().Should().Be("i42e");
-            }
-        }
-
-        [Fact]
-        public async Task CanEnodeToStreamAsync()
-        {
-            var bnumber = new BNumber(42);
-
-            using (var stream = new MemoryStream())
-            {
-                await bnumber.EncodeToAsync(stream);
 
                 stream.Length.Should().Be(4);
                 stream.AsString().Should().Be("i42e");

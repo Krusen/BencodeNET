@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using BencodeNET.IO;
 
 namespace BencodeNET.Torrents
@@ -194,18 +193,6 @@ namespace BencodeNET.Torrents
         {
             var torrent = ToBDictionary();
             torrent.EncodeTo(stream);
-        }
-
-        /// <summary>
-        /// Encodes the torrent and writes it asynchronously to the stream.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="stream"></param>
-        /// <returns>The stream that was passed to the method</returns>
-        protected override Task EncodeObjectAsync(BencodeStream stream)
-        {
-            var torrent = ToBDictionary();
-            return torrent.EncodeToAsync(stream);
         }
 
         /// <summary>

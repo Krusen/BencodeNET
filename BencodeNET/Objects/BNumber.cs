@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using BencodeNET.IO;
 
 namespace BencodeNET.Objects
@@ -49,13 +48,6 @@ namespace BencodeNET.Objects
             stream.Write('i');
             stream.Write(Value);
             stream.Write('e');
-        }
-
-        protected override async Task EncodeObjectAsync(BencodeStream stream)
-        {
-            await stream.WriteAsync('i').ConfigureAwait(false);
-            await stream.WriteAsync(Value).ConfigureAwait(false);
-            await stream.WriteAsync('e').ConfigureAwait(false);
         }
 
         public static implicit operator int(BNumber bint)

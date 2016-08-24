@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using BencodeNET.IO;
 
 namespace BencodeNET.Objects
@@ -185,16 +184,6 @@ namespace BencodeNET.Objects
                 item.EncodeTo(stream);
             }
             stream.Write('e');
-        }
-
-        protected override async Task EncodeObjectAsync(BencodeStream stream)
-        {
-            await stream.WriteAsync('l').ConfigureAwait(false);
-            foreach (var item in this)
-            {
-                await item.EncodeToAsync(stream).ConfigureAwait(false);
-            }
-            await stream.WriteAsync('e').ConfigureAwait(false);
         }
 
         #region IList<T> Members

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 using BencodeNET.Objects;
 using FluentAssertions;
 using Xunit;
@@ -230,20 +229,6 @@ namespace BencodeNET.Tests.Objects
             using (var stream = new MemoryStream())
             {
                 bstring.EncodeTo(stream);
-
-                stream.Length.Should().Be(14);
-                stream.AsString().Should().Be("11:hello world");
-            }
-        }
-
-        [Fact]
-        public async Task CanEncodeToStreamAsync()
-        {
-            var bstring = new BString("hello world");
-
-            using (var stream = new MemoryStream())
-            {
-                await bstring.EncodeToAsync(stream);
 
                 stream.Length.Should().Be(14);
                 stream.AsString().Should().Be("11:hello world");

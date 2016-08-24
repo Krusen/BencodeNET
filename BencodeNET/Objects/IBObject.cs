@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 using BencodeNET.IO;
 
 namespace BencodeNET.Objects
@@ -42,14 +41,6 @@ namespace BencodeNET.Objects
         TStream EncodeTo<TStream>(TStream stream) where TStream : Stream;
 
         /// <summary>
-        /// Asynchronously writes the object as bencode to the specified stream.
-        /// </summary>
-        /// <typeparam name="TStream">The type of stream.</typeparam>
-        /// <param name="stream">The stream to write to.</param>
-        /// <returns>The used stream.</returns>
-        Task<TStream> EncodeToAsync<TStream>(TStream stream) where TStream : Stream;
-
-        /// <summary>
         /// Writes the object as bencode to the specified stream.
         /// </summary>
         /// <param name="stream">The stream to write to.</param>
@@ -57,23 +48,9 @@ namespace BencodeNET.Objects
         BencodeStream EncodeTo(BencodeStream stream);
 
         /// <summary>
-        /// Asynchronously writes the object as bencode to the specified stream.
-        /// </summary>
-        /// <param name="stream">The stream to write to.</param>
-        /// <returns>The used stream.</returns>
-        Task<BencodeStream> EncodeToAsync(BencodeStream stream);
-
-        /// <summary>
         /// Writes the object as bencode to the specified file.
         /// </summary>
         /// <param name="filePath">The file path to write the encoded object to.</param>
         void EncodeTo(string filePath);
-
-        /// <summary>
-        /// Asynchronously writes the object as bencode to the specified file.
-        /// </summary>
-        /// <param name="filePath">The file path to write the encoded object to.</param>
-        /// <returns></returns>
-        Task EncodeToAsync(string filePath);
     }
 }

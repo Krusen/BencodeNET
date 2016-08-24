@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using BencodeNET.IO;
 
 namespace BencodeNET.Objects
@@ -90,13 +89,6 @@ namespace BencodeNET.Objects
             stream.Write(_value.Length);
             stream.Write(':');
             stream.Write(_value);
-        }
-
-        protected override async Task EncodeObjectAsync(BencodeStream stream)
-        {
-            await stream.WriteAsync(_value.Length).ConfigureAwait(false);
-            await stream.WriteAsync(':').ConfigureAwait(false);
-            await stream.WriteAsync(_value).ConfigureAwait(false);
         }
 
         public static implicit operator BString(string value)

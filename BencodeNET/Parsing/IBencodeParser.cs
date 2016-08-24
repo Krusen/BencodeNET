@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 using BencodeNET.IO;
 using BencodeNET.Objects;
 
@@ -52,27 +51,6 @@ namespace BencodeNET.Parsing
         IBObject Parse(string filePath);
 
         /// <summary>
-        /// Asynchronously parses a stream into an <see cref="IBObject"/>.
-        /// </summary>
-        /// <param name="stream">The stream to parse.</param>
-        /// <returns>The parsed object.</returns>
-        Task<IBObject> ParseAsync(Stream stream);
-
-        /// <summary>
-        /// Asynchronously parses a <see cref="BencodeStream"/> into an <see cref="IBObject"/>.
-        /// </summary>
-        /// <param name="stream">The stream to parse.</param>
-        /// <returns>The parsed object.</returns>
-        Task<IBObject> ParseAsync(BencodeStream stream);
-
-        /// <summary>
-        /// Asynchronously parses a bencoded file into an <see cref="IBObject"/>.
-        /// </summary>
-        /// <param name="filePath">The path to the file to parse.</param>
-        /// <returns>The parsed object.</returns>
-        Task<IBObject> ParseFromAsync(string filePath);
-
-        /// <summary>
         /// Parses a bencoded string into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
         /// </summary>
         /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
@@ -110,28 +88,5 @@ namespace BencodeNET.Parsing
         /// <param name="filePath">The path to the file to parse.</param>
         /// <returns>The parsed object.</returns>
         T Parse<T>(string filePath) where T : class, IBObject;
-
-        /// <summary>
-        /// Asynchronously parses a stream into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
-        /// </summary>
-        /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
-        /// <param name="stream">The bencoded string to parse.</param>
-        /// <returns>The parsed object.</returns>
-        Task<T> ParseAsync<T>(Stream stream) where T : class, IBObject;
-
-        /// <summary>
-        /// Asynchronously parses a <see cref="BencodeStream"/> into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
-        /// </summary>
-        /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
-        /// <param name="stream">The bencoded string to parse.</param>
-        /// <returns>The parsed object.</returns>
-        Task<T> ParseAsync<T>(BencodeStream stream) where T : class, IBObject;
-
-        /// <summary>
-        /// Asynchronously parses a bencoded file into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
-        /// </summary>
-        /// <param name="filePath">The path to the file to parse.</param>
-        /// <returns>The parsed object.</returns>
-        Task<T> ParseAsync<T>(string filePath) where T : class, IBObject;
     }
 }

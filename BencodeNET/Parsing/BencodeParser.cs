@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 using BencodeNET.Exceptions;
 using BencodeNET.IO;
 using BencodeNET.Objects;
@@ -172,58 +171,6 @@ namespace BencodeNET.Parsing
         }
 
         /// <summary>
-        /// Asynchronously parses a stream into an <see cref="IBObject"/>.
-        /// </summary>
-        /// <param name="stream">The stream to parse.</param>
-        /// <returns>The parsed object.</returns>
-        public Task<IBObject> ParseAsync(Stream stream)
-        {
-            return ParseAsync(new BencodeStream(stream));
-        }
-
-        /// <summary>
-        /// Asynchronously parses a <see cref="BencodeStream"/> into an <see cref="IBObject"/>.
-        /// </summary>
-        /// <param name="stream">The stream to parse.</param>
-        /// <returns>The parsed object.</returns>
-        public Task<IBObject> ParseAsync(BencodeStream stream)
-        {
-            if (stream == null) throw new ArgumentNullException(nameof(stream));
-
-            switch (stream.PeekChar())
-            {
-                case '0':
-                case '1':
-                case '2':
-                case '3':
-                case '4':
-                case '5':
-                case '6':
-                case '7':
-                case '8':
-                case '9': return ParseAsync<BString>(stream).FromDerived<IBObject, BString>();
-                case 'i': return ParseAsync<BNumber>(stream).FromDerived<IBObject, BNumber>();
-                case 'l': return ParseAsync<BList>(stream).FromDerived<IBObject, BList>();
-                case 'd': return ParseAsync<BDictionary>(stream).FromDerived<IBObject, BDictionary>();
-            }
-
-            throw new BencodeParsingException("Invalid first character - valid characters are: 0-9, 'i', 'l' and 'd'", stream.Position);
-        }
-
-        /// <summary>
-        /// Asynchronously parses a bencoded file into an <see cref="IBObject"/>.
-        /// </summary>
-        /// <param name="filePath">The path to the file to parse.</param>
-        /// <returns>The parsed object.</returns>
-        public Task<IBObject> ParseFromAsync(string filePath)
-        {
-            using (var stream = File.OpenRead(filePath))
-            {
-                return ParseAsync(stream);
-            }
-        }
-
-        /// <summary>
         /// Parses a bencoded string into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
         /// </summary>
         /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
@@ -288,46 +235,6 @@ namespace BencodeNET.Parsing
             using (var stream = File.OpenRead(filePath))
             {
                 return Parse<T>(stream);
-            }
-        }
-
-        /// <summary>
-        /// Asynchronously parses a stream into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
-        /// </summary>
-        /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
-        /// <param name="stream">The bencoded string to parse.</param>
-        /// <returns>The parsed object.</returns>
-        public Task<T> ParseAsync<T>(Stream stream) where T : class, IBObject
-        {
-            return ParseAsync<T>(new BencodeStream(stream));
-        }
-
-        /// <summary>
-        /// Asynchronously parses a <see cref="BencodeStream"/> into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
-        /// </summary>
-        /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
-        /// <param name="stream">The bencoded string to parse.</param>
-        /// <returns>The parsed object.</returns>
-        public Task<T> ParseAsync<T>(BencodeStream stream) where T : class, IBObject
-        {
-            var parser = Parsers.Get<T>();
-
-            if (parser == null)
-                throw new BencodeParsingException($"Missing parser for the type '{typeof(T).FullName}'");
-
-            return parser.ParseAsync(stream);
-        }
-
-        /// <summary>
-        /// Asynchronously parses a bencoded file into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
-        /// </summary>
-        /// <param name="filePath">The path to the file to parse.</param>
-        /// <returns>The parsed object.</returns>
-        public Task<T> ParseAsync<T>(string filePath) where T : class, IBObject
-        {
-            using (var stream = File.OpenRead(filePath))
-            {
-                return ParseAsync<T>(stream);
             }
         }
     }

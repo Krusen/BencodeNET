@@ -10,7 +10,6 @@ using Xunit;
 namespace BencodeNET.Tests.Parsing
 {
     // TODO: "Integration" tests? Full decode tests
-    // TODO: Async methods
     // TODO: stream/bencodestream methods
     public class BencodeParserTests
     {

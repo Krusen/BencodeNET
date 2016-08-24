@@ -7,7 +7,6 @@ using Xunit;
 
 namespace BencodeNET.Tests.Parsing
 {
-    // TODO: Async methods
     // TODO: Test parsing string, stream and bencodestream
     public class BNumberParserTests
     {
