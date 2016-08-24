@@ -111,12 +111,10 @@ namespace BencodeNET.IO
             if (_hasPeeked)
                 return _peekedByte;
 
+            var position = InnerStream.Position;
             _peekedByte = InnerStream.ReadByte();
             _hasPeeked = true;
-
-            // Only seek backwards if not at end of stream
-            if (_peekedByte > -1)
-                InnerStream.Seek(-1, SeekOrigin.Current);
+            InnerStream.Position = position;
 
             return _peekedByte;
         }
@@ -149,7 +147,7 @@ namespace BencodeNET.IO
                 return _peekedByte;
 
             _hasPeeked = false;
-            InnerStream.Seek(1, SeekOrigin.Current);
+            InnerStream.Position += 1;
             return _peekedByte;
         }
 
@@ -193,7 +191,7 @@ namespace BencodeNET.IO
             _hasPeeked = false;
 
             if (offset > 0)
-                InnerStream.Seek(offset, SeekOrigin.Current);
+                InnerStream.Position += offset;
 
             var readBytes = InnerStream.Read(bytes, offset, bytesToRead-offset) + offset;
             if (readBytes != bytesToRead)
