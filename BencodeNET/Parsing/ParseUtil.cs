@@ -1,10 +1,12 @@
 ﻿namespace BencodeNET.Parsing
 {
+    /// <summary>
+    /// A collection of helper methods for parsing bencode.
+    /// </summary>
     public static class ParseUtil
     {
         private const int Int64MaxDigits = 19;
 
-        // TODO: Unit tests
         /// <summary>
         /// A faster implementation than <see cref="long.TryParse(string, out long)"/>
         /// because we skip some checks that are not needed.
