@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace BencodeNET
 {
-    public static class UtilityExtensions
+    internal static class UtilityExtensions
     {
         public static bool IsDigit(this char c)
         {
