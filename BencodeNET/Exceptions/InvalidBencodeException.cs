@@ -8,7 +8,7 @@ namespace BencodeNET.Exceptions
 #if !NETSTANDARD
     [Serializable]
 #endif
-    public class InvalidBencodeException<T> : BencodeException
+    public class InvalidBencodeException<T> : BencodeException<T>
     {
         public long StreamPosition { get; set; }
 
@@ -22,6 +22,12 @@ namespace BencodeNET.Exceptions
         public InvalidBencodeException(string message, Exception inner)
             : base(message, inner)
         { }
+
+        public InvalidBencodeException(string message, Exception inner, long streamPosition)
+            : base($"Failed to parse {typeof(T).Name}. {message}", inner)
+        {
+            StreamPosition = streamPosition;
+        }
 
         public InvalidBencodeException(string message, long streamPosition)
             : base($"Failed to parse {typeof(T).Name}. {message}")
@@ -57,6 +63,12 @@ namespace BencodeNET.Exceptions
             var message =
                 $"Invalid end character of object. Expected 'e' but found '{invalidChar}' at position {streamPosition}.";
             return new InvalidBencodeException<T>(message, streamPosition);
+        }
+
+        public static InvalidBencodeException<T> MissingEndChar()
+        {
+            var message = "Missing end character of object. Expected 'e' but reached the end of the stream.";
+            return new InvalidBencodeException<T>(message);
         }
 
         public static InvalidBencodeException<T> BelowMinimumLength(int minimumLength, long actualLength, long streamPosition)
