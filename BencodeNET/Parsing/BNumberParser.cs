@@ -43,53 +43,52 @@ namespace BencodeNET.Parsing
             // We do not support numbers that cannot be stored as a long (Int64)
             if (numberOfDigits > BNumber.MaxDigits)
             {
-                throw new UnsupportedBencodeException<BNumber>(
+                throw UnsupportedException(
                     $"The number '{digits}' has more than 19 digits and cannot be stored as a long (Int64) and therefore is not supported.",
-                    stream.Position);
+                    startPosition);
             }
 
             // We need at least one digit
             if (numberOfDigits < 1)
-            {
-                throw new InvalidBencodeException<BNumber>(
-                    $"It contains no digits. Number starts at position {startPosition}.", startPosition);
-            }
+                throw InvalidException("It contains no digits.", startPosition);
 
             var firstDigit = isNegative ? digits[1] : digits[0];
 
             // Leading zeros are not valid
             if (firstDigit == '0' && numberOfDigits > 1)
-            {
-                throw new InvalidBencodeException<BNumber>(
-                    $"Leading '0's are not valid. Found value '{digits}'. Number starts at position {startPosition}.",
-                    startPosition);
-            }
+                throw InvalidException($"Leading '0's are not valid. Found value '{digits}'.", startPosition);
 
             // '-0' is not valid either
             if (firstDigit == '0' && numberOfDigits == 1 && isNegative)
-            {
-                throw new InvalidBencodeException<BNumber>(
-                    $"'-0' is not a valid number. Number starts at position {startPosition}.", startPosition);
-            }
+                throw InvalidException("'-0' is not a valid number.", startPosition);
 
             long number;
             if (!ParseUtil.TryParseLongFast(digits.ToString(), out number))
             {
                 var nonSignChars = isNegative ? digits.ToString(1, digits.Length - 1) : digits.ToString();
                 if (nonSignChars.Any(x => !x.IsDigit()))
-                {
-                    throw new InvalidBencodeException<BNumber>(
-                        $"The value '{digits}' is not a valid number. Number starts at position {startPosition}.");
-                }
+                    throw InvalidException($"The value '{digits}' is not a valid number.", startPosition);
 
-                throw new UnsupportedBencodeException<BNumber>(
-                    $"The value '{digits}' is not a valid long (Int64). Supported values range from '{long.MinValue:N0}' to '{long.MaxValue:N0}'. Number starts at position {startPosition}.",
+                throw UnsupportedException(
+                    $"The value '{digits}' is not a valid long (Int64). Supported values range from '{long.MinValue:N0}' to '{long.MaxValue:N0}'.",
                     startPosition);
             }
 
             return new BNumber(number);
         }
 
-        // TODO: Helper method for throwing exception with "Number starts at position ..." message appended
+        private static InvalidBencodeException<BNumber> InvalidException(string message, long startPosition)
+        {
+            return new InvalidBencodeException<BNumber>(
+                $"{message} The number starts at position {startPosition}.",
+                startPosition);
+        }
+
+        private static UnsupportedBencodeException<BNumber> UnsupportedException(string message, long startPosition)
+        {
+            return new UnsupportedBencodeException<BNumber>(
+                $"{message} The number starts at position {startPosition}.",
+                startPosition);
+        }
     }
 }
