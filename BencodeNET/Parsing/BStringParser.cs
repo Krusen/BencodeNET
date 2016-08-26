@@ -7,12 +7,12 @@ using BencodeNET.Objects;
 namespace BencodeNET.Parsing
 {
     /// <summary>
-    /// A bencode parser for byte strings.
+    /// A parser for bencoded byte strings.
     /// </summary>
     public class BStringParser : BObjectParser<BString>
     {
         /// <summary>
-        /// The minimum stream length in bytes ('0:') for a valid string.
+        /// The minimum stream length in bytes for a valid string ('0:').
         /// </summary>
         protected const int MinimumLength = 2;
 

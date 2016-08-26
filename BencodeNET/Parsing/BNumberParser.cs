@@ -7,12 +7,28 @@ using BencodeNET.Objects;
 
 namespace BencodeNET.Parsing
 {
+    /// <summary>
+    /// A parser for bencoded numbers.
+    /// </summary>
     public class BNumberParser : BObjectParser<BNumber>
     {
+        /// <summary>
+        /// The minimum stream length in bytes for a valid number ('i0e').
+        /// </summary>
         protected const int MinimumLength = 3;
 
+        /// <summary>
+        /// The encoding used for parsing.
+        /// </summary>
         protected override Encoding Encoding => Encoding.UTF8;
 
+        /// <summary>
+        /// Parses the next <see cref="BNumber"/> from the stream.
+        /// </summary>
+        /// <param name="stream">The stream to parse from.</param>
+        /// <returns>The parsed <see cref="BNumber"/>.</returns>
+        /// <exception cref="InvalidBencodeException{BNumber}">Invalid bencode</exception>
+        /// <exception cref="UnsupportedBencodeException{BNumber}">The bencode is unsupported by this library</exception>
         public override BNumber Parse(BencodeStream stream)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));

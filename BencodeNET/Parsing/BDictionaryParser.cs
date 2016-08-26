@@ -6,10 +6,20 @@ using BencodeNET.Objects;
 
 namespace BencodeNET.Parsing
 {
+    /// <summary>
+    /// A parser for bencoded dictionaries.
+    /// </summary>
     public class BDictionaryParser : BObjectParser<BDictionary>
     {
+        /// <summary>
+        /// The minimum stream length in bytes for a valid dictionary ('de').
+        /// </summary>
         protected const int MinimumLength = 2;
 
+        /// <summary>
+        /// Creates an instance using the specified <see cref="IBencodeParser"/> for parsing contained keys and values.
+        /// </summary>
+        /// <param name="bencodeParser">The parser used for contained keys and values.</param>
         public BDictionaryParser(IBencodeParser bencodeParser)
         {
             if (bencodeParser == null) throw new ArgumentNullException(nameof(bencodeParser));
@@ -17,10 +27,22 @@ namespace BencodeNET.Parsing
             BencodeParser = bencodeParser;
         }
 
+        /// <summary>
+        /// The parser used for parsing contained keys and values.
+        /// </summary>
         protected IBencodeParser BencodeParser { get; set; }
 
+        /// <summary>
+        /// The encoding used for parsing.
+        /// </summary>
         protected override Encoding Encoding => BencodeParser.Encoding;
 
+        /// <summary>
+        /// Parses the next <see cref="BDictionary"/> from the stream and its contained keys and values.
+        /// </summary>
+        /// <param name="stream">The stream to parse from.</param>
+        /// <returns>The parsed <see cref="BDictionary"/>.</returns>
+        /// <exception cref="InvalidBencodeException{BDictionary}">Invalid bencode</exception>
         public override BDictionary Parse(BencodeStream stream)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
