@@ -3,8 +3,14 @@
 using System.Runtime.Serialization;
 #endif
 
+#pragma warning disable 1591
 namespace BencodeNET.Exceptions
 {
+    /// <summary>
+    /// Represents parse errors for when encountering bencode that is potentially valid but not supported by this library.
+    /// Usually numbers larger than <see cref="long.MaxValue"/> or strings longer than that.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
 #if !NETSTANDARD
     [Serializable]
 #endif

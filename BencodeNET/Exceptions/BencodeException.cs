@@ -3,8 +3,12 @@
 using System.Runtime.Serialization;
 #endif
 
+#pragma warning disable 1591
 namespace BencodeNET.Exceptions
 {
+    /// <summary>
+    /// Represents generic errors in this bencode library.
+    /// </summary>
 #if !NETSTANDARD
     [Serializable]
 #endif
@@ -29,12 +33,18 @@ namespace BencodeNET.Exceptions
 #endif
     }
 
+    /// <summary>
+    /// Represents generic errors in this bencode library related to a specific <see cref="Type"/>.
+    /// </summary>
+    /// <typeparam name="T">The related type.</typeparam>
 #if !NETSTANDARD
     [Serializable]
 #endif
     public class BencodeException<T> : BencodeException
     {
-        // TODO: Naming of this property
+        /// <summary>
+        /// The type related to this error. Usually the type being parsed.
+        /// </summary>
         public Type RelatedType { get; } = typeof(T);
 
         public BencodeException()
@@ -57,6 +67,12 @@ namespace BencodeNET.Exceptions
             RelatedType = Type.GetType(info.GetString(nameof(RelatedType)), false);
         }
 
+        /// <summary>
+        /// Sets the <see cref="T:System.Runtime.Serialization.SerializationInfo"/> with information about the exception.
+        /// </summary>
+        /// <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo"/> that holds the serialized object data about the exception being thrown. </param>
+        /// <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext"/> that contains contextual information about the source or destination. </param>
+        /// <exception cref="T:System.ArgumentNullException">The <paramref name="info"/> parameter is a null reference.</exception>
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);
@@ -65,5 +81,4 @@ namespace BencodeNET.Exceptions
         }
 #endif
     }
-
 }
