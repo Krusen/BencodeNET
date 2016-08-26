@@ -48,10 +48,10 @@ namespace BencodeNET.Tests.Parsing
         [InlineData("5:spam")]
         [InlineData("6:spam")]
         [InlineData("100:spam")]
-        public void LessCharsThanSpecified_ThrowsParsingException(string bencode)
+        public void LessCharsThanSpecified_ThrowsInvalidBencodeException(string bencode)
         {
             Action action = () => Parser.Parse(bencode);
-            action.ShouldThrow<BencodeParsingException<BString>>();
+            action.ShouldThrow<InvalidBencodeException<BString>>();
         }
 
         [Theory]
@@ -62,10 +62,10 @@ namespace BencodeNET.Tests.Parsing
         [InlineData("4;spam")]
         [InlineData("4,spam")]
         [InlineData("4|spam")]
-        public void MissingDelimiter_ThrowsParsingException(string bencode)
+        public void MissingDelimiter_ThrowsInvalidBencodeException(string bencode)
         {
             Action action = () => Parser.Parse(bencode);
-            action.ShouldThrow<BencodeParsingException<BString>>();
+            action.ShouldThrow<InvalidBencodeException<BString>>();
         }
 
         [Theory]
@@ -77,19 +77,19 @@ namespace BencodeNET.Tests.Parsing
         [InlineData("?spam")]
         [InlineData("!spam")]
         [InlineData("#spam")]
-        public void NonDigitFirstChar_ThrowsParsingException(string bencode)
+        public void NonDigitFirstChar_ThrowsInvalidBencodeException(string bencode)
         {
             Action action = () => Parser.Parse(bencode);
-            action.ShouldThrow<BencodeParsingException<BString>>();
+            action.ShouldThrow<InvalidBencodeException<BString>>();
         }
 
         [Theory]
         [InlineData("0")]
         [InlineData("4")]
-        public void LessThanMinimumLength2_ThrowsParsingException(string bencode)
+        public void LessThanMinimumLength2_ThrowsInvalidBencodeException(string bencode)
         {
             Action action = () => Parser.Parse(bencode);
-            action.ShouldThrow<BencodeParsingException<BString>>();
+            action.ShouldThrow<InvalidBencodeException<BString>>();
         }
 
         [Theory]
@@ -100,7 +100,7 @@ namespace BencodeNET.Tests.Parsing
         public void LengthAboveMaxDigits10_ThrowsUnsupportedException(string bencode)
         {
             Action action = () => Parser.Parse(bencode);
-            action.ShouldThrow<UnsupportedBencodeException>();
+            action.ShouldThrow<UnsupportedBencodeException<BString>>();
         }
 
         [Theory]
@@ -117,7 +117,7 @@ namespace BencodeNET.Tests.Parsing
         public void LengthAtOrBelowMaxDigits10_DoesNotThrowUnsupportedException(string bencode)
         {
             Action action = () => Parser.Parse(bencode);
-            action.ShouldNotThrow<UnsupportedBencodeException>();
+            action.ShouldNotThrow<UnsupportedBencodeException<BString>>();
         }
 
         [Fact]
@@ -125,7 +125,7 @@ namespace BencodeNET.Tests.Parsing
         {
             var bencode = "2147483648:spam";
             Action action = () => Parser.Parse(bencode);
-            action.ShouldThrow<UnsupportedBencodeException>();
+            action.ShouldThrow<UnsupportedBencodeException<BString>>();
         }
 
         [Fact]
@@ -133,7 +133,7 @@ namespace BencodeNET.Tests.Parsing
         {
             var bencode = "2147483647:spam";
             Action action = () => Parser.Parse(bencode);
-            action.ShouldNotThrow<UnsupportedBencodeException>();
+            action.ShouldNotThrow<UnsupportedBencodeException<BString>>();
         }
     }
 }

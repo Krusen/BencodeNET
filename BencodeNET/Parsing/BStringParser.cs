@@ -29,7 +29,7 @@ namespace BencodeNET.Parsing
 
             // Minimum valid bencode string is '0:' meaning an empty string
             if (stream.Length < MinimumLength)
-                throw new BencodeParsingException<BString>($"Minimum valid stream length is {MinimumLength} (an empty string: '0:')", stream.Position);
+                throw InvalidBencodeException<BString>.BelowMinimumLength(MinimumLength, stream.Length, stream.Position);
 
             var startPosition = stream.Position;
 
@@ -39,8 +39,8 @@ namespace BencodeNET.Parsing
                 // Because of memory limitations (~1-2 GB) we know for certain we cannot handle more than 10 digits (10GB)
                 if (lengthString.Length >= BString.LengthMaxDigits)
                 {
-                    throw new UnsupportedBencodeException(
-                        $"Length of string is more than {BString.LengthMaxDigits} digits (>10GB) and is not supported (max is ~1-2GB).",
+                    throw new UnsupportedBencodeException<BString>(
+                        $"Length of string is more than {BString.LengthMaxDigits} digits (>10GB) and is not supported (max is ~1-2GB). String starts at position {startPosition}.",
                         stream.Position);
                 }
 
@@ -50,14 +50,16 @@ namespace BencodeNET.Parsing
             long stringLength;
             if (!ParseUtil.TryParseLongFast(lengthString.ToString(), out stringLength))
             {
-                throw new BencodeParsingException<BString>($"Invalid length of string '{lengthString}'", startPosition);
+                throw new InvalidBencodeException<BString>(
+                    $"Invalid length '{lengthString}' of string. String starts at position {startPosition}.",
+                    startPosition);
             }
 
             // Int32.MaxValue is ~2GB and is the absolute maximum that can be handled in memory
             if (stringLength > int.MaxValue)
             {
-                throw new UnsupportedBencodeException(
-                    $"Length of string is {stringLength:N0} but maximum supported length is {int.MaxValue:N0}.",
+                throw new UnsupportedBencodeException<BString>(
+                    $"Length of string is {stringLength:N0} but maximum supported length is {int.MaxValue:N0}. String starts at position {startPosition}.",
                     stream.Position);
             }
 
@@ -66,8 +68,8 @@ namespace BencodeNET.Parsing
             // If the two don't match we've reached the end of the stream before reading the expected number of chars
             if (bytes.Length != stringLength)
             {
-                throw new BencodeParsingException<BString>(
-                    $"Expected string to be {stringLength:N0} bytes long but could only read {bytes.Length:N0} bytes.",
+                throw new InvalidBencodeException<BString>(
+                    $"Expected string to be {stringLength:N0} bytes long but could only read {bytes.Length:N0} bytes. String starts at position {startPosition}.",
                     stream.Position);
             }
 

@@ -118,12 +118,12 @@ namespace BencodeNET.Tests.Parsing
         [InlineAutoMockedData("Y")]
         [InlineAutoMockedData("Z")]
         #endregion
-        public void InvalidFirstChars_ThrowsParsingException(string bencode)
+        public void InvalidFirstChars_ThrowsInvalidBencodeException(string bencode)
         {
             var bparser = new BencodeParser();
             Action action = () => bparser.ParseString(bencode);
 
-            action.ShouldThrow<BencodeParsingException>();
+            action.ShouldThrow<InvalidBencodeException<IBObject>>();
         }
 
         [Fact]

@@ -26,12 +26,11 @@ namespace BencodeNET.Parsing
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
             if (stream.Length < MinimumLength)
-                throw new BencodeParsingException<BList>($"Minimum valid length is {MinimumLength} (an empty list: 'le')", stream.Position);
+                throw InvalidBencodeException<BList>.BelowMinimumLength(MinimumLength, stream.Length, stream.Position);
 
             // Lists must start with 'l'
             if (stream.ReadChar() != 'l')
-                throw new BencodeParsingException<BList>(
-                    $"Must begin with 'l' but began with '{stream.ReadPreviousChar()}'.", stream.Position);
+                throw InvalidBencodeException<BList>.UnexpectedChar('l', stream.ReadPreviousChar(), stream.Position);
 
             var list = new BList();
             // Loop until next character is the end character 'e' or end of stream
@@ -43,7 +42,7 @@ namespace BencodeNET.Parsing
             }
 
             if (stream.ReadChar() != 'e')
-                throw new BencodeParsingException<BList>("Missing end character 'e'.", stream.Position);
+                throw InvalidBencodeException<BList>.InvalidEndChar(stream.ReadPreviousChar(), stream.Position);
 
             return list;
         }

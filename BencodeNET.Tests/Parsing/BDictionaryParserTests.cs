@@ -39,12 +39,12 @@ namespace BencodeNET.Tests.Parsing
 
         [Theory]
         [InlineAutoMockedData("d")]
-        public void BelowMinimumLength2_ThrowsParsingException(string bencode, IBencodeParser bparser)
+        public void BelowMinimumLength2_ThrowsInvalidBencodeException(string bencode, IBencodeParser bparser)
         {
             var parser = new BDictionaryParser(bparser);
             Action action = () => parser.Parse(bencode);
 
-            action.ShouldThrow<BencodeParsingException<BDictionary>>();
+            action.ShouldThrow<InvalidBencodeException<BDictionary>>();
         }
 
         [Theory]
@@ -52,26 +52,26 @@ namespace BencodeNET.Tests.Parsing
         [InlineAutoMockedData(":de")]
         [InlineAutoMockedData("-de")]
         [InlineAutoMockedData("1de")]
-        public void InvalidFirstChar_ThrowsParsingException(string bencode, IBencodeParser bparser)
+        public void InvalidFirstChar_ThrowsInvalidBencodeException(string bencode, IBencodeParser bparser)
         {
             var parser = new BDictionaryParser(bparser);
             Action action = () => parser.Parse(bencode);
 
-            action.ShouldThrow<BencodeParsingException<BDictionary>>();
+            action.ShouldThrow<InvalidBencodeException<BDictionary>>();
         }
 
         [Theory]
         [InlineAutoMockedData("da")]
         [InlineAutoMockedData("d4:spam3:egg")]
         [InlineAutoMockedData("d ")]
-        public void MissingEndChar_ThrowsParsingException(string bencode, IBencodeParser bparser)
+        public void MissingEndChar_ThrowsInvalidBencodeException(string bencode, IBencodeParser bparser)
         {
             SetupBencodeParser(bparser, bencode, new BString("key"), new BString("value"), hasEndChar:false);
 
             var parser = new BDictionaryParser(bparser);
             Action action = () => parser.Parse(bencode);
 
-            action.ShouldThrow<BencodeParsingException<BDictionary>>();
+            action.ShouldThrow<InvalidBencodeException<BDictionary>>();
         }
 
         private static void SetupBencodeParser(IBencodeParser bparser, string bencode, BString key, IBObject value, bool hasEndChar)

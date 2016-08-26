@@ -28,28 +28,19 @@ namespace BencodeNET.Parsing
             var startPosition = stream.Position;
 
             if (stream.Length < MinimumLength)
-                throw new BencodeParsingException<BDictionary>($"Minimum valid length is {MinimumLength} (an empty dictionary: 'de')", startPosition);
+                throw InvalidBencodeException<BDictionary>.BelowMinimumLength(MinimumLength, stream.Length, startPosition);
 
             // Dictionaries must start with 'd'
             if (stream.ReadChar() != 'd')
-                throw new BencodeParsingException<BDictionary>($"Must begin with 'd' but began with '{stream.ReadPreviousChar()}'", startPosition);
+                throw InvalidBencodeException<BDictionary>.UnexpectedChar('d', stream.ReadPreviousChar(), startPosition);
 
             var dictionary = new BDictionary();
             // Loop until next character is the end character 'e' or end of stream
             while (stream.Peek() != 'e' && stream.Peek() != -1)
             {
+                // TODO: try/catch this and throw more telling exception message?
                 // Decode next string in stream as the key
-                BString key;
-                try
-                {
-                    key = BencodeParser.Parse<BString>(stream);
-                }
-                catch (BencodeParsingException<BString>)
-                {
-                    // TODO: Change this message? Exception could be caused by anything?
-                    throw new BencodeParsingException<BDictionary>("Dictionary keys must be strings.", stream.Position);
-                }
-
+                var key = BencodeParser.Parse<BString>(stream);
                 // TODO: try/catch exception and tell that we need a value for each key?
                 // Decode next object in stream as the value
                 var value = BencodeParser.Parse(stream);
@@ -58,7 +49,7 @@ namespace BencodeNET.Parsing
             }
 
             if (stream.ReadChar() != 'e')
-                throw new BencodeParsingException<BDictionary>("Missing end character 'e'.", stream.Position);
+                throw InvalidBencodeException<BDictionary>.InvalidEndChar(stream.ReadPreviousChar(), stream.Position);
 
             return dictionary;
         }

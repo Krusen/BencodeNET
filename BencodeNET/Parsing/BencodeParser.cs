@@ -154,7 +154,7 @@ namespace BencodeNET.Parsing
                 case 'd': return Parse<BDictionary>(stream);
             }
 
-            throw new BencodeParsingException("Invalid first character - valid characters are: 0-9, 'i', 'l' and 'd'", stream.Position);
+            throw InvalidBencodeException<IBObject>.InvalidBeginningChar(stream.PeekChar(), stream.Position);
         }
 
         /// <summary>
@@ -220,7 +220,7 @@ namespace BencodeNET.Parsing
             var parser = Parsers.Get<T>();
 
             if (parser == null)
-                throw new BencodeParsingException($"Missing parser for the type '{typeof(T).FullName}'");
+                throw new BencodeException($"Missing parser for the type '{typeof(T).FullName}'. Stream position: {stream.Position}");
 
             return parser.Parse(stream);
         }

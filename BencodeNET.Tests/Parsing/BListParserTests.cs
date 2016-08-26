@@ -45,12 +45,12 @@ namespace BencodeNET.Tests.Parsing
 
         [Theory]
         [InlineAutoMockedData("l")]
-        public void BelowMinimumLength2_ThrowsParsingException(string bencode, IBencodeParser bparser)
+        public void BelowMinimumLength2_ThrowsInvalidBencodeException(string bencode, IBencodeParser bparser)
         {
             var parser = new BListParser(bparser);
             Action action = () => parser.Parse(bencode);
 
-            action.ShouldThrow<BencodeParsingException<BList>>();
+            action.ShouldThrow<InvalidBencodeException<BList>>();
         }
 
         [Theory]
@@ -60,12 +60,12 @@ namespace BencodeNET.Tests.Parsing
         [InlineAutoMockedData("-")]
         [InlineAutoMockedData(".")]
         [InlineAutoMockedData("e")]
-        public void InvalidFirstChar_ThrowsParsingException(string bencode, IBencodeParser bparser)
+        public void InvalidFirstChar_ThrowsInvalidBencodeException(string bencode, IBencodeParser bparser)
         {
             var parser = new BListParser(bparser);
             Action action = () => parser.Parse(bencode);
 
-            action.ShouldThrow<BencodeParsingException<BList>>();
+            action.ShouldThrow<InvalidBencodeException<BList>>();
         }
 
         [Theory]
@@ -73,7 +73,7 @@ namespace BencodeNET.Tests.Parsing
         [InlineAutoMockedData("l4:spam")]
         [InlineAutoMockedData("l ")]
         [InlineAutoMockedData("l:")]
-        public void MissingEndChar_ThrowsParsingException(string bencode, IBencodeParser bparser)
+        public void MissingEndChar_ThrowsInvalidBencodeException(string bencode, IBencodeParser bparser)
         {
             // Arrange
             var bstring = new BString("test");
@@ -84,7 +84,7 @@ namespace BencodeNET.Tests.Parsing
             Action action = () => parser.Parse(bencode);
 
             // Assert
-            action.ShouldThrow<BencodeParsingException<BList>>();
+            action.ShouldThrow<InvalidBencodeException<BList>>();
         }
 
         private static void SetupBencodeParser(IBencodeParser bparser, string bencode, IBObject obj, bool hasEndChar)
