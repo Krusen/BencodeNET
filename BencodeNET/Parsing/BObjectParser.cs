@@ -21,9 +21,9 @@ namespace BencodeNET.Parsing
         /// </summary>
         /// <param name="bencodedString">The bencoded string to parse.</param>
         /// <returns>The parsed object.</returns>
-        IBObject IBObjectParser.Parse(string bencodedString)
+        IBObject IBObjectParser.ParseString(string bencodedString)
         {
-            return Parse(bencodedString);
+            return ParseString(bencodedString);
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace BencodeNET.Parsing
         /// </summary>
         /// <param name="bencodedString">The bencoded string to parse.</param>
         /// <returns>The parsed object.</returns>
-        public virtual T Parse(string bencodedString)
+        public virtual T ParseString(string bencodedString)
         {
             using (var stream = bencodedString.AsStream(Encoding))
             {

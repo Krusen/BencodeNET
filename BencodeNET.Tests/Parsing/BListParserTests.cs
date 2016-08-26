@@ -23,7 +23,7 @@ namespace BencodeNET.Tests.Parsing
 
             // Act
             var parser = new BListParser(bparser);
-            var blist = parser.Parse(bencode);
+            var blist = parser.ParseString(bencode);
 
             // Assert
             blist.Count.Should().Be(1);
@@ -37,7 +37,7 @@ namespace BencodeNET.Tests.Parsing
         public void CanParseEmptyList(string bencode, IBencodeParser bparser)
         {
             var parser = new BListParser(bparser);
-            var blist = parser.Parse(bencode);
+            var blist = parser.ParseString(bencode);
 
             blist.Count.Should().Be(0);
             bparser.Received(0).Parse(Arg.Any<BencodeStream>());
@@ -48,7 +48,7 @@ namespace BencodeNET.Tests.Parsing
         public void BelowMinimumLength2_ThrowsInvalidBencodeException(string bencode, IBencodeParser bparser)
         {
             var parser = new BListParser(bparser);
-            Action action = () => parser.Parse(bencode);
+            Action action = () => parser.ParseString(bencode);
 
             action.ShouldThrow<InvalidBencodeException<BList>>();
         }
@@ -63,7 +63,7 @@ namespace BencodeNET.Tests.Parsing
         public void InvalidFirstChar_ThrowsInvalidBencodeException(string bencode, IBencodeParser bparser)
         {
             var parser = new BListParser(bparser);
-            Action action = () => parser.Parse(bencode);
+            Action action = () => parser.ParseString(bencode);
 
             action.ShouldThrow<InvalidBencodeException<BList>>();
         }
@@ -81,7 +81,7 @@ namespace BencodeNET.Tests.Parsing
 
             // Act
             var parser = new BListParser(bparser);
-            Action action = () => parser.Parse(bencode);
+            Action action = () => parser.ParseString(bencode);
 
             // Assert
             action.ShouldThrow<InvalidBencodeException<BList>>();

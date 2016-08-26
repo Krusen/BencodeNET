@@ -14,7 +14,7 @@ namespace BencodeNET.Parsing
         /// </summary>
         /// <param name="bencodedString">The bencoded string to parse.</param>
         /// <returns>The parsed object.</returns>
-        IBObject Parse(string bencodedString);
+        IBObject ParseString(string bencodedString);
 
         /// <summary>
         /// Parses a byte array into an <see cref="IBObject"/>.
@@ -48,7 +48,7 @@ namespace BencodeNET.Parsing
         /// </summary>
         /// <param name="bencodedString">The bencoded string to parse.</param>
         /// <returns>The parsed object.</returns>
-        new T Parse(string bencodedString);
+        new T ParseString(string bencodedString);
 
         /// <summary>
         /// Parses a byte array into an <see cref="IBObject"/> of type <typeparamref name="T"/>.

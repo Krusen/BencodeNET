@@ -16,7 +16,7 @@ namespace BencodeNET.Tests.Parsing
         {
             var parser = new MockBObjectParser(parserMock) as IBObjectParser;
 
-            parser.Parse("bencoded string");
+            parser.ParseString("bencoded string");
 
             parserMock.Received().Parse(Arg.Any<BencodeStream>());
         }
@@ -42,7 +42,7 @@ namespace BencodeNET.Tests.Parsing
         {
             var parser = new MockBObjectParser(parserMock);
 
-            parser.Parse("bencoded string");
+            parser.ParseString("bencoded string");
 
             parserMock.Received().Parse(Arg.Any<BencodeStream>());
         }

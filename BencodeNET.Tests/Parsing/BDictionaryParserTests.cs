@@ -20,7 +20,7 @@ namespace BencodeNET.Tests.Parsing
             SetupBencodeParser(bparser, bencode, key, value, hasEndChar:true);
 
             var parser = new BDictionaryParser(bparser);
-            var bdictionary = parser.Parse(bencode);
+            var bdictionary = parser.ParseString(bencode);
 
             bdictionary.Count.Should().Be(1);
             bdictionary.Should().ContainKey(key);
@@ -32,7 +32,7 @@ namespace BencodeNET.Tests.Parsing
         public void CanParseEmptyDictionary(string bencode, IBencodeParser bparser)
         {
             var parser = new BDictionaryParser(bparser);
-            var bdictionary = parser.Parse(bencode);
+            var bdictionary = parser.ParseString(bencode);
 
             bdictionary.Count.Should().Be(0);
         }
@@ -42,7 +42,7 @@ namespace BencodeNET.Tests.Parsing
         public void BelowMinimumLength2_ThrowsInvalidBencodeException(string bencode, IBencodeParser bparser)
         {
             var parser = new BDictionaryParser(bparser);
-            Action action = () => parser.Parse(bencode);
+            Action action = () => parser.ParseString(bencode);
 
             action.ShouldThrow<InvalidBencodeException<BDictionary>>();
         }
@@ -55,7 +55,7 @@ namespace BencodeNET.Tests.Parsing
         public void InvalidFirstChar_ThrowsInvalidBencodeException(string bencode, IBencodeParser bparser)
         {
             var parser = new BDictionaryParser(bparser);
-            Action action = () => parser.Parse(bencode);
+            Action action = () => parser.ParseString(bencode);
 
             action.ShouldThrow<InvalidBencodeException<BDictionary>>();
         }
@@ -69,7 +69,7 @@ namespace BencodeNET.Tests.Parsing
             SetupBencodeParser(bparser, bencode, new BString("key"), new BString("value"), hasEndChar:false);
 
             var parser = new BDictionaryParser(bparser);
-            Action action = () => parser.Parse(bencode);
+            Action action = () => parser.ParseString(bencode);
 
             action.ShouldThrow<InvalidBencodeException<BDictionary>>();
         }
