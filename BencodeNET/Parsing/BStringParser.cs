@@ -6,14 +6,27 @@ using BencodeNET.Objects;
 
 namespace BencodeNET.Parsing
 {
+    /// <summary>
+    /// A bencode parser for byte strings.
+    /// </summary>
     public class BStringParser : BObjectParser<BString>
     {
+        /// <summary>
+        /// The minimum stream length in bytes ('0:') for a valid string.
+        /// </summary>
         protected const int MinimumLength = 2;
 
+        /// <summary>
+        /// Creates an instance using <see cref="System.Text.Encoding.UTF8"/> for parsing.
+        /// </summary>
         public BStringParser()
             : this(Encoding.UTF8)
         { }
 
+        /// <summary>
+        /// Creates an instance using the specified encoding for parsing.
+        /// </summary>
+        /// <param name="encoding"></param>
         public BStringParser(Encoding encoding)
         {
             if (encoding == null) throw new ArgumentNullException(nameof(encoding));
@@ -21,8 +34,18 @@ namespace BencodeNET.Parsing
             Encoding = encoding;
         }
 
+        /// <summary>
+        /// The encoding used when creating the <see cref="BString"/> when parsing.
+        /// </summary>
         protected override Encoding Encoding { get; }
 
+        /// <summary>
+        /// Parses the next <see cref="BString"/> from the stream.
+        /// </summary>
+        /// <param name="stream">The stream to parse from.</param>
+        /// <returns>The parsed <see cref="BString"/>.</returns>
+        /// <exception cref="InvalidBencodeException{BString}">Invalid bencode</exception>
+        /// <exception cref="UnsupportedBencodeException{BString}">The bencode is unsupported by this library</exception>
         public override BString Parse(BencodeStream stream)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
