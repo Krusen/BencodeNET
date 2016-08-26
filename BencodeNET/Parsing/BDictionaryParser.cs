@@ -38,20 +38,47 @@ namespace BencodeNET.Parsing
             // Loop until next character is the end character 'e' or end of stream
             while (stream.Peek() != 'e' && stream.Peek() != -1)
             {
-                // TODO: try/catch this and throw more telling exception message?
-                // Decode next string in stream as the key
-                var key = BencodeParser.Parse<BString>(stream);
-                // TODO: try/catch exception and tell that we need a value for each key?
-                // Decode next object in stream as the value
-                var value = BencodeParser.Parse(stream);
+                BString key;
+                try
+                {
+                    // Decode next string in stream as the key
+                    key = BencodeParser.Parse<BString>(stream);
+                }
+                catch (BencodeException<BString> ex)
+                {
+                    throw InvalidException("Could not parse dictionary key. Keys must be strings.", ex, startPosition);
+                }
+
+                IBObject value;
+                try
+                {
+                    // Decode next object in stream as the value
+                    value = BencodeParser.Parse(stream);
+                }
+                catch (BencodeException ex)
+                {
+                    throw InvalidException(
+                        "Could not parse dictionary value. There needs to be a value for each key.",
+                        ex, startPosition);
+                }
 
                 dictionary.Add(key, value);
             }
 
             if (stream.ReadChar() != 'e')
+            {
+                if (stream.EndOfStream) throw InvalidBencodeException<BDictionary>.MissingEndChar();
                 throw InvalidBencodeException<BDictionary>.InvalidEndChar(stream.ReadPreviousChar(), stream.Position);
+            }
 
             return dictionary;
+        }
+
+        private static InvalidBencodeException<BDictionary> InvalidException(string message, Exception inner, long startPosition)
+        {
+            return new InvalidBencodeException<BDictionary>(
+                $"{message} The dictionary starts at position {startPosition}.",
+                inner, startPosition);
         }
     }
 }
