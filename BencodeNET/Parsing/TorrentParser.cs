@@ -45,11 +45,15 @@ namespace BencodeNET.Parsing
                 Trackers = LoadTrackers(data)
             };
 
-            if (torrent.FileMode == TorrentFileMode.Single)
-                torrent.File = LoadSingleFileInfo(info);
-
-            if (torrent.FileMode == TorrentFileMode.Multi)
+            // TODO: Better check of single/multi file?
+            if (info.ContainsKey(TorrentFields.Files))
+            {
                 torrent.Files = LoadMultiFileInfoList(info);
+            }
+            else
+            {
+                torrent.File = LoadSingleFileInfo(info);
+            }
 
             return torrent;
         }
