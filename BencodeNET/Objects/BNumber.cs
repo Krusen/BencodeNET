@@ -52,16 +52,19 @@ namespace BencodeNET.Objects
 
         public static implicit operator int(BNumber bint)
         {
+            if (bint == null) throw new InvalidCastException();
             return (int)bint.Value;
         }
 
         public static implicit operator long(BNumber bint)
         {
+            if (bint == null) throw new InvalidCastException();
             return bint.Value;
         }
 
         public static implicit operator DateTime?(BNumber number)
         {
+            if (number == null) return null;
             return Epoch.AddSeconds(number);
         }
 
