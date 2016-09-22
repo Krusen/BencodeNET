@@ -7,6 +7,18 @@ namespace BencodeNET.Torrents
 {
     public static class TorrentUtil
     {
+        public static string CalculateInfoHash(Torrent torrent)
+        {
+            var info = torrent.ToBDictionary().Get<BDictionary>("info");
+            return CalculateInfoHash(info);
+        }
+
+        public static byte[] CalculateInfoHashBytes(Torrent torrent)
+        {
+            var info = torrent.ToBDictionary().Get<BDictionary>("info");
+            return CalculateInfoHashBytes(info);
+        }
+
         public static string CalculateInfoHash(BDictionary info)
         {
             var hashBytes = CalculateInfoHashBytes(info);

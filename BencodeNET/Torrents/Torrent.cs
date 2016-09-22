@@ -167,7 +167,7 @@ namespace BencodeNET.Torrents
         /// Converts the torrent to a <see cref="BDictionary"/>.
         /// </summary>
         /// <returns></returns>
-        protected virtual BDictionary ToBDictionary()
+        public virtual BDictionary ToBDictionary()
         {
             var torrent = new BDictionary();
 
@@ -193,7 +193,7 @@ namespace BencodeNET.Torrents
             if (CreationDate != null)
                 torrent[TorrentFields.CreationDate] = (BNumber)CreationDate;
 
-            torrent[TorrentFields.Info] = CreateInfo(Encoding);
+            torrent[TorrentFields.Info] = CreateInfoDictionary(Encoding);
 
             if (ExtraFields != null)
                 torrent.MergeWith(ExtraFields, ExistingKeyAction.Merge);
@@ -220,7 +220,7 @@ namespace BencodeNET.Torrents
         /// </summary>
         /// <param name="encoding">The encoding used for writing strings</param>
         /// <returns>A <see cref="BDictionary"/> of the 'info' part of the torrent</returns>
-        protected virtual BDictionary CreateInfo(Encoding encoding)
+        protected virtual BDictionary CreateInfoDictionary(Encoding encoding)
         {
             var info = new BDictionary
             {
@@ -270,10 +270,9 @@ namespace BencodeNET.Torrents
         /// The info hash is a 20-byte SHA1 hash of the value of the 'info' <see cref="BDictionary"/> of the torrent.
         /// </summary>
         /// <returns>A string representation of a 20-byte SHA1 hash of the value of the 'info' part</returns>
-        public virtual string CalculateInfoHash()
+        public virtual string GetInfoHash()
         {
-            var info = CreateInfo(Encoding);
-            return TorrentUtil.CalculateInfoHash(info);
+            return TorrentUtil.CalculateInfoHash(this);
         }
 
         /// <summary>
@@ -281,7 +280,7 @@ namespace BencodeNET.Torrents
         /// The info hash is a 20-byte SHA1 hash of the value of the 'info' <see cref="BDictionary"/> of the torrent.
         /// </summary>
         /// <returns>A 20-byte SHA1 hash of the value of the 'info' part</returns>
-        public virtual byte[] CalculateInfoHashBytes()
+        public virtual byte[] GetInfoHashBytes() => TorrentUtil.CalculateInfoHashBytes(this);
         {
             var info = CreateInfo(Encoding);
             return TorrentUtil.CalculateInfoHashBytes(info);
