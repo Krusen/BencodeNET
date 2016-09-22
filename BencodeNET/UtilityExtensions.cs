@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 #if NETSTANDARD
@@ -32,6 +33,11 @@ namespace BencodeNET
         public static void Write(this Stream stream, char c)
         {
             stream.WriteByte((byte)c);
+        }
+
+        public static IEnumerable<T> Flatten<T>(this IEnumerable<IEnumerable<T>> source)
+        {
+            return source.SelectMany(x => x);
         }
 
 #if NETSTANDARD

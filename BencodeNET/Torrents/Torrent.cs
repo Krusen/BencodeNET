@@ -281,9 +281,13 @@ namespace BencodeNET.Torrents
         /// </summary>
         /// <returns>A 20-byte SHA1 hash of the value of the 'info' part</returns>
         public virtual byte[] GetInfoHashBytes() => TorrentUtil.CalculateInfoHashBytes(this);
+
+        /// <summary>
+        /// Creates a Magnet link in the BTIH (BitTorrent Info Hash) format: xt=urn:btih:{info hash}
+        /// </summary>
+        public virtual string GetMagnetLink(MagnetLinkOptions options = MagnetLinkOptions.IncludeTrackers)
         {
-            var info = CreateInfo(Encoding);
-            return TorrentUtil.CalculateInfoHashBytes(info);
+            return TorrentUtil.CreateMagnetLink(this, options);
         }
 
         public static bool operator ==(Torrent first, Torrent second)
