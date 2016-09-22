@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using BencodeNET.Exceptions;
 using BencodeNET.IO;
 
 namespace BencodeNET.Torrents
@@ -81,6 +82,25 @@ namespace BencodeNET.Torrents
                     return TorrentFileMode.Single;
 
                 return TorrentFileMode.Unknown;
+            }
+        }
+
+        /// <summary>
+        /// Returns the "display name" of the torrent.
+        /// For single-file torrents this is the file name of that file.
+        /// For multi-file torrents this is the directory name.
+        /// </summary>
+        public virtual string DisplayName
+        {
+            get
+            {
+                if (FileMode == TorrentFileMode.Single)
+                    return File.FileName;
+
+                if (FileMode == TorrentFileMode.Multi)
+                    return Files.DirectoryName;
+
+                throw new BencodeException("Cannot get torrent display name. Unknown torrent file mode.");
             }
         }
 
