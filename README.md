@@ -17,8 +17,8 @@ Overview
     - [Non-standard fields](#non-standard-fields)
   - [Parsing](#parsing)
   - [Encoding](#encoding)
-- [String Character Enoding](#string-character-encoding)
-- [Upgrading from 1.x to 2.0](#upgrading-from-version-1.x-to-2.0)
+- [String Character Encoding](#string-character-encoding)
+- [Upgrading from 1.x to 2.0](#upgrading-from-version-1x-to-20)
 
 
 Usage
@@ -201,8 +201,8 @@ Probably the biggest difference is that in 1.x you would use the static class `B
 `DecodeString(string)`, `DecodeNumber(string)` etc. In 2.0 you have to create an instance of `BencodeParser`
 and use the methods on that.
 
-Use `BencodeParser.ParseString(string)` for parsing string directly or `BencodeParser.Parse(Stream)` or one
-of its overloads for parsing `Stream`, `byte[]` or a file by file path (`string`).
+Use `BencodeParser.ParseString(string)` for parsing strings directly or `BencodeParser.Parse(...)` 
+for parsing `Stream`, `byte[]` or a file by file path (`string`) without opening af stream yourself.
 
 ```C#
 // 1.x - Parsing strings directly
