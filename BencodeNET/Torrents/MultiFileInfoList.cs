@@ -10,6 +10,17 @@ namespace BencodeNET.Torrents
     /// </remarks>
     public class MultiFileInfoList : List<MultiFileInfo>
     {
+        /// <summary> </summary>
+        public MultiFileInfoList()
+        { }
+
+        /// <summary></summary>
+        /// <param name="directoryName">Name of directory to store files in.</param>
+        public MultiFileInfoList(string directoryName)
+        {
+            DirectoryName = directoryName;
+        }
+
         /// <summary>
         /// The name of the directory in which to store all the files. This is purely advisory.
         /// </summary>
