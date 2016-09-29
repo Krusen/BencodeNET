@@ -189,7 +189,9 @@ namespace BencodeNET.Torrents
             if (CreationDate != null)
                 torrent[TorrentFields.CreationDate] = (BNumber)CreationDate;
 
-            torrent[TorrentFields.Info] = CreateInfoDictionary(Encoding);
+            var info = CreateInfoDictionary(Encoding);
+            if (info.Any())
+                torrent[TorrentFields.Info] = info;
 
             if (ExtraFields != null)
                 torrent.MergeWith(ExtraFields, ExistingKeyAction.Merge);
