@@ -53,7 +53,7 @@ namespace BencodeNET.Torrents
         /// <remarks>
         /// Corresponds to the 'info' field in a single-file torrent.
         /// </remarks>
-        public virtual TorrentSingleFileInfo File { get; set; }
+        public virtual SingleFileInfo File { get; set; }
 
         /// <summary>
         /// A list of file info for the files in the torrent. Will be <c>null</c> for single-file torrents.
@@ -61,7 +61,7 @@ namespace BencodeNET.Torrents
         /// <remarks>
         /// Corresponds to the 'info' field in a multi-file torrent.
         /// </remarks>
-        public virtual TorrentMultiFileInfoList Files { get; set; }
+        public virtual MultiFileInfoList Files { get; set; }
 
         /// <summary>
         /// The file mode of the torrent.

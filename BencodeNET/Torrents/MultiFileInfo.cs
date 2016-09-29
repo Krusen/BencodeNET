@@ -11,7 +11,7 @@ namespace BencodeNET.Torrents
     /// <remarks>
     /// Corresponds to an entry in the 'info.files' list field in a torrent.
     /// </remarks>
-    public class TorrentMultiFileInfo
+    public class MultiFileInfo
     {
         /// <summary>
         /// The file name. It just returns the last part of <see cref="Path"/>.

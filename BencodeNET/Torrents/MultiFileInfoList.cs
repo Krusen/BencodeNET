@@ -8,7 +8,7 @@ namespace BencodeNET.Torrents
     /// <remarks>
     /// Corresponds to the 'info' field in a multi-file torrent.
     /// </remarks>
-    public class TorrentMultiFileInfoList : List<TorrentMultiFileInfo>
+    public class MultiFileInfoList : List<MultiFileInfo>
     {
         /// <summary>
         /// The name of the directory in which to store all the files. This is purely advisory.

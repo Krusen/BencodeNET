@@ -58,9 +58,9 @@ namespace BencodeNET.Parsing
             return torrent;
         }
 
-        protected virtual TorrentSingleFileInfo LoadSingleFileInfo(BDictionary info)
+        protected virtual SingleFileInfo LoadSingleFileInfo(BDictionary info)
         {
-            return new TorrentSingleFileInfo
+            return new SingleFileInfo
             {
                 FileName = info.Get<BString>(TorrentFields.Name)?.ToString(),
                 FileSize = info.Get<BNumber>(TorrentFields.Length),
@@ -68,15 +68,15 @@ namespace BencodeNET.Parsing
             };
         }
 
-        protected virtual TorrentMultiFileInfoList LoadMultiFileInfoList(BDictionary info)
+        protected virtual MultiFileInfoList LoadMultiFileInfoList(BDictionary info)
         {
-            var list = new TorrentMultiFileInfoList
+            var list = new MultiFileInfoList
             {
                 DirectoryName = info.Get<BString>(TorrentFields.Name).ToString(),
             };
 
             var fileInfos = info.Get<BList>(TorrentFields.Files).Cast<BDictionary>()
-                .Select(x => new TorrentMultiFileInfo
+                .Select(x => new MultiFileInfo
                 {
                     FileSize = x.Get<BNumber>(TorrentFields.Length),
                     Path = x.Get<BList>(TorrentFields.Path)?.AsStrings().ToList(),

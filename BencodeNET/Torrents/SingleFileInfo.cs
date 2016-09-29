@@ -6,7 +6,7 @@
     /// <remarks>
     /// Corresponds to the 'info' field in a single-file torrent.
     /// </remarks>
-    public class TorrentSingleFileInfo
+    public class SingleFileInfo
     {
         // Name
         /// <summary>
