@@ -13,7 +13,7 @@ namespace BencodeNET.Objects
     /// <remarks>
     /// The underlying value is a <see cref="IList{IBObject}"/>.
     /// </remarks>
-    public class BList : BList<IBObject>
+    public class BList : BObject<IList<IBObject>>, IList<IBObject>
     {
         /// <summary>
         /// The underlying list.
@@ -52,8 +52,9 @@ namespace BencodeNET.Objects
         /// </summary>
         /// <param name="objects"></param>
         public BList(IEnumerable<IBObject> objects)
-            : base(objects)
-        { }
+        {
+            Value = new List<IBObject>(objects);
+        }
 
         /// <summary>
         /// Adds a string to the list using <see cref="Encoding.UTF8"/>.
@@ -121,7 +122,8 @@ namespace BencodeNET.Objects
         /// <returns></returns>
         public IEnumerable<string> AsStrings(Encoding encoding)
         {
-            return As<BString>().Select(x => x.ToString(encoding));
+            IList<BString> bstrings = this.As<BString>();
+            return bstrings.Select(x => x.ToString(encoding));
         }
 
         /// <summary>
@@ -132,7 +134,7 @@ namespace BencodeNET.Objects
         /// <exception cref="InvalidCastException">
         /// An element is not of type <typeparamref name="T"/>.
         /// </exception>
-        public BList<T> As<T>() where T : IBObject
+        public BList<T> As<T>() where T : class,IBObject
         {
             try
             {
@@ -142,37 +144,6 @@ namespace BencodeNET.Objects
             {
                 throw new InvalidCastException($"Not all elements are of type '{typeof(T).FullName}'.", ex);
             }
-        }
-    }
-
-    /// <summary>
-    /// Represents a bencoded list of <see cref="IBObject"/> of type <typeparamref name="T"/>.
-    /// </summary>
-    /// <remarks>
-    /// The underlying value is a <see cref="IList{T}"/>.
-    /// </remarks>
-    public class BList<T> : BObject<IList<T>>, IList<T> where T : IBObject
-    {
-        /// <summary>
-        /// The underlying list.
-        /// </summary>
-        public override IList<T> Value { get; }
-
-        /// <summary>
-        /// Creates an empty list.
-        /// </summary>
-        public BList()
-        {
-            Value = new List<T>();
-        }
-
-        /// <summary>
-        /// Creates a list from the specified objects.
-        /// </summary>
-        /// <param name="objects"></param>
-        public BList(IEnumerable<T> objects)
-        {
-            Value = objects.ToList();
         }
 
 #pragma warning disable 1591
@@ -185,16 +156,116 @@ namespace BencodeNET.Objects
             }
             stream.Write('e');
         }
+#pragma warning restore 1591
 
-        #region IList<T> Members
+        #region IList<IBObject> Members
+#pragma warning disable 1591
 
         public int Count => Value.Count;
 
         public bool IsReadOnly => Value.IsReadOnly;
 
-        public T this[int index]
+        public IBObject this[int index]
         {
             get { return Value[index]; }
+            set
+            {
+                if (value == null) throw new ArgumentNullException(nameof(value));
+                Value[index] = value;
+            }
+        }
+
+        public void Add(IBObject item)
+        {
+            if (item == null) throw new ArgumentNullException(nameof(item));
+            Value.Add(item);
+        }
+
+        public void Clear()
+        {
+            Value.Clear();
+        }
+
+        public bool Contains(IBObject item)
+        {
+            return Value.Contains(item);
+        }
+
+        public void CopyTo(IBObject[] array, int arrayIndex)
+        {
+            Value.CopyTo(array, arrayIndex);
+        }
+
+        public IEnumerator<IBObject> GetEnumerator()
+        {
+            return Value.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public int IndexOf(IBObject item)
+        {
+            return Value.IndexOf(item);
+        }
+
+        public void Insert(int index, IBObject item)
+        {
+            Value.Insert(index, item);
+        }
+
+        public bool Remove(IBObject item)
+        {
+            return Value.Remove(item);
+        }
+
+        public void RemoveAt(int index)
+        {
+            Value.RemoveAt(index);
+        }
+
+#pragma warning restore 1591
+        #endregion
+    }
+
+    /// <summary>
+    /// Represents a bencoded list of type <typeparamref name="T"/> which implements <see cref="IBObject"/> .
+    /// </summary>
+    public class BList<T> : BList, IList<T> where T : class, IBObject
+    {
+        /// <summary>
+        /// The underlying list.
+        /// </summary>
+        public override IList<IBObject> Value { get; } = new List<IBObject>();
+
+        /// <summary>
+        /// Creates an empty list.
+        /// </summary>
+        public BList()
+        { }
+
+        /// <summary>
+        /// Creates a list from the specified objects.
+        /// </summary>
+        /// <param name="objects"></param>
+        public BList(IEnumerable<T> objects)
+        {
+            Value = objects.Cast<IBObject>().ToList();
+        }
+
+        #region IList<T> Members
+#pragma warning disable 1591
+
+        public new T this[int index]
+        {
+            get
+            {
+                var obj = Value[index] as T;
+                if (obj == null) throw new InvalidCastException($"The object at index {index} is not of type {typeof (T).FullName}");
+                return obj;
+            }
             set
             {
                 if (value == null) throw new ArgumentNullException(nameof(value));
@@ -208,11 +279,6 @@ namespace BencodeNET.Objects
             Value.Add(item);
         }
 
-        public void Clear()
-        {
-            Value.Clear();
-        }
-
         public bool Contains(T item)
         {
             return Value.Contains(item);
@@ -220,17 +286,20 @@ namespace BencodeNET.Objects
 
         public void CopyTo(T[] array, int arrayIndex)
         {
-            Value.CopyTo(array, arrayIndex);
+            Value.CopyTo(array.Cast<IBObject>().ToArray(), arrayIndex);
         }
 
-        public IEnumerator<T> GetEnumerator()
+        public new IEnumerator<T> GetEnumerator()
         {
-            return Value.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
+            var i = 0;
+            var enumerator = Value.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                var obj = enumerator.Current as T;
+                if (obj == null) throw new InvalidCastException($"The object at index {i} is not of type {typeof(T).FullName}");
+                yield return (T) enumerator.Current;
+                i++;
+            }
         }
 
         public int IndexOf(T item)
@@ -248,12 +317,7 @@ namespace BencodeNET.Objects
             return Value.Remove(item);
         }
 
-        public void RemoveAt(int index)
-        {
-            Value.RemoveAt(index);
-        }
-
-        #endregion
 #pragma warning restore 1591
+        #endregion
     }
 }

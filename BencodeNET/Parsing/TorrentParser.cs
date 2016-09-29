@@ -100,7 +100,7 @@ namespace BencodeNET.Parsing
                 primary.Add(announce);
             }
 
-            var announceLists = data.Get<BList>(TorrentFields.AnnounceList)?.As<BList>();
+            var announceLists = data.Get<BList>(TorrentFields.AnnounceList)?.As<BList>() as IList<BList>;
             if (announceLists?.Any() == true)
             {
                 primary.AddRange(announceLists.First().AsStrings());
