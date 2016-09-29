@@ -9,8 +9,6 @@ using BencodeNET.IO;
 
 namespace BencodeNET.Torrents
 {
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-
     /// <summary>
     ///
     /// </summary>
@@ -160,7 +158,6 @@ namespace BencodeNET.Torrents
         /// </summary>
         public virtual int NumberOfPieces => (int)Math.Ceiling((double)TotalSize / PieceSize);
 
-        // TODO: Validation that torrent is valid?
         /// <summary>
         /// Converts the torrent to a <see cref="BDictionary"/>.
         /// </summary>
@@ -273,7 +270,6 @@ namespace BencodeNET.Torrents
             return TorrentUtil.CreateMagnetLink(this, options);
         }
 
-        // TODO: Some sort of error handling?
         /// <summary>
         /// Encodes the torrent and writes it to the stream.
         /// </summary>
@@ -285,6 +281,7 @@ namespace BencodeNET.Torrents
             torrent.EncodeTo(stream);
         }
 
+#pragma warning disable 1591
         public static bool operator ==(Torrent first, Torrent second)
         {
             if (ReferenceEquals(first, null))
@@ -318,5 +315,6 @@ namespace BencodeNET.Torrents
         {
             throw new NotSupportedException();
         }
+#pragma warning restore 1591
     }
 }
