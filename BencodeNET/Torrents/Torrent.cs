@@ -11,8 +11,6 @@ namespace BencodeNET.Torrents
 {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
-    // TODO: Equals comparison
-    // TODO: Support for adding extra fields (List of BObject)
     /// <summary>
     ///
     /// </summary>
@@ -132,7 +130,7 @@ namespace BencodeNET.Torrents
         /// <summary>
         /// A concatenation of all 20-byte SHA1 hash values (one for each piece).
         /// </summary>
-        public virtual BString Pieces { get; internal set; }
+        public virtual BString Pieces { get; set; }
 
         /// <summary>
         /// [optional] If set to true clients must only publish it's presence to the defined trackers.
@@ -201,20 +199,6 @@ namespace BencodeNET.Torrents
             return torrent;
         }
 
-        // TODO: Split into smaller parts - maybe a TorrentFactory
-        // TODO: Some sort of error handling?
-        /// <summary>
-        /// Encodes the torrent and writes it to the stream.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="stream"></param>
-        /// <returns></returns>
-        protected override void EncodeObject(BencodeStream stream)
-        {
-            var torrent = ToBDictionary();
-            torrent.EncodeTo(stream);
-        }
-
         /// <summary>
         /// Creates the 'info' part of the torrent.
         /// </summary>
@@ -222,11 +206,13 @@ namespace BencodeNET.Torrents
         /// <returns>A <see cref="BDictionary"/> of the 'info' part of the torrent</returns>
         protected virtual BDictionary CreateInfoDictionary(Encoding encoding)
         {
-            var info = new BDictionary
-            {
-                [TorrentFields.PieceLength] = (BNumber)PieceSize,
-                [TorrentFields.Pieces] = Pieces,
-            };
+            var info = new BDictionary();
+
+            if (PieceSize > 0)
+                info[TorrentFields.PieceLength] = (BNumber) PieceSize;
+
+            if (Pieces != null)
+                info[TorrentFields.Pieces] = Pieces;
 
             if (IsPrivate)
                 info[TorrentFields.Private] = (BNumber)1;
@@ -270,10 +256,7 @@ namespace BencodeNET.Torrents
         /// The info hash is a 20-byte SHA1 hash of the value of the 'info' <see cref="BDictionary"/> of the torrent.
         /// </summary>
         /// <returns>A string representation of a 20-byte SHA1 hash of the value of the 'info' part</returns>
-        public virtual string GetInfoHash()
-        {
-            return TorrentUtil.CalculateInfoHash(this);
-        }
+        public virtual string GetInfoHash() => TorrentUtil.CalculateInfoHash(this);
 
         /// <summary>
         /// Calculates the info hash of the torrent. This is used when communicating with trackers.
@@ -288,6 +271,18 @@ namespace BencodeNET.Torrents
         public virtual string GetMagnetLink(MagnetLinkOptions options = MagnetLinkOptions.IncludeTrackers)
         {
             return TorrentUtil.CreateMagnetLink(this, options);
+        }
+
+        // TODO: Some sort of error handling?
+        /// <summary>
+        /// Encodes the torrent and writes it to the stream.
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        protected override void EncodeObject(BencodeStream stream)
+        {
+            var torrent = ToBDictionary();
+            torrent.EncodeTo(stream);
         }
 
         public static bool operator ==(Torrent first, Torrent second)
