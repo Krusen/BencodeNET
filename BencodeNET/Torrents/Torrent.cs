@@ -169,15 +169,13 @@ namespace BencodeNET.Torrents
         {
             var torrent = new BDictionary();
 
-            if (Trackers?.Count > 0)
-            {
-                torrent[TorrentFields.Announce] = new BList(Trackers.First().Select(x => new BString(x, Encoding)));
-            }
+            var trackerCount = Trackers.Flatten().Count();
 
-            if (Trackers?.Count > 1)
-            {
+            if (trackerCount > 0)
+                torrent[TorrentFields.Announce] = new BList(Trackers.First().Select(x => new BString(x, Encoding)));
+
+            if (trackerCount > 1)
                 torrent[TorrentFields.AnnounceList] = new BList(Trackers.Select(x => new BList(x, Encoding)));
-            }
 
             if (Encoding != null)
                 torrent[TorrentFields.Encoding] = new BString(Encoding.WebName.ToUpper(), Encoding);
