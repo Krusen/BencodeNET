@@ -165,7 +165,8 @@ namespace BencodeNET.Objects
             get { return ContainsKey(key) ? Value[key] : null; }
             set
             {
-                if (value == null) throw new ArgumentNullException(nameof(value));
+                if (value == null)
+                    throw new ArgumentNullException(nameof(value), "A null value cannot be added to a BDictionary");
                 Value[key] = value;
             }
         }
