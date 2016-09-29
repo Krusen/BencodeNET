@@ -139,15 +139,25 @@ namespace BencodeNET.Tests.Objects
         }
 
         [Fact]
-        public void AsGeneric_ConvertsToListOfGenericType()
+        public void AsType_ConvertsToListOfType()
         {
             var blist = new BList {1, 2, 3};
-            var bnumbers = blist.As<BNumber>();
+            var bnumbers = blist.AsType<BNumber>();
 
             bnumbers.Should()
                 .HaveCount(3)
                 .And.ContainItemsAssignableTo<BNumber>()
                 .And.ContainInOrder(blist);
+        }
+
+        [Fact]
+        public void AsType_ContainingWrongType_ThrowsInvalidCastException()
+        {
+            var blist = new BList {1, "2", 3};
+
+            Action action = () => blist.AsType<BNumber>();
+
+            action.ShouldThrow<InvalidCastException>();
         }
 
         [Fact]
@@ -158,6 +168,16 @@ namespace BencodeNET.Tests.Objects
 
             strings.Should().HaveCount(3);
             strings.Should().ContainInOrder("a", "b", "c");
+        }
+
+        [Fact]
+        public void AsStrings_ContainingNonBStringType_ThrowsInvalidCastException()
+        {
+            var blist = new BList {"a", "b", 3};
+
+            Action action = () => blist.AsStrings();
+
+            action.ShouldThrow<InvalidCastException>();
         }
     }
 }

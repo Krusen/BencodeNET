@@ -122,7 +122,7 @@ namespace BencodeNET.Objects
         /// <returns></returns>
         public IEnumerable<string> AsStrings(Encoding encoding)
         {
-            IList<BString> bstrings = this.As<BString>();
+            IList<BString> bstrings = this.AsType<BString>();
             return bstrings.Select(x => x.ToString(encoding));
         }
 
@@ -134,7 +134,7 @@ namespace BencodeNET.Objects
         /// <exception cref="InvalidCastException">
         /// An element is not of type <typeparamref name="T"/>.
         /// </exception>
-        public BList<T> As<T>() where T : class,IBObject
+        public BList<T> AsType<T>() where T : class,IBObject
         {
             try
             {
