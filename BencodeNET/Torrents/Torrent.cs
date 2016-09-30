@@ -128,7 +128,7 @@ namespace BencodeNET.Torrents
         /// <summary>
         /// A concatenation of all 20-byte SHA1 hash values (one for each piece).
         /// </summary>
-        public virtual BString Pieces { get; set; }
+        public virtual string Pieces { get; set; }
 
         /// <summary>
         /// [optional] If set to true clients must only publish it's presence to the defined trackers.
@@ -209,7 +209,7 @@ namespace BencodeNET.Torrents
                 info[TorrentFields.PieceLength] = (BNumber) PieceSize;
 
             if (Pieces != null)
-                info[TorrentFields.Pieces] = Pieces;
+                info[TorrentFields.Pieces] = new BString(Pieces, encoding);
 
             if (IsPrivate)
                 info[TorrentFields.Private] = (BNumber)1;
