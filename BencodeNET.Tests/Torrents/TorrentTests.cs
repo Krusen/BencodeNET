@@ -152,7 +152,27 @@ namespace BencodeNET.Tests.Torrents
         }
 
         [Fact]
-        public void ToBDictionary_DoesNotAddNullEncoding()
+        public void ToBDictionary_Encoding_UsesWebNameToUpper()
+        {
+            var torrent = new Torrent { Encoding = Encoding.UTF8 };
+
+            var result = torrent.ToBDictionary();
+
+            result.Get<BString>(TorrentFields.Encoding).Should().Be(Encoding.UTF8.WebName.ToUpper());
+        }
+
+        [Fact]
+        public void ToBDictionary_Encoding_AddsToCorrectField()
+        {
+            var torrent = new Torrent {Encoding = Encoding.UTF8};
+
+            var result = torrent.ToBDictionary();
+
+            result.Should().Contain(TorrentFields.Encoding, (BString)Encoding.UTF8.WebName.ToUpper());
+        }
+
+        [Fact]
+        public void ToBDictionary_Encoding_DoesNotAddNull()
         {
             var torrent = new Torrent {Encoding = null};
 
@@ -162,7 +182,7 @@ namespace BencodeNET.Tests.Torrents
         }
 
         [Fact]
-        public void ToBDictionary_DoesNotAddAnnounce_IfNoTrackers()
+        public void ToBDictionary_Announce_NoTrackers_DoesNotAddAnnounce()
         {
             var torrent = new Torrent
             {
@@ -178,7 +198,7 @@ namespace BencodeNET.Tests.Torrents
         }
 
         [Fact]
-        public void ToBDictionary_AddsAnnounceButNotAddAnnounceList_IfOnlySingleTracker()
+        public void ToBDictionary_Announce_SingleTracker_AddsAnnounceButNotAddAnnounceList()
         {
             var torrent = new Torrent
             {
@@ -197,8 +217,20 @@ namespace BencodeNET.Tests.Torrents
             result.Should().NotContainKey(TorrentFields.AnnounceList);
         }
 
+        [Theory]
+        [AutoMockedData]
+        public void ToBDictionary_Comment_AddsToCorrectField(string comment)
+        {
+            var torrent = new Torrent {Comment = comment
+            };
+
+            var result = torrent.ToBDictionary();
+
+            result.Should().Contain(TorrentFields.Comment, (BString)comment);
+        }
+
         [Fact]
-        public void ToBDictionary_DoesNotAddNullComment()
+        public void ToBDictionary_Comment_DoesNotAddNull()
         {
             var torrent = new Torrent {Comment = null};
 
@@ -207,8 +239,19 @@ namespace BencodeNET.Tests.Torrents
             result.Should().NotContainKey(TorrentFields.Comment);
         }
 
+        [Theory]
+        [AutoMockedData]
+        public void ToBDictionary_CreatedBy_AddsToCorrectField(string createdBy)
+        {
+            var torrent = new Torrent {CreatedBy = createdBy};
+
+            var result = torrent.ToBDictionary();
+
+            result.Should().Contain(TorrentFields.CreatedBy, (BString)createdBy);
+        }
+
         [Fact]
-        public void ToBDictionary_DoesNotAddNullCreatedBy()
+        public void ToBDictionary_CreatedBy_DoesNotAddNull()
         {
             var torrent = new Torrent {CreatedBy = null};
 
@@ -217,8 +260,19 @@ namespace BencodeNET.Tests.Torrents
             result.Should().NotContainKey(TorrentFields.CreatedBy);
         }
 
+        [Theory]
+        [AutoMockedData]
+        public void ToBDictionary_CreationDate_AddsToCorrectField(DateTime creationDate)
+        {
+            var torrent = new Torrent {CreationDate = creationDate};
+
+            var result = torrent.ToBDictionary();
+
+            result.Should().Contain(TorrentFields.CreationDate, (BNumber)creationDate);
+        }
+
         [Fact]
-        public void ToBDictionary_DoesNotAddNullCreationDate()
+        public void ToBDictionary_CreationDate_DoesNotAddNull()
         {
             var torrent = new Torrent {CreationDate = null};
 
@@ -229,7 +283,7 @@ namespace BencodeNET.Tests.Torrents
 
         [Theory]
         [AutoMockedData]
-        public void ToBDictionary_AddsNameAndLengthToInfo_IfSingleFile(long fileSize, string fileName)
+        public void ToBDictionary_Info_SingleFile_AddsNameAndLength(long fileSize, string fileName)
         {
             // Arrange
             var torrent = new Torrent
@@ -251,7 +305,7 @@ namespace BencodeNET.Tests.Torrents
 
         [Theory]
         [AutoMockedData]
-        public void ToBDictionary_AddsFilesToInfo_IfMultiFile(string directoryName, long fileSize, IList<string> path)
+        public void ToBDictionary_Info_MultiFile_AddsFiles(string directoryName, long fileSize, IList<string> path)
         {
             // Arrange
             var torrent = new Torrent
@@ -282,7 +336,7 @@ namespace BencodeNET.Tests.Torrents
 
         [Theory]
         [AutoMockedData]
-        public void ToBDictionary_AddsExtraFields(BString key, BString value)
+        public void ToBDictionary_ExtraFields_AreAdded(BString key, BString value)
         {
             // Arrange
             var torrent = new Torrent
@@ -302,7 +356,7 @@ namespace BencodeNET.Tests.Torrents
 
         [Theory]
         [AutoMockedData]
-        public void ToBDictionary_ExtraFieldsOverwritesExistingData(string comment, BString extraValue)
+        public void ToBDictionary_ExtraFields_OverwritesExistingData(string comment, BString extraValue)
         {
             // Arrange
             var torrent = new Torrent
