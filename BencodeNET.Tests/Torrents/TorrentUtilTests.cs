@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BencodeNET.Objects;
+using BencodeNET.Parsing;
 using BencodeNET.Torrents;
 using FluentAssertions;
 using NSubstitute;
@@ -10,6 +12,38 @@ namespace BencodeNET.Tests.Torrents
 {
     public class TorrentUtilTests
     {
+        private const string UbuntuTorrentFile = "Files\\ubuntu-14.10-desktop-amd64.iso.torrent";
+
+        [Fact]
+        public void CalculateInfoHash_CompleteTorrentFile()
+        {
+            var bdictionary = new BencodeParser().Parse<BDictionary>(UbuntuTorrentFile);
+            var info = bdictionary.Get<BDictionary>(TorrentFields.Info);
+            var hash = TorrentUtil.CalculateInfoHash(info);
+
+            hash.Should().Be("B415C913643E5FF49FE37D304BBB5E6E11AD5101");
+        }
+
+        [Fact]
+        public void CalculateInfoHash_SimpleInfoDictionary()
+        {
+            var info = new BDictionary
+            {
+                ["key"] = (BString) "value",
+                ["list"] = new BList {1, 2, 3},
+                ["number"] = (BNumber)42,
+                ["dictionary"] = new BDictionary
+                {
+                    ["key"] = (BString) "value"
+                }
+            };
+
+            var hash = TorrentUtil.CalculateInfoHash(info);
+
+            info.EncodeAsString().Should().Be("d10:dictionaryd3:key5:valuee3:key5:value4:listli1ei2ei3ee6:numberi42ee");
+            hash.Should().Be("8715E7488A8964C6383E09A87287321FE6CBCC07");
+        }
+
         [Theory]
         [InlineAutoMockedData("")]
         [InlineAutoMockedData((string)null)]

@@ -1,5 +1,8 @@
 ﻿{
   "version": "1.0.0-*",
+  "buildOptions": {
+    "copyToOutput": [ "Files\\ubuntu-14.10-desktop-amd64.iso.torrent" ]
+  },
   "dependencies": {
     "BencodeNET": {"target": "project"},
     "NETStandard.Library": "1.6.0"
