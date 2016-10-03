@@ -8,8 +8,18 @@ using BencodeNET.Torrents;
 
 namespace BencodeNET.Parsing
 {
+    // TODO: Unit tests
+    // TODO: Parse extra (non-standard) fields
+    /// <summary>
+    /// A parser for torrent files.
+    /// </summary>
     public class TorrentParser : BObjectParser<Torrent>
     {
+        /// <summary>
+        /// Creates an instance using the specified <see cref="IBencodeParser"/> for parsing
+        /// the torrent <see cref="BDictionary"/>.
+        /// </summary>
+        /// <param name="bencodeParser">The parser used for parsing the torrent <see cref="BDictionary"/>.</param>
         public TorrentParser(IBencodeParser bencodeParser)
         {
             if (bencodeParser == null) throw new ArgumentNullException(nameof(bencodeParser));
@@ -17,16 +27,32 @@ namespace BencodeNET.Parsing
             BencodeParser = bencodeParser;
         }
 
+        /// <summary>
+        /// The parser ued for parsing the torrent <see cref="BDictionary"/>.
+        /// </summary>
         protected IBencodeParser BencodeParser { get; set; }
 
+        /// <summary>
+        /// The encoding used for parsing.
+        /// </summary>
         protected override Encoding Encoding => BencodeParser.Encoding;
 
+        /// <summary>
+        /// Parses the next <see cref="BDictionary"/> from the stream as a <see cref="Torrent"/>.
+        /// </summary>
+        /// <param name="stream">The stream to parse from.</param>
+        /// <returns>The parsed <see cref="Torrent"/>.</returns>
         public override Torrent Parse(BencodeStream stream)
         {
             var data = BencodeParser.Parse<BDictionary>(stream);
             return CreateTorrent(data);
         }
 
+        /// <summary>
+        /// Creates a torrrent by reading the relevant data from the <see cref="BDictionary"/>.
+        /// </summary>
+        /// <param name="data">The torrent bencode data.</param>
+        /// <returns>A <see cref="Torrent"/> matching the input.</returns>
         protected Torrent CreateTorrent(BDictionary data)
         {
             var info = data.Get<BDictionary>(TorrentFields.Info);
@@ -58,6 +84,11 @@ namespace BencodeNET.Parsing
             return torrent;
         }
 
+        /// <summary>
+        /// Loads file info for single-file torrents.
+        /// </summary>
+        /// <param name="info">The 'info'-dictionary of a torrent.</param>
+        /// <returns>The file info.</returns>
         protected virtual SingleFileInfo LoadSingleFileInfo(BDictionary info)
         {
             return new SingleFileInfo
@@ -68,6 +99,11 @@ namespace BencodeNET.Parsing
             };
         }
 
+        /// <summary>
+        /// Loads file info for multi-file torrents.
+        /// </summary>
+        /// <param name="info">The 'info'-dictionary of a torrent.</param>
+        /// <returns>The file info.</returns>
         protected virtual MultiFileInfoList LoadMultiFileInfoList(BDictionary info)
         {
             var list = new MultiFileInfoList
@@ -88,6 +124,11 @@ namespace BencodeNET.Parsing
             return list;
         }
 
+        /// <summary>
+        /// Loads trackers (announce URLs) from a torrent.
+        /// </summary>
+        /// <param name="data">The torrent data to load trackers from.</param>
+        /// <returns>A list of list of trackers (announce URLs).</returns>
         protected virtual IList<IList<string>> LoadTrackers(BDictionary data)
         {
             var trackerList = new List<IList<string>>();
@@ -114,6 +155,12 @@ namespace BencodeNET.Parsing
             return trackerList;
         }
 
+        /// <summary>
+        /// Parses the encoding string to an <see cref="Encoding"/>.
+        /// Returns null if parsing fails.
+        /// </summary>
+        /// <param name="bstring">The <see cref="BString"/> value to parse.</param>
+        /// <returns>The parsed encoding or null if parsing fails.</returns>
         protected virtual Encoding ParseEncoding(BString bstring)
         {
             if (bstring == null)

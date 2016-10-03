@@ -7,20 +7,50 @@ using BencodeNET.Objects;
 
 namespace BencodeNET.Torrents
 {
+    /// <summary>
+    /// Utility class for doing torrent-related work like calculating info hash and creating magnet links.
+    /// </summary>
     public static class TorrentUtil
     {
+        /// <summary>
+        /// Calculates the info hash of the torrent.
+        /// The info hash is a 20-byte SHA1 hash of the 'info'-dictionary of the torrent
+        /// used to uniquely identify it and it's contents.
+        ///
+        /// <para>Example: 6D60711ECF005C1147D8973A67F31A11454AB3F5</para>
+        /// </summary>
+        /// <param name="torrent">The torrent to calculate the info hash for.</param>
+        /// <returns>A string representation of the 20-byte SHA1 hash without dashes.</returns>
         public static string CalculateInfoHash(Torrent torrent)
         {
             var info = torrent.ToBDictionary().Get<BDictionary>("info");
             return CalculateInfoHash(info);
         }
 
+        /// <summary>
+        /// Calculates the info hash of the torrent.
+        /// The info hash is a 20-byte SHA1 hash of the 'info'-dictionary of the torrent
+        /// used to uniquely identify it and it's contents.
+        ///
+        /// <para>Example: 6D60711ECF005C1147D8973A67F31A11454AB3F5</para>
+        /// </summary>
+        /// <param name="torrent">The torrent to calculate the info hash for.</param>
+        /// <returns>A byte-array of the 20-byte SHA1 hash.</returns>
         public static byte[] CalculateInfoHashBytes(Torrent torrent)
         {
             var info = torrent.ToBDictionary().Get<BDictionary>("info");
             return CalculateInfoHashBytes(info);
         }
 
+        /// <summary>
+        /// Calculates the hash of the 'info'-dictionary.
+        /// The info hash is a 20-byte SHA1 hash of the 'info'-dictionary of the torrent
+        /// used to uniquely identify it and it's contents.
+        ///
+        /// <para>Example: 6D60711ECF005C1147D8973A67F31A11454AB3F5</para>
+        /// </summary>
+        /// <param name="info">The 'info'-dictionary of a torrent.</param>
+        /// <returns>A string representation of the 20-byte SHA1 hash without dashes.</returns>
         public static string CalculateInfoHash(BDictionary info)
         {
             var hashBytes = CalculateInfoHashBytes(info);
@@ -28,6 +58,15 @@ namespace BencodeNET.Torrents
             return BitConverter.ToString(hashBytes).Replace("-", "");
         }
 
+        /// <summary>
+        /// Calculates the hash of the 'info'-dictionary.
+        /// The info hash is a 20-byte SHA1 hash of the 'info'-dictionary of the torrent
+        /// used to uniquely identify it and it's contents.
+        ///
+        /// <para>Example: 6D60711ECF005C1147D8973A67F31A11454AB3F5</para>
+        /// </summary>
+        /// <param name="info">The 'info'-dictionary of a torrent.</param>
+        /// <returns>A byte-array of the 20-byte SHA1 hash.</returns>
         public static byte[] CalculateInfoHashBytes(BDictionary info)
         {
             using (var sha1 = SHA1.Create())
@@ -55,7 +94,6 @@ namespace BencodeNET.Torrents
             return CreateMagnetLink(infoHash, displayName, trackers, options);
         }
 
-        // TODO: Unit test
         /// <summary>
         /// Creates a Magnet link in the BTIH (BitTorrent Info Hash) format: xt=urn:btih:{info hash}
         /// </summary>
