@@ -86,6 +86,11 @@ namespace BencodeNET.Objects
             }
         }
 
+        /// <summary>
+        /// Implementations of this method should encode their
+        /// underlying value to bencode and write it to the stream.
+        /// </summary>
+        /// <param name="stream">The stream to encode to.</param>
         protected abstract void EncodeObject(BencodeStream stream);
     }
 
