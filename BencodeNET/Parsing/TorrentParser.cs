@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using BencodeNET.Exceptions;
 using BencodeNET.IO;
 using BencodeNET.Objects;
 using BencodeNET.Torrents;
@@ -55,13 +56,15 @@ namespace BencodeNET.Parsing
         /// <returns>A <see cref="Torrent"/> matching the input.</returns>
         protected Torrent CreateTorrent(BDictionary data)
         {
+            EnsureValidTorrentData(data);
+
             var info = data.Get<BDictionary>(TorrentFields.Info);
 
             var torrent = new Torrent
             {
                 IsPrivate = info.Get<BNumber>(TorrentFields.Private) == 1,
                 PieceSize = info.Get<BNumber>(TorrentFields.PieceLength),
-                Pieces = info.Get<BString>(TorrentFields.Pieces).ToString(),
+                Pieces = info.Get<BString>(TorrentFields.Pieces)?.ToString(),
 
                 Comment = data.Get<BString>(TorrentFields.Comment)?.ToString(),
                 CreatedBy = data.Get<BString>(TorrentFields.CreatedBy)?.ToString(),
@@ -82,6 +85,68 @@ namespace BencodeNET.Parsing
             }
 
             return torrent;
+        }
+
+        /// <summary>
+        /// Checks the torrent data for required fields and throws an exception if any are missing or invalid.
+        /// </summary>
+        /// <param name="data">The torrent data.</param>
+        /// <exception cref="InvalidTorrentException">The torrent data is missing required fields or otherwise invalid.</exception>
+        protected void EnsureValidTorrentData(BDictionary data)
+        {
+            if (!data.ContainsKey(TorrentFields.Info))
+                throw new InvalidTorrentException("Torrent is missing 'info'-dictionary.", TorrentFields.Info);
+
+            var info = data.Get<BDictionary>(TorrentFields.Info);
+
+            var requiredFields = new List<string>
+            {
+                TorrentFields.PieceLength,
+                TorrentFields.Pieces,
+                TorrentFields.Name
+            };
+
+            // Single-file torrents must have the 'length' field
+            if (!info.ContainsKey(TorrentFields.Files))
+                requiredFields.Add(TorrentFields.Length);
+
+            EnsureFields(requiredFields, info, "Torrent is missing required field in 'info'-dictionary.");
+
+            if (info.ContainsKey(TorrentFields.Files))
+            {
+                var filesData = info.Get<BList<BDictionary>>(TorrentFields.Files);
+
+                var requiredFileFields = new[]
+                {
+                    TorrentFields.Length,
+                    TorrentFields.Path
+                };
+
+                EnsureFields(requiredFileFields, filesData, "Torrent is missing required field in 'info.files' dictionaries.");
+            }
+        }
+
+        private static void EnsureFields(IEnumerable<string> requiredFields, BDictionary data, string message = null)
+        {
+            message = message ?? "Torrent is missing required field.";
+
+            foreach (var field in requiredFields.Where(field => !data.ContainsKey(TorrentFields.Info)))
+            {
+                throw new InvalidTorrentException("Torrent is missing required field.", field);
+            }
+        }
+
+        private static void EnsureFields(IEnumerable<string> requiredFields, IEnumerable<BDictionary> list, string message = null)
+        {
+            message = message ?? "Torrent is missing required field.";
+
+            foreach (var data in list)
+            {
+                foreach (var field in requiredFields.Where(field => !data.ContainsKey(TorrentFields.Info)))
+                {
+                    throw new InvalidTorrentException(message, field);
+                }
+            }
         }
 
         /// <summary>
