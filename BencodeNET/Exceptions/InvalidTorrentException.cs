@@ -1,12 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+#if !NETSTANDARD
+using System.Runtime.Serialization;
+#endif
 
+#pragma warning disable 1591
 namespace BencodeNET.Exceptions
 {
+    /// <summary>
+    /// Represents parse errors when parsing torrents.
+    /// </summary>
+#if !NETSTANDARD
+    [Serializable]
+#endif
     public class InvalidTorrentException : BencodeException
     {
+        public string InvalidField { get; set; }
+
         public InvalidTorrentException()
         { }
 
@@ -24,6 +33,21 @@ namespace BencodeNET.Exceptions
             : base(message, inner)
         { }
 
-        public string InvalidField { get; set; }
+#if !NETSTANDARD
+        protected InvalidTorrentException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+            if (info == null) return;
+            InvalidField = info.GetString(nameof(InvalidField));
+        }
+
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            base.GetObjectData(info, context);
+
+            info.AddValue(nameof(InvalidField), InvalidField);
+        }
+#endif
     }
 }
+#pragma warning restore 1591
