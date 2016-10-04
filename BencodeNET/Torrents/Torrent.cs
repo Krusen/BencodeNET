@@ -206,43 +206,43 @@ namespace BencodeNET.Torrents
             var info = new BDictionary();
 
             if (PieceSize > 0)
-                info[TorrentFields.PieceLength] = (BNumber) PieceSize;
+                info[TorrentInfoFields.PieceLength] = (BNumber) PieceSize;
 
             if (Pieces != null)
-                info[TorrentFields.Pieces] = new BString(Pieces, encoding);
+                info[TorrentInfoFields.Pieces] = new BString(Pieces, encoding);
 
             if (IsPrivate)
-                info[TorrentFields.Private] = (BNumber)1;
+                info[TorrentInfoFields.Private] = (BNumber)1;
 
             if (FileMode == TorrentFileMode.Single)
             {
-                info[TorrentFields.Name] = new BString(File.FileName, encoding);
-                info[TorrentFields.Length] = (BNumber)File.FileSize;
+                info[TorrentInfoFields.Name] = new BString(File.FileName, encoding);
+                info[TorrentInfoFields.Length] = (BNumber)File.FileSize;
 
                 if (File.Md5Sum != null)
-                    info[TorrentFields.Md5Sum] = new BString(File.Md5Sum, encoding);
+                    info[TorrentInfoFields.Md5Sum] = new BString(File.Md5Sum, encoding);
 
             }
             else if (FileMode == TorrentFileMode.Multi)
             {
-                info[TorrentFields.Name] = new BString(Files.DirectoryName, encoding);
+                info[TorrentInfoFields.Name] = new BString(Files.DirectoryName, encoding);
 
                 var files = new BList<BDictionary>();
                 foreach (var file in Files)
                 {
                     var fileDictionary = new BDictionary
                     {
-                        [TorrentFields.Length] = (BNumber)file.FileSize,
-                        [TorrentFields.Path] = new BList(file.Path)
+                        [TorrentFilesFields.Length] = (BNumber)file.FileSize,
+                        [TorrentFilesFields.Path] = new BList(file.Path)
                     };
 
                     if (file.Md5Sum != null)
-                        fileDictionary[TorrentFields.Md5Sum] = new BString(file.Md5Sum, encoding);
+                        fileDictionary[TorrentFilesFields.Md5Sum] = new BString(file.Md5Sum, encoding);
 
                     files.Add(fileDictionary);
                 }
 
-                info[TorrentFields.Files] = files;
+                info[TorrentInfoFields.Files] = files;
             }
 
             return info;

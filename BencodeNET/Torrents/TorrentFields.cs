@@ -1,11 +1,13 @@
-﻿namespace BencodeNET.Torrents
+﻿using BencodeNET.Objects;
+
+#pragma warning disable 1591
+namespace BencodeNET.Torrents
 {
     /// <summary>
     /// A reference of default torrent field names.
     /// </summary>
     public static class TorrentFields
     {
-#pragma warning disable 1591
         public const string Announce = "announce";
         public const string AnnounceList = "announce-list";
         public const string CreatedBy = "created by";
@@ -14,29 +16,32 @@
         public const string Encoding = "encoding";
         public const string Info = "info";
 
-        // Fields in 'info' dictionary
+        public static readonly BString[] Keys =
+        {
+            Announce,
+            AnnounceList,
+            Comment,
+            CreatedBy,
+            CreationDate,
+            Encoding,
+            Info
+        };
+    }
+
+    /// <summary>
+    /// A reference of default torrent fields names in the 'info'-dictionary.
+    /// </summary>
+    public static class TorrentInfoFields
+    {
         public const string Name = "name";
         public const string Private = "private";
         public const string PieceLength = "piece length";
         public const string Pieces = "pieces";
         public const string Length = "length";
-        public const string Files = "files";
-        public const string Path = "path";
         public const string Md5Sum = "md5sum";
-#pragma warning restore 1591
+        public const string Files = "files";
 
-        internal static readonly string[] RootFields =
-        {
-            Announce,
-            AnnounceList,
-            CreatedBy,
-            CreationDate,
-            Comment,
-            Encoding,
-            Info
-        };
-
-        internal static readonly string[] InfoFields =
+        public static readonly BString[] Keys =
         {
             Name,
             Private,
@@ -46,8 +51,18 @@
             Md5Sum,
             Files
         };
+    }
 
-        internal static readonly string[] FilesFields =
+    /// <summary>
+    /// A reference of default torrent fields in the dictionaries in the 'files'-list in the 'info'-dictionary.s
+    /// </summary>
+    public static class TorrentFilesFields
+    {
+        public const string Length = "length";
+        public const string Path = "path";
+        public const string Md5Sum = "md5sum";
+
+        public static readonly BString[] Keys =
         {
             Length,
             Path,
@@ -55,3 +70,4 @@
         };
     }
 }
+#pragma warning restore 1591

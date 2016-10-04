@@ -10,7 +10,6 @@ using BencodeNET.Torrents;
 namespace BencodeNET.Parsing
 {
     // TODO: Unit tests
-    // TODO: Parse extra (non-standard) fields
     /// <summary>
     /// A parser for torrent files.
     /// </summary>
@@ -62,9 +61,9 @@ namespace BencodeNET.Parsing
 
             var torrent = new Torrent
             {
-                IsPrivate = info.Get<BNumber>(TorrentFields.Private) == 1,
-                PieceSize = info.Get<BNumber>(TorrentFields.PieceLength),
-                Pieces = info.Get<BString>(TorrentFields.Pieces)?.ToString(),
+                IsPrivate = info.Get<BNumber>(TorrentInfoFields.Private) == 1,
+                PieceSize = info.Get<BNumber>(TorrentInfoFields.PieceLength),
+                Pieces = info.Get<BString>(TorrentInfoFields.Pieces)?.ToString(),
 
                 Comment = data.Get<BString>(TorrentFields.Comment)?.ToString(),
                 CreatedBy = data.Get<BString>(TorrentFields.CreatedBy)?.ToString(),
@@ -74,11 +73,11 @@ namespace BencodeNET.Parsing
                 Trackers = ParseTrackers(data)
             };
 
-            if (info.ContainsKey(TorrentFields.Length))
+            if (info.ContainsKey(TorrentInfoFields.Length))
             {
                 torrent.File = ParseSingleFileInfo(info);
             }
-            else if (info.ContainsKey(TorrentFields.Files))
+            else if (info.ContainsKey(TorrentInfoFields.Files))
             {
                 torrent.Files = ParseMultiFileInfo(info);
             }
@@ -95,6 +94,11 @@ namespace BencodeNET.Parsing
         /// <exception cref="InvalidTorrentException">The torrent data is missing required fields or otherwise invalid.</exception>
         protected void EnsureValidTorrentData(BDictionary data)
         {
+            /*
+             *  NOTE: The 'announce' field is technically required according to the specification,
+             *        but is not really required for DHT and PEX.
+             */
+
             if (!data.ContainsKey(TorrentFields.Info))
                 throw new InvalidTorrentException("Torrent is missing 'info'-dictionary.", TorrentFields.Info);
 
@@ -102,31 +106,31 @@ namespace BencodeNET.Parsing
 
             var requiredFields = new List<string>
             {
-                TorrentFields.PieceLength,
-                TorrentFields.Pieces,
-                TorrentFields.Name
+                TorrentInfoFields.PieceLength,
+                TorrentInfoFields.Pieces,
+                TorrentInfoFields.Name
             };
 
             // Single-file torrents must have either the 'length' field or the 'files' field, but not both
-            if (info.ContainsKey(TorrentFields.Length) && info.ContainsKey(TorrentFields.Files))
+            if (info.ContainsKey(TorrentInfoFields.Length) && info.ContainsKey(TorrentInfoFields.Files))
             {
                 throw new InvalidTorrentException(
-                    $"Torrent 'info'-dictionary cannot contain both '{TorrentFields.Length}' and '{TorrentFields.Files}'.");
+                    $"Torrent 'info'-dictionary cannot contain both '{TorrentInfoFields.Length}' and '{TorrentInfoFields.Files}'.");
             }
 
-            if (!info.ContainsKey(TorrentFields.Length))
-                requiredFields.Add(TorrentFields.Files);
+            if (!info.ContainsKey(TorrentInfoFields.Length))
+                requiredFields.Add(TorrentInfoFields.Files);
 
             EnsureFields(requiredFields, info, "Torrent is missing required field in 'info'-dictionary.");
 
-            if (info.ContainsKey(TorrentFields.Files))
+            if (info.ContainsKey(TorrentInfoFields.Files))
             {
-                var filesData = info.Get<BList<BDictionary>>(TorrentFields.Files);
+                var filesData = info.Get<BList<BDictionary>>(TorrentInfoFields.Files);
 
                 var requiredFileFields = new[]
                 {
-                    TorrentFields.Length,
-                    TorrentFields.Path
+                    TorrentFilesFields.Length,
+                    TorrentFilesFields.Path
                 };
 
                 EnsureFields(requiredFileFields, filesData, "Torrent is missing required field in 'info.files' dictionaries.");
@@ -165,9 +169,9 @@ namespace BencodeNET.Parsing
         {
             return new SingleFileInfo
             {
-                FileName = info.Get<BString>(TorrentFields.Name)?.ToString(),
-                FileSize = info.Get<BNumber>(TorrentFields.Length),
-                Md5Sum = info.Get<BString>(TorrentFields.Md5Sum)?.ToString()
+                FileName = info.Get<BString>(TorrentInfoFields.Name)?.ToString(),
+                FileSize = info.Get<BNumber>(TorrentInfoFields.Length),
+                Md5Sum = info.Get<BString>(TorrentInfoFields.Md5Sum)?.ToString()
             };
         }
 
@@ -180,15 +184,15 @@ namespace BencodeNET.Parsing
         {
             var list = new MultiFileInfoList
             {
-                DirectoryName = info.Get<BString>(TorrentFields.Name).ToString(),
+                DirectoryName = info.Get<BString>(TorrentInfoFields.Name).ToString(),
             };
 
-            var fileInfos = info.Get<BList>(TorrentFields.Files).Cast<BDictionary>()
+            var fileInfos = info.Get<BList>(TorrentInfoFields.Files).Cast<BDictionary>()
                 .Select(x => new MultiFileInfo
                 {
-                    FileSize = x.Get<BNumber>(TorrentFields.Length),
-                    Path = x.Get<BList>(TorrentFields.Path)?.AsStrings().ToList(),
-                    Md5Sum = x.Get<BString>(TorrentFields.Md5Sum)?.ToString()
+                    FileSize = x.Get<BNumber>(TorrentFilesFields.Length),
+                    Path = x.Get<BList>(TorrentFilesFields.Path)?.AsStrings().ToList(),
+                    Md5Sum = x.Get<BString>(TorrentFilesFields.Md5Sum)?.ToString()
                 });
 
             list.AddRange(fileInfos);
@@ -223,9 +227,8 @@ namespace BencodeNET.Parsing
         private BDictionary ParseExtraRootFields(BDictionary data)
         {
             var extraFields = new BDictionary();
-            var rootFieldKeys = TorrentFields.RootFields.Select(field => new BString(field, Encoding));
 
-            var extraRootFieldKeys = data.Keys.Except(rootFieldKeys);
+            var extraRootFieldKeys = data.Keys.Except(TorrentFields.Keys);
             foreach (var key in extraRootFieldKeys)
             {
                 extraFields.Add(key, data[key]);
@@ -237,9 +240,8 @@ namespace BencodeNET.Parsing
         private BDictionary ParseExtraInfoFields(BDictionary info)
         {
             var extraFields = new BDictionary();
-            var infoFieldKeys = TorrentFields.InfoFields.Select(field => new BString(field, Encoding));
 
-            var extraInfoFieldKeys = info.Keys.Except(infoFieldKeys);
+            var extraInfoFieldKeys = info.Keys.Except(TorrentInfoFields.Keys);
             foreach (var key in extraInfoFieldKeys)
             {
                 extraFields.Add(key, info[key]);
