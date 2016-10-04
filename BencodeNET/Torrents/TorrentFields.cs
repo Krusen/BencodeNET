@@ -24,5 +24,34 @@
         public const string Path = "path";
         public const string Md5Sum = "md5sum";
 #pragma warning restore 1591
+
+        internal static readonly string[] RootFields =
+        {
+            Announce,
+            AnnounceList,
+            CreatedBy,
+            CreationDate,
+            Comment,
+            Encoding,
+            Info
+        };
+
+        internal static readonly string[] InfoFields =
+        {
+            Name,
+            Private,
+            PieceLength,
+            Pieces,
+            Length,
+            Md5Sum,
+            Files
+        };
+
+        internal static readonly string[] FilesFields =
+        {
+            Length,
+            Path,
+            Md5Sum
+        };
     }
 }

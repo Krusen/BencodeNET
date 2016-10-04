@@ -83,6 +83,8 @@ namespace BencodeNET.Parsing
                 torrent.Files = LoadMultiFileInfoList(info);
             }
 
+            torrent.ExtraFields = LoadAnyExtraFields(data);
+
             return torrent;
         }
 
@@ -192,6 +194,58 @@ namespace BencodeNET.Parsing
             list.AddRange(fileInfos);
 
             return list;
+        }
+
+        /// <summary>
+        /// Loads any extra fields from the root or the 'info'-dictionary
+        /// that are not otherwise represented in a <see cref="Torrent"/>.
+        /// </summary>
+        /// <param name="root"></param>
+        /// <returns></returns>
+        protected virtual BDictionary LoadAnyExtraFields(BDictionary root)
+        {
+            var extraFields = LoadExtraRootFields(root);
+
+            if (!root.ContainsKey(TorrentFields.Info))
+                return extraFields;
+
+            var info = root.Get<BDictionary>(TorrentFields.Info);
+            var extraInfoFields = LoadExtraInfoFields(info);
+
+            if (extraInfoFields.Any())
+            {
+                extraFields.Add(TorrentFields.Info, extraInfoFields);
+            }
+
+            return extraFields;
+        }
+
+        private BDictionary LoadExtraRootFields(BDictionary data)
+        {
+            var extraFields = new BDictionary();
+            var rootFieldKeys = TorrentFields.RootFields.Select(field => new BString(field, Encoding));
+
+            var extraRootFieldKeys = data.Keys.Except(rootFieldKeys);
+            foreach (var key in extraRootFieldKeys)
+            {
+                extraFields.Add(key, data[key]);
+            }
+
+            return extraFields;
+        }
+
+        private BDictionary LoadExtraInfoFields(BDictionary info)
+        {
+            var extraFields = new BDictionary();
+            var infoFieldKeys = TorrentFields.InfoFields.Select(field => new BString(field, Encoding));
+
+            var extraInfoFieldKeys = info.Keys.Except(infoFieldKeys);
+            foreach (var key in extraInfoFieldKeys)
+            {
+                extraFields.Add(key, info[key]);
+            }
+
+            return extraFields;
         }
 
         /// <summary>
