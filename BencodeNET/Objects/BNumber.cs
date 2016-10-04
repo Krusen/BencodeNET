@@ -62,6 +62,13 @@ namespace BencodeNET.Objects
             return bint.Value;
         }
 
+        public static implicit operator bool(BNumber bint)
+        {
+            if (bint == null) throw new InvalidCastException();
+            return bint.Value > 0;
+
+        }
+
         public static implicit operator DateTime?(BNumber number)
         {
             if (number == null) return null;
@@ -76,6 +83,11 @@ namespace BencodeNET.Objects
         public static implicit operator BNumber(long value)
         {
             return new BNumber(value);
+        }
+
+        public static implicit operator BNumber(bool value)
+        {
+            return new BNumber(value ? 1 : 0);
         }
 
         public static implicit operator BNumber(DateTime? datetime)
