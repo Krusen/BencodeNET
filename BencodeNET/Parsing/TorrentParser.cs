@@ -71,19 +71,19 @@ namespace BencodeNET.Parsing
                 Encoding = ParseEncoding(data.Get<BString>(TorrentFields.Encoding)),
                 CreationDate = data.Get<BNumber>(TorrentFields.CreationDate),
 
-                Trackers = LoadTrackers(data)
+                Trackers = ParseTrackers(data)
             };
 
             if (info.ContainsKey(TorrentFields.Length))
             {
-                torrent.File = LoadSingleFileInfo(info);
+                torrent.File = ParseSingleFileInfo(info);
             }
             else if (info.ContainsKey(TorrentFields.Files))
             {
-                torrent.Files = LoadMultiFileInfoList(info);
+                torrent.Files = ParseMultiFileInfo(info);
             }
 
-            torrent.ExtraFields = LoadAnyExtraFields(data);
+            torrent.ExtraFields = ParseAnyExtraFields(data);
 
             return torrent;
         }
@@ -157,11 +157,11 @@ namespace BencodeNET.Parsing
         }
 
         /// <summary>
-        /// Loads file info for single-file torrents.
+        /// Parses file info for single-file torrents.
         /// </summary>
         /// <param name="info">The 'info'-dictionary of a torrent.</param>
         /// <returns>The file info.</returns>
-        protected virtual SingleFileInfo LoadSingleFileInfo(BDictionary info)
+        protected virtual SingleFileInfo ParseSingleFileInfo(BDictionary info)
         {
             return new SingleFileInfo
             {
@@ -172,11 +172,11 @@ namespace BencodeNET.Parsing
         }
 
         /// <summary>
-        /// Loads file info for multi-file torrents.
+        /// Parses file info for multi-file torrents.
         /// </summary>
         /// <param name="info">The 'info'-dictionary of a torrent.</param>
         /// <returns>The file info.</returns>
-        protected virtual MultiFileInfoList LoadMultiFileInfoList(BDictionary info)
+        protected virtual MultiFileInfoList ParseMultiFileInfo(BDictionary info)
         {
             var list = new MultiFileInfoList
             {
@@ -197,20 +197,20 @@ namespace BencodeNET.Parsing
         }
 
         /// <summary>
-        /// Loads any extra fields from the root or the 'info'-dictionary
+        /// Parses any extra fields from the root or the 'info'-dictionary
         /// that are not otherwise represented in a <see cref="Torrent"/>.
         /// </summary>
         /// <param name="root"></param>
         /// <returns></returns>
-        protected virtual BDictionary LoadAnyExtraFields(BDictionary root)
+        protected virtual BDictionary ParseAnyExtraFields(BDictionary root)
         {
-            var extraFields = LoadExtraRootFields(root);
+            var extraFields = ParseExtraRootFields(root);
 
             if (!root.ContainsKey(TorrentFields.Info))
                 return extraFields;
 
             var info = root.Get<BDictionary>(TorrentFields.Info);
-            var extraInfoFields = LoadExtraInfoFields(info);
+            var extraInfoFields = ParseExtraInfoFields(info);
 
             if (extraInfoFields.Any())
             {
@@ -220,7 +220,7 @@ namespace BencodeNET.Parsing
             return extraFields;
         }
 
-        private BDictionary LoadExtraRootFields(BDictionary data)
+        private BDictionary ParseExtraRootFields(BDictionary data)
         {
             var extraFields = new BDictionary();
             var rootFieldKeys = TorrentFields.RootFields.Select(field => new BString(field, Encoding));
@@ -234,7 +234,7 @@ namespace BencodeNET.Parsing
             return extraFields;
         }
 
-        private BDictionary LoadExtraInfoFields(BDictionary info)
+        private BDictionary ParseExtraInfoFields(BDictionary info)
         {
             var extraFields = new BDictionary();
             var infoFieldKeys = TorrentFields.InfoFields.Select(field => new BString(field, Encoding));
@@ -249,11 +249,11 @@ namespace BencodeNET.Parsing
         }
 
         /// <summary>
-        /// Loads trackers (announce URLs) from a torrent.
+        /// Parses trackers (announce URLs) from a torrent.
         /// </summary>
-        /// <param name="data">The torrent data to load trackers from.</param>
+        /// <param name="data">The torrent data to parse trackers from.</param>
         /// <returns>A list of list of trackers (announce URLs).</returns>
-        protected virtual IList<IList<string>> LoadTrackers(BDictionary data)
+        protected virtual IList<IList<string>> ParseTrackers(BDictionary data)
         {
             var trackerList = new List<IList<string>>();
             var primary = new List<string>();
