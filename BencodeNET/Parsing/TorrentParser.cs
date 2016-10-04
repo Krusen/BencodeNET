@@ -74,14 +74,13 @@ namespace BencodeNET.Parsing
                 Trackers = LoadTrackers(data)
             };
 
-            // TODO: Better check of single/multi file?
-            if (info.ContainsKey(TorrentFields.Files))
-            {
-                torrent.Files = LoadMultiFileInfoList(info);
-            }
-            else
+            if (info.ContainsKey(TorrentFields.Length))
             {
                 torrent.File = LoadSingleFileInfo(info);
+            }
+            else if (info.ContainsKey(TorrentFields.Files))
+            {
+                torrent.Files = LoadMultiFileInfoList(info);
             }
 
             return torrent;
@@ -106,9 +105,15 @@ namespace BencodeNET.Parsing
                 TorrentFields.Name
             };
 
-            // Single-file torrents must have the 'length' field
-            if (!info.ContainsKey(TorrentFields.Files))
-                requiredFields.Add(TorrentFields.Length);
+            // Single-file torrents must have either the 'length' field or the 'files' field, but not both
+            if (info.ContainsKey(TorrentFields.Length) && info.ContainsKey(TorrentFields.Files))
+            {
+                throw new InvalidTorrentException(
+                    $"Torrent 'info'-dictionary cannot contain both '{TorrentFields.Length}' and '{TorrentFields.Files}'.");
+            }
+
+            if (!info.ContainsKey(TorrentFields.Length))
+                requiredFields.Add(TorrentFields.Files);
 
             EnsureFields(requiredFields, info, "Torrent is missing required field in 'info'-dictionary.");
 
