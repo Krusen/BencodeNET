@@ -141,9 +141,9 @@ namespace BencodeNET.Parsing
         {
             message = message ?? "Torrent is missing required field.";
 
-            foreach (var field in requiredFields.Where(field => !data.ContainsKey(TorrentFields.Info)))
+            foreach (var field in requiredFields.Where(field => !data.ContainsKey(field)))
             {
-                throw new InvalidTorrentException("Torrent is missing required field.", field);
+                throw new InvalidTorrentException(message, field);
             }
         }
 
@@ -153,7 +153,7 @@ namespace BencodeNET.Parsing
 
             foreach (var data in list)
             {
-                foreach (var field in requiredFields.Where(field => !data.ContainsKey(TorrentFields.Info)))
+                foreach (var field in requiredFields.Where(field => !data.ContainsKey(field)))
                 {
                     throw new InvalidTorrentException(message, field);
                 }
