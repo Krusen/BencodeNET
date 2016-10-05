@@ -173,5 +173,48 @@ namespace BencodeNET.Tests.Objects
             var datetime = (DateTime) bnumber;
             datetime.Should().Be(new DateTime(2016, 1, 1));
         }
+
+        [Fact]
+        public void CastingFromBool_False_IsZero()
+        {
+            var bnumber = (BNumber) false;
+            bnumber.Should().Be(0);
+        }
+
+        [Fact]
+        public void CastingFromBool_True_IsOne()
+        {
+            var bnumber = (BNumber)true;
+            bnumber.Should().Be(1);
+        }
+
+        [Theory]
+        [InlineAutoMockedData(0)]
+        [InlineAutoMockedData(-1)]
+        [InlineAutoMockedData(-42)]
+        [InlineAutoMockedData(-123456)]
+        public void CastingToBool_BelowOrEqualToZero_ShouldBeFalse(int number)
+        {
+            var boolean = (bool) new BNumber(number);
+            boolean.Should().BeFalse();
+        }
+
+        [Theory]
+        [InlineAutoMockedData(1)]
+        [InlineAutoMockedData(10)]
+        [InlineAutoMockedData(42)]
+        [InlineAutoMockedData(123456)]
+        public void CastingToBool_AboveZero_ShouldBeTrue(int number)
+        {
+            var boolean = (bool) new BNumber(number);
+            boolean.Should().BeTrue();
+        }
+
+        public void CastingToBool_Null_ThrowsInvalidCastException()
+        {
+            BNumber bnumber = null;
+            Action action = () => { var b = (bool) bnumber; };
+            action.ShouldThrow<InvalidCastException>();
+        }
     }
 }
