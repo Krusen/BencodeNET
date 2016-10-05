@@ -299,8 +299,8 @@ namespace BencodeNET.Tests.Torrents
             var info = torrent.ToBDictionary().Get<BDictionary>("info");
 
             // Assert
-            info.Should().Contain(TorrentFields.Length, (BNumber)fileSize);
-            info.Should().Contain(TorrentFields.Name, (BString)fileName);
+            info.Should().Contain(TorrentInfoFields.Length, (BNumber)fileSize);
+            info.Should().Contain(TorrentInfoFields.Name, (BString)fileName);
         }
 
         [Theory]
@@ -322,16 +322,16 @@ namespace BencodeNET.Tests.Torrents
 
             // Act
             var info = torrent.ToBDictionary().Get<BDictionary>("info");
-            var files = info.Get<BList<BDictionary>>(TorrentFields.Files);
+            var files = info.Get<BList<BDictionary>>(TorrentInfoFields.Files);
 
             // Assert
-            info.Should().Contain(TorrentFields.Name, (BString) directoryName);
-            info.Should().ContainKey(TorrentFields.Files);
-            info[TorrentFields.Files].Should().BeOfType<BList<BDictionary>>();
+            info.Should().Contain(TorrentInfoFields.Name, (BString) directoryName);
+            info.Should().ContainKey(TorrentInfoFields.Files);
+            info[TorrentInfoFields.Files].Should().BeOfType<BList<BDictionary>>();
             files[0].Should().BeOfType<BDictionary>();
-            files[0].Should().Contain(TorrentFields.Length, (BNumber) fileSize);
-            files[0].Should().ContainKey(TorrentFields.Path);
-            files[0].Get<BList>(TorrentFields.Path).Should().HaveCount(path.Count);
+            files[0].Should().Contain(TorrentFilesFields.Length, (BNumber) fileSize);
+            files[0].Should().ContainKey(TorrentFilesFields.Path);
+            files[0].Get<BList>(TorrentFilesFields.Path).Should().HaveCount(path.Count);
         }
 
         [Theory]
