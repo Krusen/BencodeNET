@@ -69,19 +69,13 @@ namespace BencodeNET.Parsing
                 Encoding = ParseEncoding(data.Get<BString>(TorrentFields.Encoding)),
                 CreationDate = data.Get<BNumber>(TorrentFields.CreationDate),
 
-                Trackers = ParseTrackers(data)
+                File = ParseSingleFileInfo(info),
+                Files = ParseMultiFileInfo(info),
+
+                Trackers = ParseTrackers(data),
+
+                ExtraFields = ParseAnyExtraFields(data)
             };
-
-            if (info.ContainsKey(TorrentInfoFields.Length))
-            {
-                torrent.File = ParseSingleFileInfo(info);
-            }
-            else if (info.ContainsKey(TorrentInfoFields.Files))
-            {
-                torrent.Files = ParseMultiFileInfo(info);
-            }
-
-            torrent.ExtraFields = ParseAnyExtraFields(data);
 
             return torrent;
         }
@@ -166,7 +160,10 @@ namespace BencodeNET.Parsing
         /// <returns>The file info.</returns>
         protected virtual SingleFileInfo ParseSingleFileInfo(BDictionary info)
         {
-            return new SingleFileInfo
+            if (!info.ContainsKey(TorrentInfoFields.Length))
+                return null;
+
+                return new SingleFileInfo
             {
                 FileName = info.Get<BString>(TorrentInfoFields.Name)?.ToString(),
                 FileSize = info.Get<BNumber>(TorrentInfoFields.Length),
@@ -181,6 +178,9 @@ namespace BencodeNET.Parsing
         /// <returns>The file info.</returns>
         protected virtual MultiFileInfoList ParseMultiFileInfo(BDictionary info)
         {
+            if (!info.ContainsKey(TorrentInfoFields.Files))
+                return null;
+
             var list = new MultiFileInfoList
             {
                 DirectoryName = info.Get<BString>(TorrentInfoFields.Name).ToString(),

@@ -356,6 +356,7 @@ namespace BencodeNET.Tests.Parsing
             var torrent = parser.Parse((BencodeStream)null);
 
             // Assert
+            torrent.Files.Should().BeNull();
             torrent.FileMode.Should().Be(TorrentFileMode.Single);
             torrent.TotalSize.Should().Be(length);
             torrent.File.Should().NotBeNull();
@@ -393,6 +394,7 @@ namespace BencodeNET.Tests.Parsing
             var torrent = parser.Parse((BencodeStream)null);
 
             // Assert
+            torrent.File.Should().BeNull();
             torrent.FileMode.Should().Be(TorrentFileMode.Multi);
             torrent.TotalSize.Should().Be(length1 + length2);
             torrent.Files.DirectoryName.Should().Be(directoryName);
