@@ -125,6 +125,7 @@ namespace BencodeNET.Torrents
         /// </summary>
         public virtual long PieceSize { get; set; }
 
+        // TODO: Split into list of 20-byte hashes and rename to something appropriate?
         /// <summary>
         /// A concatenation of all 20-byte SHA1 hash values (one for each piece).
         /// </summary>
