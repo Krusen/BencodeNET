@@ -9,7 +9,6 @@ using BencodeNET.Torrents;
 
 namespace BencodeNET.Parsing
 {
-    // TODO: Unit tests
     /// <summary>
     /// A parser for torrent files.
     /// </summary>
@@ -261,18 +260,22 @@ namespace BencodeNET.Parsing
             var primary = new List<string>();
             trackerList.Add(primary);
 
+            // Get single 'announce' url and add it to the primary list if there is any
             var announce = data.Get<BString>(TorrentFields.Announce)?.ToString();
             if (!string.IsNullOrEmpty(announce))
             {
                 primary.Add(announce);
             }
 
+            // Get the 'announce-list' list´s
             var announceLists = data.Get<BList>(TorrentFields.AnnounceList)?.AsType<BList>() as IList<BList>;
             if (announceLists?.Any() == true)
             {
+                // Add the first list to the primary list and remove duplicates
                 primary.AddRange(announceLists.First().AsStrings());
                 trackerList[0] = primary.Distinct().ToList();
 
+                // Add the other lists to the lists of lists of announce urls
                 trackerList.AddRange(
                     announceLists.Skip(1)
                         .Select(x => x.AsStrings().ToList()));
