@@ -1,7 +1,7 @@
 BencodeNET 
 ==========
-[![AppVeyor](https://img.shields.io/appveyor/ci/Krusen/bencodenet.svg)](https://ci.appveyor.com/project/Krusen/bencodenet)
-[![NuGet Version](http://img.shields.io/nuget/v/BencodeNET.svg)](https://www.nuget.org/packages/BencodeNET/)
+[![AppVeyor](https://ci.appveyor.com/api/projects/status/pikvrmie3ibsk6pt/branch/master?svg=true)](https://ci.appveyor.com/project/Krusen/bencodenet)
+[![NuGet](https://buildstats.info/nuget/bencodenet?includePreReleases=false)](https://www.nuget.org/packages/BencodeNET/)
 
 A .NET library for encoding and decoding bencode.
 
