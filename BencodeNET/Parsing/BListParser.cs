@@ -27,7 +27,6 @@ namespace BencodeNET.Parsing
             BencodeParser = bencodeParser;
         }
 
-
         /// <summary>
         /// The parser used for parsing contained objects.
         /// </summary>
