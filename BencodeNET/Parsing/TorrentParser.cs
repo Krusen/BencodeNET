@@ -118,7 +118,7 @@ namespace BencodeNET.Parsing
 
             if (info.ContainsKey(TorrentInfoFields.Files))
             {
-                var filesData = info.Get<BList<BDictionary>>(TorrentInfoFields.Files);
+                var filesData = info.Get<BList>(TorrentInfoFields.Files).AsType<BDictionary>();
 
                 var requiredFileFields = new[]
                 {

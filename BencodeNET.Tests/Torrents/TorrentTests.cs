@@ -322,7 +322,7 @@ namespace BencodeNET.Tests.Torrents
 
             // Act
             var info = torrent.ToBDictionary().Get<BDictionary>("info");
-            var files = info.Get<BList<BDictionary>>(TorrentInfoFields.Files);
+            var files = info.Get<BList>(TorrentInfoFields.Files).AsType<BDictionary>();
 
             // Assert
             info.Should().Contain(TorrentInfoFields.Name, (BString) directoryName);
