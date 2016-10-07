@@ -13,7 +13,6 @@ using Xunit;
 
 namespace BencodeNET.Tests.Parsing
 {
-    // TODO: Rename CanParse tests to better explain expected behavior/outcome
     public class TorrentParserTests
     {
         private BDictionary ValidSingleFileTorrentData { get; }
@@ -54,7 +53,7 @@ namespace BencodeNET.Tests.Parsing
 
         [Theory]
         [AutoMockedData]
-        public void CanParseComment(string comment)
+        public void Comment_IsParsed(string comment)
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
@@ -70,7 +69,7 @@ namespace BencodeNET.Tests.Parsing
 
         [Theory]
         [AutoMockedData]
-        public void CanParseCreatedBy(string createdBy)
+        public void CreatedBy_IsParsed(string createdBy)
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
@@ -86,7 +85,7 @@ namespace BencodeNET.Tests.Parsing
 
         [Theory]
         [AutoMockedData]
-        public void CanParseCreationDate()
+        public void CreationDate_IsParsed()
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
@@ -105,7 +104,7 @@ namespace BencodeNET.Tests.Parsing
         [InlineAutoMockedData("UTF8")]
         [InlineAutoMockedData("utf-8")]
         [InlineAutoMockedData("UTF-8")]
-        public void CanParseEncoding_UTF8(string encoding)
+        public void Encoding_UTF8_CanBeParsed(string encoding)
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
@@ -122,7 +121,7 @@ namespace BencodeNET.Tests.Parsing
         [Theory]
         [InlineAutoMockedData("ascii")]
         [InlineAutoMockedData("ASCII")]
-        public void CanParseEncoding_ASCII(string encoding)
+        public void Encoding_ASCII_CanBeParsed(string encoding)
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
@@ -141,7 +140,7 @@ namespace BencodeNET.Tests.Parsing
         [InlineAutoMockedData("asdf")]
         [InlineAutoMockedData("1")]
         [InlineAutoMockedData("UTF 8")]
-        public void CanParseEncoding_InvalidValueIsNull(string encoding)
+        public void Encoding_InvalidValidAsNull(string encoding)
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
@@ -157,7 +156,7 @@ namespace BencodeNET.Tests.Parsing
 
         [Theory]
         [AutoMockedData]
-        public void CanParse_Info_PieceLength(long pieceSize)
+        public void Info_PieceLength_IsParsed(long pieceSize)
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
@@ -174,7 +173,7 @@ namespace BencodeNET.Tests.Parsing
 
         [Theory]
         [AutoMockedData]
-        public void CanParse_Info_Pieces(string pieces)
+        public void Info_Pieces_IsParsed(string pieces)
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
@@ -195,7 +194,7 @@ namespace BencodeNET.Tests.Parsing
         [InlineAutoMockedData(1, true)]
         [InlineAutoMockedData(42, false)]
         [InlineAutoMockedData(12345, false)]
-        public void CanParse_Info_Private_ShouldBeTrueIfValueIsOne(int value, bool expectedResult)
+        public void Info_Private_ShouldBeTrueOnlyIfValueIsOne(int value, bool expectedResult)
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
@@ -212,7 +211,7 @@ namespace BencodeNET.Tests.Parsing
 
         [Theory]
         [AutoMockedData]
-        public void CanParse_ExtraFields(string extraKey, string extraValue, string extraInfoKey, string extraInfoValue)
+        public void ExtraFields_IsParsed(string extraKey, string extraValue, string extraInfoKey, string extraInfoValue)
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
@@ -230,7 +229,7 @@ namespace BencodeNET.Tests.Parsing
 
         [Theory]
         [AutoMockedData]
-        public void CanParse_Announce(string announceUrl)
+        public void Announce_IsParsed(string announceUrl)
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
@@ -248,7 +247,7 @@ namespace BencodeNET.Tests.Parsing
 
         [Theory]
         [AutoMockedData]
-        public void CanParse_AnnounceList_Single(IList<string> announceList)
+        public void AnnounceList_Single_IsParsed(IList<string> announceList)
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
@@ -269,7 +268,7 @@ namespace BencodeNET.Tests.Parsing
 
         [Theory]
         [AutoMockedData]
-        public void CanParse_AnnounceList_Multiple(IList<string> announceList1, IList<string> announceList2)
+        public void AnnounceList_Multiple_IsParsed(IList<string> announceList1, IList<string> announceList2)
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
@@ -293,7 +292,7 @@ namespace BencodeNET.Tests.Parsing
 
         [Theory]
         [AutoMockedData]
-        public void CanParse_AnnounceAndAnnounceList(string announceUrl, IList<string> announceList1, IList<string> announceList2)
+        public void AnnounceAndAnnounceList_IsParsed(string announceUrl, IList<string> announceList1, IList<string> announceList2)
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
@@ -321,7 +320,7 @@ namespace BencodeNET.Tests.Parsing
 
         [Theory]
         [AutoMockedData]
-        public void CanParse_AnnounceAndAnnounceList_DoesNotContainDuplicatesInPrimary(string announceUrl1, string announceUrl2)
+        public void AnnounceAndAnnounceList_DoesNotContainDuplicatesInPrimaryList(string announceUrl1, string announceUrl2)
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
@@ -343,7 +342,7 @@ namespace BencodeNET.Tests.Parsing
 
         [Theory]
         [AutoMockedData]
-        public void CanParse_SingleFileInfo(long length, string fileName, string md5Sum)
+        public void SingleFileInfo_IsParsed(long length, string fileName, string md5Sum)
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
@@ -368,7 +367,7 @@ namespace BencodeNET.Tests.Parsing
 
         [Theory]
         [AutoMockedData]
-        public void CanParse_MultiFileInfo(string directoryName, long length1, IList<string> paths1, string md5Sum1, long length2, IList<string> paths2, string md5Sum2)
+        public void MultiFileInfo_IsParsed(string directoryName, long length1, IList<string> paths1, string md5Sum1, long length2, IList<string> paths2, string md5Sum2)
         {
             // Arrange
             ParsedData = ValidMultiFileTorrentData;
