@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using BencodeNET.Exceptions;
 using BencodeNET.Objects;
 using BencodeNET.Parsing;
@@ -7,7 +8,6 @@ using Xunit;
 
 namespace BencodeNET.Tests.Parsing
 {
-    // TODO: Other encoding tests
     public class BStringParserTests
     {
         private BStringParser Parser { get; }
@@ -121,7 +121,7 @@ namespace BencodeNET.Tests.Parsing
         }
 
         [Fact]
-        public void LengthAboveInt32MaxValue_ShouldThrowUnsupportedException()
+        public void LengthAboveInt32MaxValue_ThrowsUnsupportedException()
         {
             var bencode = "2147483648:spam";
             Action action = () => Parser.ParseString(bencode);
@@ -129,7 +129,7 @@ namespace BencodeNET.Tests.Parsing
         }
 
         [Fact]
-        public void LengthBelowInt32MaxValue_ShouldNotThrowUnsupportedException()
+        public void LengthBelowInt32MaxValue_DoesNotThrowUnsupportedException()
         {
             var bencode = "2147483647:spam";
             Action action = () => Parser.ParseString(bencode);
