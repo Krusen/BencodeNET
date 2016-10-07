@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using BencodeNET.Exceptions;
 using BencodeNET.IO;
 using BencodeNET.Objects;
 using BencodeNET.Parsing;
@@ -32,10 +33,10 @@ namespace BencodeNET.Tests.Parsing
             {
                 [TorrentFields.Info] = new BDictionary
                 {
-                    [TorrentInfoFields.Name] = (BString)"",
-                    [TorrentInfoFields.Pieces] = (BString)"",
-                    [TorrentInfoFields.PieceLength] = (BNumber)0,
-                    [TorrentInfoFields.Length] = (BNumber)0
+                    [TorrentInfoFields.Name] = (BString) "",
+                    [TorrentInfoFields.Pieces] = (BString) "",
+                    [TorrentInfoFields.PieceLength] = (BNumber) 0,
+                    [TorrentInfoFields.Length] = (BNumber) 0
                 },
             };
 
@@ -43,9 +44,9 @@ namespace BencodeNET.Tests.Parsing
             {
                 [TorrentFields.Info] = new BDictionary
                 {
-                    [TorrentInfoFields.Name] = (BString)"",
-                    [TorrentInfoFields.Pieces] = (BString)"",
-                    [TorrentInfoFields.PieceLength] = (BNumber)0,
+                    [TorrentInfoFields.Name] = (BString) "",
+                    [TorrentInfoFields.Pieces] = (BString) "",
+                    [TorrentInfoFields.PieceLength] = (BNumber) 0,
                     [TorrentInfoFields.Files] = new BList()
                 },
             };
@@ -405,6 +406,155 @@ namespace BencodeNET.Tests.Parsing
             torrent.Files[1].FileSize.Should().Be(length2);
             torrent.Files[1].Path.ShouldAllBeEquivalentTo(paths2);
             torrent.Files[1].Md5Sum.Should().Be(md5Sum2);
+        }
+
+        [Fact]
+        public void Root_MissingInfoField_ThrowsInvalidTorrentException()
+        {
+            // Arrange
+            ParsedData = ValidSingleFileTorrentData;
+            ParsedData.Remove(TorrentFields.Info);
+
+            // Act
+            var parser = new TorrentParser(BencodeParser);
+            Action action = () => parser.Parse((BencodeStream)null);
+
+            // Assert
+            action.ShouldThrow<InvalidTorrentException>()
+                .Where(ex => ex.InvalidField == TorrentFields.Info);
+        }
+
+        [Fact]
+        public void Info_ContainingBothLengthAndFilesField_ThrowsInvalidTorrentException()
+        {
+            // Arrange
+            ParsedData = ValidSingleFileTorrentData;
+            var info = ParsedData.Get<BDictionary>(TorrentFields.Info);
+            info[TorrentInfoFields.Length] = (BNumber) 1;
+            info[TorrentInfoFields.Files] = new BList();
+
+            // Act
+            var parser = new TorrentParser(BencodeParser);
+            Action action = () => parser.Parse((BencodeStream)null);
+
+            // Assert
+            action.ShouldThrow<InvalidTorrentException>()
+                .WithMessage($"*{TorrentInfoFields.Length}*")
+                .WithMessage($"*{TorrentInfoFields.Files}*");
+        }
+
+        [Fact]
+        public void Info_MissingPieceLengthField_ThrowsInvalidTorrentException()
+        {
+            // Arrange
+            ParsedData = ValidSingleFileTorrentData;
+            var info = ParsedData.Get<BDictionary>(TorrentFields.Info);
+            info.Remove(TorrentInfoFields.PieceLength);
+
+            // Act
+            var parser = new TorrentParser(BencodeParser);
+            Action action = () => parser.Parse((BencodeStream)null);
+
+            // Assert
+            action.ShouldThrow<InvalidTorrentException>()
+                .Where(ex => ex.InvalidField == TorrentInfoFields.PieceLength);
+        }
+
+        [Fact]
+        public void Info_MissingPiecesField_ThrowsInvalidTorrentException()
+        {
+            // Arrange
+            ParsedData = ValidSingleFileTorrentData;
+            var info = ParsedData.Get<BDictionary>(TorrentFields.Info);
+            info.Remove(TorrentInfoFields.Pieces);
+
+            // Act
+            var parser = new TorrentParser(BencodeParser);
+            Action action = () => parser.Parse((BencodeStream)null);
+
+            // Assert
+            action.ShouldThrow<InvalidTorrentException>()
+                .Where(ex => ex.InvalidField == TorrentInfoFields.Pieces);
+        }
+
+        [Fact]
+        public void Info_MissingNameField_ThrowsInvalidTorrentException()
+        {
+            // Arrange
+            ParsedData = ValidSingleFileTorrentData;
+            var info = ParsedData.Get<BDictionary>(TorrentFields.Info);
+            info.Remove(TorrentInfoFields.Name);
+
+            // Act
+            var parser = new TorrentParser(BencodeParser);
+            Action action = () => parser.Parse((BencodeStream)null);
+
+            // Assert
+            action.ShouldThrow<InvalidTorrentException>()
+                .Where(ex => ex.InvalidField == TorrentInfoFields.Name);
+        }
+
+        [Fact]
+        public void MultiFileInfo_MissingFilesField_ThrowsInvalidTorrentException()
+        {
+            // Arrange
+            ParsedData = ValidMultiFileTorrentData;
+            var info = ParsedData.Get<BDictionary>(TorrentFields.Info);
+            info.Remove(TorrentInfoFields.Files);
+
+            // Act
+            var parser = new TorrentParser(BencodeParser);
+            Action action = () => parser.Parse((BencodeStream)null);
+
+            // Assert
+            action.ShouldThrow<InvalidTorrentException>()
+                .Where(ex => ex.InvalidField == TorrentInfoFields.Files);
+        }
+
+        [Fact]
+        public void MultiFile_Files_MissingLengthField_ThrowsInvalidTorrentException()
+        {
+            // Arrange
+            ParsedData = ValidMultiFileTorrentData;
+            var info = ParsedData.Get<BDictionary>(TorrentFields.Info);
+            info[TorrentInfoFields.Files] = new BList<BDictionary>
+            {
+                new BDictionary
+                {
+                    [TorrentFilesFields.Path] = new BList()
+                }
+            };
+
+            // Act
+            var parser = new TorrentParser(BencodeParser);
+            Action action = () => parser.Parse((BencodeStream)null);
+
+            // Assert
+            action.ShouldThrow<InvalidTorrentException>()
+                .Where(ex => ex.InvalidField == TorrentFilesFields.Length);
+        }
+
+        [Fact]
+        public void MultiFile_Files_MissingPathField_ThrowsInvalidTorrentException()
+        {
+            // Arrange
+            ParsedData = ValidMultiFileTorrentData;
+            var info = ParsedData.Get<BDictionary>(TorrentFields.Info);
+            info[TorrentInfoFields.Files] = new BList<BDictionary>
+            {
+                new BDictionary
+                {
+                    [TorrentFilesFields.Length] = (BNumber) 1
+                }
+            };
+
+            // Act
+            var parser = new TorrentParser(BencodeParser);
+            Action action = () => parser.Parse((BencodeStream)null);
+
+            // Assert
+            action.ShouldThrow<InvalidTorrentException>()
+                .Where(ex => ex.InvalidField == TorrentFilesFields.Path);
         }
     }
 }
