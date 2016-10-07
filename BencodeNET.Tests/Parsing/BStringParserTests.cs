@@ -135,5 +135,19 @@ namespace BencodeNET.Tests.Parsing
             Action action = () => Parser.ParseString(bencode);
             action.ShouldNotThrow<UnsupportedBencodeException<BString>>();
         }
+
+        [Fact]
+        public void CanParseEncodedAsLatin1()
+        {
+            var encoding = Encoding.GetEncoding("LATIN1");
+            var expected = new BString("æøå", encoding);
+            var parser = new BStringParser(encoding);
+
+            // "3:æøå"
+            var bytes = new byte[] {51, 58, 230, 248, 229};
+            var bstring = parser.Parse(bytes);
+
+            bstring.Should().Be(expected);
+        }
     }
 }
