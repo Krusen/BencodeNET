@@ -106,6 +106,17 @@ namespace BencodeNET.Objects
         }
 
         /// <summary>
+        /// Gets the object at the specified index as <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The type to cast the object to.</typeparam>
+        /// <param name="index">The index in the list to get the object from.</param>
+        /// <returns>The object at the specified index as the specified type or null if the object is not of that type.</returns>
+        public T Get<T>(int index) where T : class, IBObject
+        {
+            return this[index] as T;
+        }
+
+        /// <summary>
         /// Assumes all elements are <see cref="BString"/> and returns
         /// an enumerable of their string representation.
         /// </summary>
