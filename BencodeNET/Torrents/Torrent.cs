@@ -129,7 +129,7 @@ namespace BencodeNET.Torrents
         /// <summary>
         /// A concatenation of all 20-byte SHA1 hash values (one for each piece).
         /// </summary>
-        public virtual string Pieces { get; set; }
+        public virtual byte[] Pieces { get; set; }
 
         /// <summary>
         /// [optional] If set to true clients must only publish it's presence to the defined trackers.

@@ -62,7 +62,7 @@ namespace BencodeNET.Parsing
             {
                 IsPrivate = info.Get<BNumber>(TorrentInfoFields.Private) == 1,
                 PieceSize = info.Get<BNumber>(TorrentInfoFields.PieceLength),
-                Pieces = info.Get<BString>(TorrentInfoFields.Pieces)?.ToString(),
+                Pieces = info.Get<BString>(TorrentInfoFields.Pieces)?.Value.ToArray() ?? new byte[0],
 
                 Comment = data.Get<BString>(TorrentFields.Comment)?.ToString(),
                 CreatedBy = data.Get<BString>(TorrentFields.CreatedBy)?.ToString(),
