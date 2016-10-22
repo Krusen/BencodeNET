@@ -173,19 +173,19 @@ namespace BencodeNET.Tests.Parsing
 
         [Theory]
         [AutoMockedData]
-        public void Info_Pieces_IsParsed(string pieces)
+        public void Info_Pieces_IsParsed(byte[] pieces)
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
             var info = ParsedData.Get<BDictionary>(TorrentFields.Info);
-            info[TorrentInfoFields.Pieces] = (BString) pieces;
+            info[TorrentInfoFields.Pieces] = new BString(pieces);
 
             // Act
             var parser = new TorrentParser(BencodeParser);
             var torrent = parser.Parse((BencodeStream)null);
 
             // Assert
-            torrent.Pieces.Should().Be(pieces);
+            torrent.Pieces.Should().Equal(pieces);
         }
 
         [Theory]
