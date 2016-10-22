@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using BencodeNET.Exceptions;
 using BencodeNET.IO;
 
@@ -128,8 +129,38 @@ namespace BencodeNET.Torrents
         // TODO: Split into list of 20-byte hashes and rename to something appropriate?
         /// <summary>
         /// A concatenation of all 20-byte SHA1 hash values (one for each piece).
+        /// Use <see cref="PiecesAsHexString"/> to get/set this value as a hex string instead.
         /// </summary>
         public virtual byte[] Pieces { get; set; }
+
+        /// <summary>
+        /// Gets or sets <see cref="Pieces"/> from/to a hex string (without dashes), e.g. 1C115D26444AEF2A5E936133DCF8789A552BBE9F[...].
+        /// The length of the string must be a multiple of 40.
+        /// </summary>
+        public virtual string PiecesAsHexString
+        {
+            get
+            {
+                return BitConverter.ToString(Pieces).Replace("-", "");
+            }
+            set
+            {
+                if (value?.Length % 40 != 0)
+                    throw new ArgumentException("Value length must be a multiple of 40 (20 bytes as hex).");
+
+                if (Regex.IsMatch(value, "[^0-9A-F]"))
+                    throw new ArgumentException("Value must only contain hex characters (0-9 and A-F) and only uppercase.");
+
+                var bytes = new byte[value.Length/2];
+                for (var i = 0; i < bytes.Length; i++)
+                {
+                    var str = $"{value[i*2]}{value[i*2+1]}";
+                    bytes[i] = Convert.ToByte(str, 16);
+                }
+
+                Pieces = bytes;
+            }
+        }
 
         /// <summary>
         /// [optional] If set to true clients must only publish it's presence to the defined trackers.
@@ -209,7 +240,7 @@ namespace BencodeNET.Torrents
             if (PieceSize > 0)
                 info[TorrentInfoFields.PieceLength] = (BNumber) PieceSize;
 
-            if (Pieces != null)
+            if (Pieces?.Length > 0)
                 info[TorrentInfoFields.Pieces] = new BString(Pieces, encoding);
 
             if (IsPrivate)
