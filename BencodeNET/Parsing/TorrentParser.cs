@@ -58,23 +58,25 @@ namespace BencodeNET.Parsing
 
             var info = data.Get<BDictionary>(TorrentFields.Info);
 
+            var encoding = ParseEncoding(data.Get<BString>(TorrentFields.Encoding)) ?? BencodeParser.Encoding;
+
             var torrent = new Torrent
             {
                 IsPrivate = info.Get<BNumber>(TorrentInfoFields.Private) == 1,
                 PieceSize = info.Get<BNumber>(TorrentInfoFields.PieceLength),
                 Pieces = info.Get<BString>(TorrentInfoFields.Pieces)?.Value.ToArray() ?? new byte[0],
 
-                Comment = data.Get<BString>(TorrentFields.Comment)?.ToString(),
-                CreatedBy = data.Get<BString>(TorrentFields.CreatedBy)?.ToString(),
+                Comment = data.Get<BString>(TorrentFields.Comment)?.ToString(encoding),
+                CreatedBy = data.Get<BString>(TorrentFields.CreatedBy)?.ToString(encoding),
                 Encoding = ParseEncoding(data.Get<BString>(TorrentFields.Encoding)),
                 CreationDate = data.Get<BNumber>(TorrentFields.CreationDate),
 
-                File = ParseSingleFileInfo(info),
-                Files = ParseMultiFileInfo(info),
+                File = ParseSingleFileInfo(info, encoding),
+                Files = ParseMultiFileInfo(info, encoding),
 
-                Trackers = ParseTrackers(data),
+                Trackers = ParseTrackers(data, encoding),
 
-                ExtraFields = ParseAnyExtraFields(data)
+                ExtraFields = ParseAnyExtraFields(data, encoding)
             };
 
             return torrent;
@@ -157,17 +159,18 @@ namespace BencodeNET.Parsing
         /// Parses file info for single-file torrents.
         /// </summary>
         /// <param name="info">The 'info'-dictionary of a torrent.</param>
+        /// <param name="encoding"></param>
         /// <returns>The file info.</returns>
-        protected virtual SingleFileInfo ParseSingleFileInfo(BDictionary info)
+        protected virtual SingleFileInfo ParseSingleFileInfo(BDictionary info, Encoding encoding)
         {
             if (!info.ContainsKey(TorrentInfoFields.Length))
                 return null;
 
                 return new SingleFileInfo
             {
-                FileName = info.Get<BString>(TorrentInfoFields.Name)?.ToString(),
+                FileName = info.Get<BString>(TorrentInfoFields.Name)?.ToString(encoding),
                 FileSize = info.Get<BNumber>(TorrentInfoFields.Length),
-                Md5Sum = info.Get<BString>(TorrentInfoFields.Md5Sum)?.ToString()
+                Md5Sum = info.Get<BString>(TorrentInfoFields.Md5Sum)?.ToString(encoding)
             };
         }
 
@@ -175,23 +178,24 @@ namespace BencodeNET.Parsing
         /// Parses file info for multi-file torrents.
         /// </summary>
         /// <param name="info">The 'info'-dictionary of a torrent.</param>
+        /// <param name="encoding"></param>
         /// <returns>The file info.</returns>
-        protected virtual MultiFileInfoList ParseMultiFileInfo(BDictionary info)
+        protected virtual MultiFileInfoList ParseMultiFileInfo(BDictionary info, Encoding encoding)
         {
             if (!info.ContainsKey(TorrentInfoFields.Files))
                 return null;
 
             var list = new MultiFileInfoList
             {
-                DirectoryName = info.Get<BString>(TorrentInfoFields.Name).ToString(),
+                DirectoryName = info.Get<BString>(TorrentInfoFields.Name).ToString(encoding),
             };
 
             var fileInfos = info.Get<BList>(TorrentInfoFields.Files).Cast<BDictionary>()
                 .Select(x => new MultiFileInfo
                 {
                     FileSize = x.Get<BNumber>(TorrentFilesFields.Length),
-                    Path = x.Get<BList>(TorrentFilesFields.Path)?.AsStrings().ToList(),
-                    Md5Sum = x.Get<BString>(TorrentFilesFields.Md5Sum)?.ToString()
+                    Path = x.Get<BList>(TorrentFilesFields.Path)?.AsStrings(encoding).ToList(),
+                    Md5Sum = x.Get<BString>(TorrentFilesFields.Md5Sum)?.ToString(encoding)
                 });
 
             list.AddRange(fileInfos);
@@ -204,8 +208,9 @@ namespace BencodeNET.Parsing
         /// that are not otherwise represented in a <see cref="Torrent"/>.
         /// </summary>
         /// <param name="root"></param>
+        /// <param name="encoding"></param>
         /// <returns></returns>
-        protected virtual BDictionary ParseAnyExtraFields(BDictionary root)
+        protected virtual BDictionary ParseAnyExtraFields(BDictionary root, Encoding encoding)
         {
             var extraFields = ParseExtraRootFields(root);
 
@@ -219,6 +224,8 @@ namespace BencodeNET.Parsing
             {
                 extraFields.Add(TorrentFields.Info, extraInfoFields);
             }
+
+            FixEncoding(extraFields, encoding);
 
             return extraFields;
         }
@@ -249,19 +256,63 @@ namespace BencodeNET.Parsing
             return extraFields;
         }
 
+        // TODO: Unit tests
+        private void FixEncoding(IBObject bobject, Encoding encoding)
+        {
+            var dictionary = bobject as BDictionary;
+            if (dictionary != null)
+            {
+                FixEncodingInDictionary(dictionary, encoding);
+            }
+
+            var list = bobject as BList;
+            if (list != null)
+            {
+                FixEncodingInList(list, encoding);
+            }
+
+            var value = bobject as BString;
+            if (value != null)
+            {
+                value.Encoding = encoding;
+            }
+        }
+
+        private void FixEncodingInList(BList list, Encoding encoding)
+        {
+            foreach (var item in list)
+            {
+                FixEncoding(item, encoding);
+            }
+        }
+
+        private void FixEncodingInDictionary(BDictionary data, Encoding encoding)
+        {
+            foreach (var field in data)
+            {
+                // TODO: Add unit tests for this
+                var key = field.Key.ToString(encoding);
+                var isUtf8Key = key.EndsWith("utf-8", StringComparison.OrdinalIgnoreCase);
+                var fieldEncoding = isUtf8Key ? Encoding.UTF8 : encoding;
+
+                FixEncoding(field.Value, fieldEncoding);
+            }
+        }
+
         /// <summary>
         /// Parses trackers (announce URLs) from a torrent.
         /// </summary>
         /// <param name="data">The torrent data to parse trackers from.</param>
+        /// <param name="encoding"></param>
         /// <returns>A list of list of trackers (announce URLs).</returns>
-        protected virtual IList<IList<string>> ParseTrackers(BDictionary data)
+        protected virtual IList<IList<string>> ParseTrackers(BDictionary data, Encoding encoding)
         {
             var trackerList = new List<IList<string>>();
             var primary = new List<string>();
             trackerList.Add(primary);
 
             // Get single 'announce' url and add it to the primary list if there is any
-            var announce = data.Get<BString>(TorrentFields.Announce)?.ToString();
+            var announce = data.Get<BString>(TorrentFields.Announce)?.ToString(encoding);
             if (!string.IsNullOrEmpty(announce))
             {
                 primary.Add(announce);
@@ -272,13 +323,13 @@ namespace BencodeNET.Parsing
             if (announceLists?.Any() == true)
             {
                 // Add the first list to the primary list and remove duplicates
-                primary.AddRange(announceLists.First().AsStrings());
+                primary.AddRange(announceLists.First().AsStrings(encoding));
                 trackerList[0] = primary.Distinct().ToList();
 
                 // Add the other lists to the lists of lists of announce urls
                 trackerList.AddRange(
                     announceLists.Skip(1)
-                        .Select(x => x.AsStrings().ToList()));
+                        .Select(x => x.AsStrings(encoding).ToList()));
             }
 
             return trackerList;

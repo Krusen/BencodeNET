@@ -1,12 +1,11 @@
 ﻿{
   "$schema": "http://json.schemastore.org/project",
-  "version": "2.2.0-*",
+  "version": "2.2.1-*",
   "title": "BencodeNET",
   "authors": [ "Søren Kruse" ],
   "description": "A library for encoding and decoding bencode (e.g. torrent files)",
   "packOptions": {
-    //"summary": "A library for encoding and decoding bencode (e.g. torrent files)",
-    "releaseNotes": "Fixed Torrent.Pieces and added Torrent.PiecesAsHexString property.",
+    "releaseNotes": "Now uses the encoding information of a .torrent when parsing the torrent data.",
     "projectUrl": "https://github.com/Krusen/BencodeNET",
     "licenseUrl": "https://github.com/Krusen/BencodeNET/blob/master/LICENSE.md",
     "requireLicenseAcceptance": false,

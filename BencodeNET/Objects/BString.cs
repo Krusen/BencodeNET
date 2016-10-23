@@ -186,6 +186,7 @@ namespace BencodeNET.Objects
         /// </returns>
         public string ToString(Encoding encoding)
         {
+            encoding = encoding ?? _encoding;
             return encoding.GetString(Value.ToArray());
         }
     }
