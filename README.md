@@ -30,12 +30,12 @@ Working with torrent files:
 ```C#
 // Parse torrent by specifying the file path
 var parser = new BencodeParser(); // Default encoding is Encoding.UT8F, but you can specify another if you need to
-var torrent = parse.Parse<Torrent>("C:\ubuntu.torrent");
+var torrent = parser.Parse<Torrent>("C:\ubuntu.torrent");
 
 // Alternatively, handle the stream yourself
 using (var stream = File.OpenRead("C:\ubuntu.torrent"))
 {
-    torrent = parse.Parse<Torrent>(stream);
+    torrent = parser.Parse<Torrent>(stream);
 }
 
 // Calculate the info hash
