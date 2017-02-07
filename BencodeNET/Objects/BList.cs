@@ -117,10 +117,9 @@ namespace BencodeNET.Objects
         }
 
         /// <summary>
-        /// Assumes all elements are <see cref="BString"/> and returns
-        /// an enumerable of their string representation.
+        /// Assumes all elements are <see cref="BString"/>
+        /// and returns an enumerable of their string representation.
         /// </summary>
-        /// <returns></returns>
         public IEnumerable<string> AsStrings()
         {
             return AsStrings(Encoding.UTF8);
@@ -130,11 +129,20 @@ namespace BencodeNET.Objects
         /// Assumes all elements are <see cref="BString"/> and returns
         /// an enumerable of their string representation using the specified encoding.
         /// </summary>
-        /// <returns></returns>
         public IEnumerable<string> AsStrings(Encoding encoding)
         {
             IList<BString> bstrings = this.AsType<BString>();
             return bstrings.Select(x => x.ToString(encoding));
+        }
+
+        /// <summary>
+        /// Assumes all elements are <see cref="BNumber"/>
+        /// and returns an enumerable of their <c>long</c> value.
+        /// </summary>
+        public IEnumerable<long> AsNumbers()
+        {
+            IList<BNumber> bnumbers = this.AsType<BNumber>();
+            return bnumbers.Select(x => x.Value);
         }
 
         /// <summary>
@@ -145,7 +153,7 @@ namespace BencodeNET.Objects
         /// <exception cref="InvalidCastException">
         /// An element is not of type <typeparamref name="T"/>.
         /// </exception>
-        public BList<T> AsType<T>() where T : class,IBObject
+        public BList<T> AsType<T>() where T : class, IBObject
         {
             try
             {

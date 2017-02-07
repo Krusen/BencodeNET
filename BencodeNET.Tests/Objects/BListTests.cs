@@ -154,9 +154,7 @@ namespace BencodeNET.Tests.Objects
         public void AsType_ContainingWrongType_ThrowsInvalidCastException()
         {
             var blist = new BList {1, "2", 3};
-
             Action action = () => blist.AsType<BNumber>();
-
             action.ShouldThrow<InvalidCastException>();
         }
 
@@ -174,9 +172,25 @@ namespace BencodeNET.Tests.Objects
         public void AsStrings_ContainingNonBStringType_ThrowsInvalidCastException()
         {
             var blist = new BList {"a", "b", 3};
-
             Action action = () => blist.AsStrings();
+            action.ShouldThrow<InvalidCastException>();
+        }
 
+        [Fact]
+        public void AsNumbers_ConvertsToListOfLongs()
+        {
+            var blist = new BList {1, 2, 3};
+            var numbers = blist.AsNumbers();
+
+            numbers.Should().HaveCount(3);
+            numbers.Should().ContainInOrder(1L, 2L, 3L);
+        }
+
+        [Fact]
+        public void AsNumbers_ContainingNonBNumberType_ThrowsInvalidCastException()
+        {
+            var blist = new BList {1, 2, "3"};
+            Action action = () => blist.AsNumbers();
             action.ShouldThrow<InvalidCastException>();
         }
     }
