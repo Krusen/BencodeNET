@@ -12,6 +12,7 @@ A .NET library for encoding and decoding bencode.
 Overview
 --------
 
+- [Installation](#installation)
 - [Usage](#usage)
   - [Torrents](#torrents)
     - [File modes](#file-modes)
@@ -21,6 +22,16 @@ Overview
 - [String Character Encoding](#string-character-encoding)
 - [Upgrading from 1.x to 2.0](#upgrading-from-version-1x-to-20)
 
+
+Installation
+------------
+
+Install the package **BencodeNET** from [NuGet](https://www.nuget.org/packages/BencodeNET/) 
+or install it from the [Package Manager Console](https://docs.microsoft.com/da-dk/nuget/tools/package-manager-console):
+
+```
+PM> Install-Package BencodeNET
+```
 
 Usage
 -----
