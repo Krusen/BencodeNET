@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net45;netstandard1.3</TargetFrameworks>
+    <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.3' ">1.6.0</NetStandardImplicitPackageVersion>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <PackageId>BencodeNET</PackageId>
+    <Version>2.2.2</Version>
+    <Authors>Søren Kruse</Authors>
+    <Company />
+    <Product>BencodeNET</Product>
+    <Description>A library for encoding and decoding bencode (e.g. torrent files)</Description>
+    <PackageLicenseUrl>https://github.com/Krusen/BencodeNET/blob/master/LICENSE.md</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/Krusen/BencodeNET</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/Krusen/BencodeNET/master/Assets/icon.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/Krusen/BencodeNET</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReleaseNotes>Now uses the encoding information of a .torrent when parsing the torrent data.</PackageReleaseNotes>
+    <PackageTags>bencode;torrent;torrents</PackageTags>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <IncludeSource>True</IncludeSource>
+    <IncludeSymbols>True</IncludeSymbols>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
+    <DefineConstants>$(DefineConstants);NETSTANDARD</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
+    <PackageReference Include="System.Reflection" Version="4.1.0" />
+    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.2.0" />
+  </ItemGroup>
+
+</Project>
