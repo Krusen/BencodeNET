@@ -60,7 +60,7 @@ namespace BencodeNET.Parsing
 
             var encoding = ParseEncoding(data.Get<BString>(TorrentFields.Encoding)) ?? BencodeParser.Encoding;
 
-            var torrent = new Torrent
+            var torrent = new Torrent(info)
             {
                 IsPrivate = info.Get<BNumber>(TorrentInfoFields.Private) == 1,
                 PieceSize = info.Get<BNumber>(TorrentInfoFields.PieceLength),

@@ -5,7 +5,7 @@
     <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.3' ">1.6.0</NetStandardImplicitPackageVersion>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <PackageId>BencodeNET</PackageId>
-    <Version>2.2.2</Version>
+    <Version>2.2.3</Version>
     <Authors>Søren Kruse</Authors>
     <Company />
     <Product>BencodeNET</Product>
@@ -15,7 +15,7 @@
     <PackageIconUrl>https://raw.githubusercontent.com/Krusen/BencodeNET/master/Assets/icon.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/Krusen/BencodeNET</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageReleaseNotes>Now uses the encoding information of a .torrent when parsing the torrent data.</PackageReleaseNotes>
+    <PackageReleaseNotes>Save original info hash of parsed torrents</PackageReleaseNotes>
     <PackageTags>bencode;torrent;torrents</PackageTags>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <IncludeSource>True</IncludeSource>

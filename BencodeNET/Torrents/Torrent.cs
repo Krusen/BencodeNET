@@ -16,6 +16,36 @@ namespace BencodeNET.Torrents
     public class Torrent : BObject
     {
         /// <summary>
+        ///
+        /// </summary>
+        public Torrent()
+        {
+        }
+
+        /// <summary>
+        /// Creates a torrent and populates the <see cref="OriginalInfoHash"/> and <see cref="OriginalInfoHashBytes"/>
+        /// properties from the provided <see cref="BDictionary"/>.
+        /// </summary>
+        /// <param name="originalInfoDictionary"></param>
+        internal Torrent(BDictionary originalInfoDictionary)
+        {
+            OriginalInfoHashBytes = TorrentUtil.CalculateInfoHashBytes(originalInfoDictionary);
+            OriginalInfoHash = TorrentUtil.BytesToHexString(OriginalInfoHashBytes);
+        }
+
+        /// <summary>
+        /// The original info hash value from when the torrent was parsed.
+        /// This will be null if the instance was created manually and not by the parser.
+        /// </summary>
+        public string OriginalInfoHash { get; protected set; }
+
+        /// <summary>
+        /// The original info hash bytes from when the torrent was parsed.
+        /// This will be null if the instance was created manually and not by the parser.
+        /// </summary>
+        public byte[] OriginalInfoHashBytes { get; protected set; }
+
+        /// <summary>
         /// Add any custom fields to this <see cref="BDictionary"/> and they will
         /// be merged with the torrent data when encoded.
         /// </summary>

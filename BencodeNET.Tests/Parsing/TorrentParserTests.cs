@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using BencodeNET.Exceptions;
 using BencodeNET.IO;
@@ -554,6 +553,36 @@ namespace BencodeNET.Tests.Parsing
             // Assert
             action.ShouldThrow<InvalidTorrentException>()
                 .Where(ex => ex.InvalidField == TorrentFilesFields.Path);
+        }
+
+        [Fact]
+        public void OriginalInfoHash_IsSet()
+        {
+            // Arrange
+            ParsedData = ValidSingleFileTorrentData;
+            var expectedInfoHash = TorrentUtil.CalculateInfoHash(ParsedData.Get<BDictionary>("info"));
+
+            // Act
+            var parser = new TorrentParser(BencodeParser);
+            var torrent = parser.Parse((BencodeStream) null);
+
+            // Assert
+            torrent.OriginalInfoHash.Should().Be(expectedInfoHash);
+        }
+
+        [Fact]
+        public void OriginalInfoHashBytes_IsSet()
+        {
+            // Arrange
+            ParsedData = ValidSingleFileTorrentData;
+            var expectedInfoHashBytes = TorrentUtil.CalculateInfoHashBytes(ParsedData.Get<BDictionary>("info"));
+
+            // Act
+            var parser = new TorrentParser(BencodeParser);
+            var torrent = parser.Parse((BencodeStream) null);
+
+            // Assert
+            torrent.OriginalInfoHashBytes.Should().Equal(expectedInfoHashBytes);
         }
     }
 }

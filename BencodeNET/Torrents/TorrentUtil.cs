@@ -54,8 +54,7 @@ namespace BencodeNET.Torrents
         public static string CalculateInfoHash(BDictionary info)
         {
             var hashBytes = CalculateInfoHashBytes(info);
-
-            return BitConverter.ToString(hashBytes).Replace("-", "");
+            return BytesToHexString(hashBytes);
         }
 
         /// <summary>
@@ -77,6 +76,15 @@ namespace BencodeNET.Torrents
 
                 return sha1.ComputeHash(stream);
             }
+        }
+
+        /// <summary>
+        /// Converts the byte array to a hexadecimal string representation without hyphens.
+        /// </summary>
+        /// <param name="bytes"></param>
+        public static string BytesToHexString(byte[] bytes)
+        {
+            return BitConverter.ToString(bytes).Replace("-", "");
         }
 
         /// <summary>
