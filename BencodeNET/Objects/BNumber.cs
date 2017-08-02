@@ -72,6 +72,13 @@ namespace BencodeNET.Objects
         public static implicit operator DateTime?(BNumber number)
         {
             if (number == null) return null;
+
+            if (number.Value > int.MaxValue)
+            {
+                // Assuming unix timestamp is in milliseconds instead of seconds
+                return Epoch.AddMilliseconds(number);
+            }
+
             return Epoch.AddSeconds(number);
         }
 
