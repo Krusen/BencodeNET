@@ -15,15 +15,33 @@ namespace BencodeNET.Parsing
     public class TorrentParser : BObjectParser<Torrent>
     {
         /// <summary>
+        /// The parsing mode used when parsing torrents.
+        /// You can use <see cref="TorrentParserMode.Tolerant"/> if your torrent files are not always following the torrent specification.
+        /// </summary>
+        public TorrentParserMode ParseMode { get; set; }
+
+        /// <summary>
         /// Creates an instance using the specified <see cref="IBencodeParser"/> for parsing
         /// the torrent <see cref="BDictionary"/>.
         /// </summary>
         /// <param name="bencodeParser">The parser used for parsing the torrent <see cref="BDictionary"/>.</param>
         public TorrentParser(IBencodeParser bencodeParser)
+            : this(bencodeParser, TorrentParserMode.Strict)
+        {
+        }
+
+        /// <summary>
+        /// Creates an instance using the specified <see cref="IBencodeParser"/> for parsing
+        /// the torrent <see cref="BDictionary"/>.
+        /// </summary>
+        /// <param name="bencodeParser">The parser used for parsing the torrent <see cref="BDictionary"/>.</param>
+        /// <param name="torrentParserMode">The parsing mode to use.</param>
+        public TorrentParser(IBencodeParser bencodeParser, TorrentParserMode torrentParserMode)
         {
             if (bencodeParser == null) throw new ArgumentNullException(nameof(bencodeParser));
 
             BencodeParser = bencodeParser;
+            ParseMode = torrentParserMode;
         }
 
         /// <summary>
@@ -54,7 +72,8 @@ namespace BencodeNET.Parsing
         /// <returns>A <see cref="Torrent"/> matching the input.</returns>
         protected Torrent CreateTorrent(BDictionary data)
         {
-            EnsureValidTorrentData(data);
+            if (ParseMode == TorrentParserMode.Strict)
+                EnsureValidTorrentData(data);
 
             var info = data.Get<BDictionary>(TorrentFields.Info);
 

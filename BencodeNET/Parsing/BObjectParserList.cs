@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using BencodeNET.Objects;
 
 namespace BencodeNET.Parsing
@@ -119,6 +120,16 @@ namespace BencodeNET.Parsing
         }
 
         /// <summary>
+        /// Gets the specific parser of the type specified or null if not found.
+        /// </summary>
+        /// <typeparam name="T">The parser type to get.</typeparam>
+        /// <returns>The parser of the specified type or null if there isn't one.</returns>
+        public T GetSpecific<T>() where T : class, IBObjectParser
+        {
+            return Parsers.FirstOrDefault(x => x.Value is T).Value as T;
+        }
+
+        /// <summary>
         /// Removes the parser for the specified type.
         /// </summary>
         /// <param name="type">The type to remove the parser for.</param>
@@ -136,7 +147,6 @@ namespace BencodeNET.Parsing
         /// Empties the collection.
         /// </summary>
         public void Clear() => Parsers.Clear();
-
 
         /// <summary>
         /// Returns an enumerator that iterates through the collection.
