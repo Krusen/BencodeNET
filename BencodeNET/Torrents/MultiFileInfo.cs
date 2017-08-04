@@ -41,14 +41,8 @@ namespace BencodeNET.Torrents
         /// </summary>
         public string FullPath
         {
-            get
-            {
-                return string.Join(System.IO.Path.DirectorySeparatorChar.ToString(), Path);
-            }
-            set
-            {
-                Path = value.Split(new[] { System.IO.Path.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
-            }
+            get => string.Join(System.IO.Path.DirectorySeparatorChar.ToString(), Path);
+            set => Path = value.Split(new[] { System.IO.Path.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
         }
     }
 }

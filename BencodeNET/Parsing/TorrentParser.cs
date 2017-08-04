@@ -185,7 +185,7 @@ namespace BencodeNET.Parsing
             if (!info.ContainsKey(TorrentInfoFields.Length))
                 return null;
 
-                return new SingleFileInfo
+            return new SingleFileInfo
             {
                 FileName = info.Get<BString>(TorrentInfoFields.Name)?.ToString(encoding),
                 FileSize = info.Get<BNumber>(TorrentInfoFields.Length),
@@ -278,22 +278,14 @@ namespace BencodeNET.Parsing
         // TODO: Unit tests
         private void FixEncoding(IBObject bobject, Encoding encoding)
         {
-            var dictionary = bobject as BDictionary;
-            if (dictionary != null)
+            switch (bobject)
             {
-                FixEncodingInDictionary(dictionary, encoding);
-            }
-
-            var list = bobject as BList;
-            if (list != null)
-            {
-                FixEncodingInList(list, encoding);
-            }
-
-            var value = bobject as BString;
-            if (value != null)
-            {
-                value.Encoding = encoding;
+                case BDictionary dictionary:
+                    FixEncodingInDictionary(dictionary, encoding); break;
+                case BList list:
+                    FixEncodingInList(list, encoding); break;
+                case BString str:
+                    str.Encoding = encoding; break;
             }
         }
 

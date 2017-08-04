@@ -39,8 +39,8 @@ namespace BencodeNET.Objects
         /// <exception cref="ArgumentNullException"></exception>
         public Encoding Encoding
         {
-            get { return _encoding; }
-            set { _encoding = value ?? DefaultEncoding; }
+            get => _encoding;
+            set => _encoding = value ?? DefaultEncoding;
         }
         private Encoding _encoding;
 
@@ -111,8 +111,7 @@ namespace BencodeNET.Objects
 
         public override bool Equals(object other)
         {
-            var bstring = other as BString;
-            if (bstring != null)
+            if (other is BString bstring)
                 return Value.SequenceEqual(bstring.Value);
 
             return false;

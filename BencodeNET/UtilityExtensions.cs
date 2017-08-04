@@ -14,7 +14,7 @@ namespace BencodeNET
     {
         public static bool IsDigit(this char c)
         {
-            return (c >= '0' && c <= '9');
+            return c >= '0' && c <= '9';
         }
 
         public static MemoryStream AsStream(this string str, Encoding encoding)
@@ -24,10 +24,7 @@ namespace BencodeNET
 
         public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
         {
-            TValue value;
-            if (dictionary.TryGetValue(key, out value))
-                return value;
-            return default(TValue);
+            return dictionary.TryGetValue(key, out TValue value) ? value : default(TValue);
         }
 
         public static void Write(this Stream stream, char c)

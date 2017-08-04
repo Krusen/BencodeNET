@@ -169,10 +169,7 @@ namespace BencodeNET.Torrents
         /// </summary>
         public virtual string PiecesAsHexString
         {
-            get
-            {
-                return BitConverter.ToString(Pieces).Replace("-", "");
-            }
+            get => BitConverter.ToString(Pieces).Replace("-", "");
             set
             {
                 if (value?.Length % 40 != 0)

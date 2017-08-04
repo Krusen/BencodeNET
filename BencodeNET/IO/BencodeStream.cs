@@ -75,7 +75,7 @@ namespace BencodeNET.IO
         /// </summary>
         public long Position
         {
-            get { return InnerStream.Position; }
+            get => InnerStream.Position;
             set
             {
                 _hasPeeked = false;

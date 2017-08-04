@@ -60,6 +60,7 @@ namespace BencodeNET.Parsing
 
             if (Parsers.ContainsKey(type))
                 Parsers.Remove(type);
+
             Parsers.Add(type, parser);
         }
 
@@ -105,8 +106,8 @@ namespace BencodeNET.Parsing
         /// <returns>The parser for the specified type or null if there isn't one.</returns>
         public IBObjectParser this[Type type]
         {
-            get { return Get(type); }
-            set { AddOrReplace(type, value); }
+            get => Get(type);
+            set => AddOrReplace(type, value);
         }
 
         /// <summary>
