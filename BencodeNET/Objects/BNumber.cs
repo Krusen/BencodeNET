@@ -75,8 +75,14 @@ namespace BencodeNET.Objects
 
             if (number.Value > int.MaxValue)
             {
-                // Assuming unix timestamp is in milliseconds instead of seconds
-                return Epoch.AddMilliseconds(number);
+                try
+                {
+                    return Epoch.AddMilliseconds(number);
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    return Epoch;
+                }
             }
 
             return Epoch.AddSeconds(number);

@@ -115,6 +115,22 @@ namespace BencodeNET.Tests.Parsing
         }
 
         [Theory]
+        [AutoMockedData]
+        public void CreationDate_InvalidValue_ReturnsEpoch()
+        {
+            // Arrange
+            ParsedData = ValidSingleFileTorrentData;
+            ParsedData[TorrentFields.CreationDate] = (BNumber) long.MaxValue;
+
+            // Act
+            var parser = new TorrentParser(BencodeParser);
+            var torrent = parser.Parse((BencodeStream) null);
+
+            // Assert
+            torrent.CreationDate.Should().Be(new DateTime(1970, 1, 1));
+        }
+
+        [Theory]
         [InlineAutoMockedData("utf8")]
         [InlineAutoMockedData("UTF8")]
         [InlineAutoMockedData("utf-8")]
