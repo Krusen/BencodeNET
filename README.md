@@ -3,6 +3,7 @@ BencodeNET
 [![AppVeyor](https://ci.appveyor.com/api/projects/status/pikvrmie3ibsk6pt/branch/master?svg=true)](https://ci.appveyor.com/project/Krusen/bencodenet)
 [![Coverage](https://coveralls.io/repos/github/Krusen/BencodeNET/badge.svg?branch=master)](https://coveralls.io/github/Krusen/BencodeNET?branch=master)
 [![NuGet](https://buildstats.info/nuget/bencodenet?includePreReleases=false)](https://www.nuget.org/packages/BencodeNET/)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bhttps%3A%2F%2Fgithub.com%2FKrusen%2FBencodeNET.svg?type=shield)](https://app.fossa.io/projects/git%2Bhttps%3A%2F%2Fgithub.com%2FKrusen%2FBencodeNET?ref=badge_shield)
 
 A .NET library for encoding and decoding bencode.
 
@@ -233,3 +234,7 @@ BDictionary bdictionary = parser.ParseString<BDictionary>("d3:fooi42e5:Hello6:Wo
 // If you don't know the type you are parsing, you can use the non-generic method
 IBObject bobject = parser.ParseString("12:Hellow World!");
 ```
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bhttps%3A%2F%2Fgithub.com%2FKrusen%2FBencodeNET.svg?type=large)](https://app.fossa.io/projects/git%2Bhttps%3A%2F%2Fgithub.com%2FKrusen%2FBencodeNET?ref=badge_large)
