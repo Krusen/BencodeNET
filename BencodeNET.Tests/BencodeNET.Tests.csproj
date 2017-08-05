@@ -9,6 +9,9 @@
     <None Update="Files\ubuntu-14.10-desktop-amd64.iso.torrent">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="xunit.runner.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -23,11 +26,11 @@
     <PackageReference Include="AutoFixture.Xunit2" Version="3.50.3" />
     <PackageReference Include="FluentAssertions" Version="4.19.3" />
     <PackageReference Include="NSubstitute" Version="2.0.3" />
-    <PackageReference Include="xunit" Version="2.2.0" />
-    <PackageReference Include="xunit.core" Version="2.2.0" />
-    <PackageReference Include="xunit.extensibility.execution" Version="2.2.0" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
-    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.0-beta1-build3642" />
+    <PackageReference Include="xunit" Version="2.3.0-beta3-build3705" />
+    <PackageReference Include="xunit.core" Version="2.3.0-beta3-build3705" />
+    <PackageReference Include="xunit.extensibility.execution" Version="2.3.0-beta3-build3705" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0-beta3-build3705" />
+    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.0-beta3-build3705" />
   </ItemGroup>
 
   <ItemGroup>

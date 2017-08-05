@@ -6,6 +6,11 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
+  <!-- Needed for code coverage -->
+  <PropertyGroup>
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+
   <PropertyGroup>
     <PackageId>BencodeNET</PackageId>
     <Version>2.2.0</Version>
