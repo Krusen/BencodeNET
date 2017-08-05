@@ -13,7 +13,7 @@
 
   <PropertyGroup>
     <PackageId>BencodeNET</PackageId>
-    <Version>2.2.0</Version>
+    <Version>$(SemVer)</Version>
     <Authors>Søren Kruse</Authors>
     <Company />
     <Product>BencodeNET</Product>

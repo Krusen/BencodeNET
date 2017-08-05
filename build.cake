@@ -1,7 +1,10 @@
+// For inspiration see: https://github.com/Jericho/Picton/blob/develop/build.cake
+
 // Install addins.
 #addin "nuget:?package=Cake.Coveralls&version=0.5.0"
 
 // Install tools.
+#tool "nuget:?package=GitVersion.CommandLine&version=4.0.0-beta0012"
 #tool "nuget:?package=OpenCover&version=4.6.519"
 #tool "nuget:?package=coveralls.io&version=1.3.4"
 #tool "nuget:?package=xunit.runner.console&version=2.2.0"
@@ -23,14 +26,20 @@ var libraryName = "BencodeNET";
 
 var sourceFolder = "./";
 
-var projectFile = "./BencodeNET/BencodeNET.csproj";
-
 var testProjectFile = "./BencodeNET.Tests/BencodeNET.Tests.csproj";
 var codeCoverageOutput = "coverage.xml";
 var codeCoverageFilter = "+[*]* -[*.Tests]*";
 
+var versionInfo = GitVersion(new GitVersionSettings() { OutputType = GitVersionOutput.Json });
+var milestone = string.Concat("v", versionInfo.MajorMinorPatch);
 var cakeVersion = typeof(ICakeContext).Assembly.GetName().Version.ToString();
 
+var isLocalBuild = BuildSystem.IsLocalBuild;
+var	isPullRequest = BuildSystem.AppVeyor.Environment.PullRequest.IsPullRequest;
+var	isTagged = (
+    BuildSystem.AppVeyor.Environment.Repository.Tag.IsTag &&
+    !string.IsNullOrWhiteSpace(BuildSystem.AppVeyor.Environment.Repository.Tag.Name)
+);
 
 ///////////////////////////////////////////////////////////////////////////////
 // SETUP / TEARDOWN
@@ -38,7 +47,18 @@ var cakeVersion = typeof(ICakeContext).Assembly.GetName().Version.ToString();
 
 Setup(context =>
 {
-    Information($"Building using version {cakeVersion} of Cake");
+    Information($"Building version {versionInfo.NuGetVersionV2} of {libraryName} using version {cakeVersion} of Cake");
+
+    Information("Variables:\r\n"
+        + $"\tIsLocalBuild: {isLocalBuild}\r\n"
+        + $"\tIsPullRequest: {isPullRequest}\r\n"
+        + $"\tIsTagged: {isTagged}"
+    );
+
+    Information("GitVersion:\r\n"
+        + $"\tNuGetVersionV2: {versionInfo.NuGetVersionV2}\r\n"
+        + $"\tFullSemVer: {versionInfo.FullSemVer}"
+    );
 });
 
 
@@ -46,26 +66,11 @@ Setup(context =>
 // TASK DEFINITIONS
 ///////////////////////////////////////////////////////////////////////////////
 
-Task("Update-Build-Version")
+Task("AppVeyor_Set-Build-Version")
     .WithCriteria(() => AppVeyor.IsRunningOnAppVeyor)
     .Does(() =>
 {
-    var versionPeekXpath = "/Project/PropertyGroup/Version/text()";
-    var versionPokeXpath = "/Project/PropertyGroup/Version";
-
-    var buildNumber = AppVeyor.Environment.Build.Number;
-    var version = XmlPeek(projectFile, versionPeekXpath);
-
-    Information("AppVeyor build version is " + AppVeyor.Environment.Build.Version);
-    Information("Project version is " + version);
-
-    var parts = version.Split('.');
-    version = string.Join(".", parts[0], parts[1], buildNumber);
-
-    Information("Changing versions to " + version);
-
-    AppVeyor.UpdateBuildVersion(version);
-    XmlPoke(projectFile, versionPokeXpath, version);
+    AppVeyor.UpdateBuildVersion(versionInfo.FullSemVer);
 });
 
 Task("Restore-NuGet-Packages")
@@ -80,7 +85,8 @@ Task("Build")
 {
     DotNetCoreBuild(sourceFolder + libraryName + ".sln", new DotNetCoreBuildSettings
     {
-        Configuration = configuration
+        Configuration = configuration,
+        ArgumentCustomization = args => args.Append("/p:SemVer=" + versionInfo.NuGetVersionV2)
     });
 });
 
@@ -118,6 +124,7 @@ Task("Run-Code-Coverage")
 });
 
 Task("Upload-Coverage-Result")
+    .WithCriteria(() => !isLocalBuild)
     .Does(() =>
 {
     CoverallsIo(codeCoverageOutput);
@@ -129,7 +136,7 @@ Task("Upload-Coverage-Result")
 ///////////////////////////////////////////////////////////////////////////////
 
 Task("AppVeyor")
-    .IsDependentOn("Update-Build-Version")
+    .IsDependentOn("AppVeyor_Set-Build-Version")
     .IsDependentOn("Run-Code-Coverage")
     .IsDependentOn("Upload-Coverage-Result");
 
