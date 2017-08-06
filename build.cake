@@ -47,7 +47,7 @@ var	isTagged = (
 
 Setup(context =>
 {
-    Information($"Building version {versionInfo.NuGetVersionV2} of {libraryName} using version {cakeVersion} of Cake");
+    Information($"Building version {versionInfo.SemVer} of {libraryName} using version {cakeVersion} of Cake");
 
     Information("Variables:\r\n"
         + $"\tIsLocalBuild: {isLocalBuild}\r\n"
@@ -56,12 +56,11 @@ Setup(context =>
     );
 
     Information("GitVersion:\r\n"
+        + $"\tSemVer: {versionInfo.SemVer}\r\n"
+        + $"\tLegacySemVer: {versionInfo.LegacySemVer}\r\n"
         + $"\tNuGetVersionV2: {versionInfo.NuGetVersionV2}\r\n"
         + $"\tFullSemVer: {versionInfo.FullSemVer}"
     );
-
-    Information("Setting environment variable NUGET_PACKAGE_VERSION to " + versionInfo.NuGetVersionV2);
-    Environment.SetEnvironmentVariable("NUGET_PACKAGE_VERSION", versionInfo.NuGetVersionV2);
 });
 
 
@@ -73,7 +72,9 @@ Task("AppVeyor_Set-Build-Version")
     .WithCriteria(() => AppVeyor.IsRunningOnAppVeyor)
     .Does(() =>
 {
-    AppVeyor.UpdateBuildVersion(versionInfo.FullSemVer);
+    var version = $"{versionInfo.SemVer}+{AppVeyor.Environment.Build.Number}";
+    Information("Setting AppVeyor build version to " + version);
+    AppVeyor.UpdateBuildVersion(version);
 });
 
 Task("Restore-NuGet-Packages")
@@ -89,7 +90,7 @@ Task("Build")
     DotNetCoreBuild(sourceFolder + libraryName + ".sln", new DotNetCoreBuildSettings
     {
         Configuration = configuration,
-        ArgumentCustomization = args => args.Append("/p:SemVer=" + versionInfo.NuGetVersionV2)
+        ArgumentCustomization = args => args.Append("/p:SemVer=" + versionInfo.SemVer)
     });
 });
 
