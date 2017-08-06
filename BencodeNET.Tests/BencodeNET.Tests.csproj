@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net452</TargetFramework>
-    <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,8 +18,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
     <PackageReference Include="AutoFixture" Version="3.50.3" />
     <PackageReference Include="AutoFixture.AutoNSubstitute" Version="3.50.3" />
     <PackageReference Include="AutoFixture.Xunit2" Version="3.50.3" />
@@ -31,10 +28,6 @@
     <PackageReference Include="xunit.extensibility.execution" Version="2.3.0-beta3-build3705" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0-beta3-build3705" />
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.0-beta3-build3705" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
 
 </Project>
