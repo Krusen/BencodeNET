@@ -59,6 +59,9 @@ Setup(context =>
         + $"\tNuGetVersionV2: {versionInfo.NuGetVersionV2}\r\n"
         + $"\tFullSemVer: {versionInfo.FullSemVer}"
     );
+
+    Information("Setting environment variable NUGET_PACKAGE_VERSION to " + versionInfo.NuGetVersionV2);
+    Environment.SetEnvironmentVariable("NUGET_PACKAGE_VERSION", versionInfo.NuGetVersionV2);
 });
 
 
