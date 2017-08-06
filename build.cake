@@ -30,9 +30,11 @@ var testProjectFile = "./BencodeNET.Tests/BencodeNET.Tests.csproj";
 var codeCoverageOutput = "coverage.xml";
 var codeCoverageFilter = "+[*]* -[*.Tests]*";
 
+var cakeVersion = typeof(ICakeContext).Assembly.GetName().Version.ToString();
 var versionInfo = GitVersion(new GitVersionSettings() { OutputType = GitVersionOutput.Json });
 var milestone = string.Concat("v", versionInfo.MajorMinorPatch);
-var cakeVersion = typeof(ICakeContext).Assembly.GetName().Version.ToString();
+var buildVersion = $"{versionInfo.SemVer}+{AppVeyor.Environment.Build.Number}";
+var packageVersion = versionInfo.LegacySemVer;
 
 var isLocalBuild = BuildSystem.IsLocalBuild;
 var	isPullRequest = BuildSystem.AppVeyor.Environment.PullRequest.IsPullRequest;
@@ -47,19 +49,19 @@ var	isTagged = (
 
 Setup(context =>
 {
-    Information($"Building version {versionInfo.SemVer} of {libraryName} using version {cakeVersion} of Cake");
+    Information($"Building version {versionInfo.SemVer} of {libraryName} using version {cakeVersion} of Cake" + Environment.NewLine);
 
-    Information("Variables:\r\n"
-        + $"\tIsLocalBuild: {isLocalBuild}\r\n"
-        + $"\tIsPullRequest: {isPullRequest}\r\n"
-        + $"\tIsTagged: {isTagged}"
+    Information("Variables:" + Environment.NewLine
+        + $"\t IsLocalBuild: {isLocalBuild}" + Environment.NewLine
+        + $"\t IsPullRequest: {isPullRequest}" + Environment.NewLine
+        + $"\t IsTagged: {isTagged}" + Environment.NewLine
     );
 
-    Information("GitVersion:\r\n"
-        + $"\tSemVer: {versionInfo.SemVer}\r\n"
-        + $"\tLegacySemVer: {versionInfo.LegacySemVer}\r\n"
-        + $"\tNuGetVersionV2: {versionInfo.NuGetVersionV2}\r\n"
-        + $"\tFullSemVer: {versionInfo.FullSemVer}"
+    Information("Versions:" + Environment.NewLine
+        + $"\t Milestone: {milestone}" + Environment.NewLine
+        + $"\t BuildNumber: {AppVeyor.Environment.Build.Number}" + Environment.NewLine
+        + $"\t BuildVersion: {buildVersion}" + Environment.NewLine
+        + $"\t PackageVersion: {packageVersion}" + Environment.NewLine
     );
 });
 
@@ -72,9 +74,7 @@ Task("AppVeyor_Set-Build-Version")
     .WithCriteria(() => AppVeyor.IsRunningOnAppVeyor)
     .Does(() =>
 {
-    var version = $"{versionInfo.SemVer}+{AppVeyor.Environment.Build.Number}";
-    Information("Setting AppVeyor build version to " + version);
-    AppVeyor.UpdateBuildVersion(version);
+    AppVeyor.UpdateBuildVersion(buildVersion);
 });
 
 Task("Restore-NuGet-Packages")
@@ -90,7 +90,7 @@ Task("Build")
     DotNetCoreBuild(sourceFolder + libraryName + ".sln", new DotNetCoreBuildSettings
     {
         Configuration = configuration,
-        ArgumentCustomization = args => args.Append("/p:SemVer=" + versionInfo.SemVer)
+        ArgumentCustomization = args => args.Append("/p:SemVer=" + packageVersion)
     });
 });
 
