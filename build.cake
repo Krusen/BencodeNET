@@ -34,7 +34,7 @@ var cakeVersion = typeof(ICakeContext).Assembly.GetName().Version.ToString();
 var versionInfo = GitVersion(new GitVersionSettings() { OutputType = GitVersionOutput.Json });
 var milestone = string.Concat("v", versionInfo.MajorMinorPatch);
 var buildVersion = $"{versionInfo.SemVer}+{AppVeyor.Environment.Build.Number}";
-var packageVersion = versionInfo.LegacySemVer;
+var packageVersion = versionInfo.SemVer;
 
 var isLocalBuild = BuildSystem.IsLocalBuild;
 var	isPullRequest = BuildSystem.AppVeyor.Environment.PullRequest.IsPullRequest;
@@ -49,7 +49,7 @@ var	isTagged = (
 
 Setup(context =>
 {
-    Information($"Building version {versionInfo.SemVer} of {libraryName} using version {cakeVersion} of Cake" + Environment.NewLine);
+    Information($"Building version {packageVersion} of {libraryName} using version {cakeVersion} of Cake" + Environment.NewLine);
 
     Information("Variables:" + Environment.NewLine
         + $"\t IsLocalBuild: {isLocalBuild}" + Environment.NewLine
