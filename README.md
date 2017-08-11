@@ -62,7 +62,7 @@ byte[] infoHashBytes = torrent.GetInfoHashBytes();
 string magnetLink = torrent.GetMagnetLink();
 // magnet:?xt=urn:btih:1CA512A4822EDC7C1B1CE354D7B8D2F84EE11C32&dn=ubuntu-14.10-desktop-amd64.iso&tr=http://torrent.ubuntu.com:6969/announce&tr=http://ipv6.torrent.ubuntu.com:6969/announce
 
-// Convert Torrent to it's BDictionary representation
+// Convert Torrent to its BDictionary representation
 BDictionary bencode = torrent.ToBDictionary();
 ```
 
