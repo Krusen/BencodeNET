@@ -82,8 +82,7 @@ namespace BencodeNET.Tests.Parsing
             torrent.CreatedBy.Should().Be(createdBy);
         }
 
-        [Theory]
-        [AutoMockedData]
+        [Fact]
         public void CreationDate_IsParsed()
         {
             // Arrange
@@ -98,8 +97,7 @@ namespace BencodeNET.Tests.Parsing
             torrent.CreationDate.Should().Be(new DateTime(2016, 1, 1));
         }
 
-        [Theory]
-        [AutoMockedData]
+        [Fact]
         public void CreationDate_UnixTimeInMilliseconds_IsParsed()
         {
             // Arrange
@@ -114,8 +112,7 @@ namespace BencodeNET.Tests.Parsing
             torrent.CreationDate.Should().Be(new DateTime(2016, 1, 1));
         }
 
-        [Theory]
-        [AutoMockedData]
+        [Fact]
         public void CreationDate_InvalidValue_ReturnsEpoch()
         {
             // Arrange

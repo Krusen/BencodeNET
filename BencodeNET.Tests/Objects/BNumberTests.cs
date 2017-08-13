@@ -210,6 +210,7 @@ namespace BencodeNET.Tests.Objects
             boolean.Should().BeTrue();
         }
 
+        [Fact]
         public void CastingToBool_Null_ThrowsInvalidCastException()
         {
             BNumber bnumber = null;

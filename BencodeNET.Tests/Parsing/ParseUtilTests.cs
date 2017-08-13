@@ -6,7 +6,8 @@ namespace BencodeNET.Tests.Parsing
 {
     public class ParseUtilTests
     {
-        public void asd()
+        [Fact]
+        public void TryParseLongFast_CanParseSimple()
         {
             long value;
             ParseUtil.TryParseLongFast("123", out value);
