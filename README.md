@@ -1,5 +1,6 @@
 BencodeNET 
 ==========
+[![license](https://img.shields.io/badge/license-Unlicense-blue.svg)](https://github.com/Krusen/BencodeNET/blob/master/LICENSE.md)
 [![AppVeyor](https://ci.appveyor.com/api/projects/status/pikvrmie3ibsk6pt/branch/master?svg=true)](https://ci.appveyor.com/project/Krusen/bencodenet)
 [![Coverage](https://coveralls.io/repos/github/Krusen/BencodeNET/badge.svg?branch=master)](https://coveralls.io/github/Krusen/BencodeNET?branch=master)
 [![CodeFactor](https://www.codefactor.io/repository/github/krusen/bencodenet/badge)](https://www.codefactor.io/repository/github/krusen/bencodenet)
