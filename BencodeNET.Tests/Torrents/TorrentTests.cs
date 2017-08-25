@@ -276,6 +276,46 @@ namespace BencodeNET.Tests.Torrents
             result.Should().NotContainKey(TorrentFields.AnnounceList);
         }
 
+        [Fact]
+        public void ToBDictionary_Announce_SingleTracker_AnnounceMustBeAString()
+        {
+            var torrent = new Torrent
+            {
+                Trackers = new List<IList<string>>
+                {
+                    new List<string>
+                    {
+                        "http://sometracker.com"
+                    }
+                }
+            };
+
+            var result = torrent.ToBDictionary();
+            result[TorrentFields.Announce].Should().BeAssignableTo<BString>();
+        }
+
+        [Fact]
+        public void ToBDictionary_Announce_MultipleTrackers_AddAnnounceAndAnnounceList()
+        {
+            const string firstTracker = "http://sometracker.com";
+            var torrent = new Torrent
+            {
+                Trackers = new List<IList<string>>
+                {
+                    new List<string>
+                    {
+                        firstTracker,
+                        "http://someothertracker.com"
+                    }
+                }
+            };
+
+            var result = torrent.ToBDictionary();
+            result.Should().ContainKey(TorrentFields.Announce);
+            result.Should().ContainKey(TorrentFields.AnnounceList);
+            result[TorrentFields.Announce].ToString().Should().Be(firstTracker);
+        }
+
         [Theory]
         [AutoMockedData]
         public void ToBDictionary_Comment_AddsToCorrectField(string comment)
