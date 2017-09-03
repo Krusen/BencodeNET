@@ -64,7 +64,10 @@ namespace BencodeNET.Parsing
             }
 
             if (stream.ReadChar() != 'e')
+            {
+                if (stream.EndOfStream) throw InvalidBencodeException<BList>.MissingEndChar();
                 throw InvalidBencodeException<BList>.InvalidEndChar(stream.ReadPreviousChar(), stream.Position);
+            }
 
             return list;
         }

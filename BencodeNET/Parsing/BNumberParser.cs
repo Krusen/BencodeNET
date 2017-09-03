@@ -51,7 +51,10 @@ namespace BencodeNET.Parsing
 
             // Last read character should be 'e'
             if (c != 'e')
+            {
+                if (stream.EndOfStream) throw InvalidBencodeException<BNumber>.MissingEndChar();
                 throw InvalidBencodeException<BNumber>.InvalidEndChar(c, stream.Position);
+            }
 
             var isNegative = digits[0] == '-';
             var numberOfDigits = isNegative ? digits.Length - 1 : digits.Length;
