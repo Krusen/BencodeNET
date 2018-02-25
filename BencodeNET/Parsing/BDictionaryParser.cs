@@ -80,8 +80,14 @@ namespace BencodeNET.Parsing
                 catch (BencodeException ex)
                 {
                     throw InvalidException(
-                        "Could not parse dictionary value. There needs to be a value for each key.",
+                        $"Could not parse dictionary value for the key '{key}'. There needs to be a value for each key.",
                         ex, startPosition);
+                }
+
+                if (dictionary.ContainsKey(key))
+                {
+                    throw InvalidException(
+                        $"The dictionary already contains the key '{key}'. Duplicate keys are not supported.", startPosition);
                 }
 
                 dictionary.Add(key, value);
@@ -94,6 +100,12 @@ namespace BencodeNET.Parsing
             }
 
             return dictionary;
+        }
+
+        private static InvalidBencodeException<BDictionary> InvalidException(string message, long startPosition)
+        {
+            return new InvalidBencodeException<BDictionary>(
+                $"{message} The dictionary starts at position {startPosition}.", startPosition);
         }
 
         private static InvalidBencodeException<BDictionary> InvalidException(string message, Exception inner, long startPosition)
