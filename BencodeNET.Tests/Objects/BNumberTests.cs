@@ -160,6 +160,39 @@ namespace BencodeNET.Tests.Objects
         }
 
         [Fact]
+        public void CanCastFromInt()
+        {
+            int number = 12345;
+            var bnumber = (BNumber)number;
+            bnumber.Should().Be(12345);
+        }
+
+        [Fact]
+        public void CanCastFromLong()
+        {
+            long number = 12345;
+            var bnumber = (BNumber)number;
+            bnumber.Should().Be(12345);
+        }
+
+        [Fact]
+        public void CanCastFromNullableInt()
+        {
+            int? number = null;
+            var bnumber = (BNumber)number;
+            bnumber.Should().BeNull();
+        }
+
+        [Fact]
+        public void CanCastFromNullableLong()
+        {
+            long? number = null;
+            var bnumber = (BNumber)number;
+            bnumber.Should().BeNull();
+        }
+
+
+        [Fact]
         public void CanCastFromDateTime()
         {
             var bnumber = (BNumber) new DateTime(2016, 1, 1);
