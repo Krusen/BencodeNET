@@ -1,8 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net45;netstandard1.3</TargetFrameworks>
-    <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
+    <TargetFrameworks>net45;netstandard1.3;netstandard2.0</TargetFrameworks>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
@@ -18,7 +17,7 @@
     <Company />
     <Product>BencodeNET</Product>
     <Description>A library for encoding and decoding bencode (e.g. torrent files)</Description>
-    <PackageLicenseUrl>https://github.com/Krusen/BencodeNET/blob/master/LICENSE.md</PackageLicenseUrl>
+    <PackageLicenseExpression>Unlicense</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/Krusen/BencodeNET</PackageProjectUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/Krusen/BencodeNET/master/Assets/icon.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/Krusen/BencodeNET</RepositoryUrl>
@@ -30,13 +29,10 @@
     <IncludeSymbols>True</IncludeSymbols>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-    <DefineConstants>$(DefineConstants);NETSTANDARD</DefineConstants>
-  </PropertyGroup>
-
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-    <PackageReference Include="System.Reflection" Version="4.1.0" />
-    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.2.0" />
+    <PackageReference Update="NETStandard.Library" PrivateAssets="all" />
+    <PackageReference Include="System.Reflection" Version="4.3.0" />
+    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.0" />
   </ItemGroup>
 
 </Project>

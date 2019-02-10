@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-#if NETSTANDARD
+#if NETSTANDARD1_3
 using System;
 using System.Reflection;
 #endif
@@ -37,7 +37,7 @@ namespace BencodeNET
             return source.SelectMany(x => x);
         }
 
-#if NETSTANDARD
+#if NETSTANDARD1_3
         public static bool IsAssignableFrom(this Type type, Type otherType)
         {
             return type.GetTypeInfo().IsAssignableFrom(otherType.GetTypeInfo());
