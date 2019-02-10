@@ -51,7 +51,7 @@ namespace BencodeNET.Tests.Torrents
         {
             Action action = () => TorrentUtil.CreateMagnetLink(infoHash, null, null, MagnetLinkOptions.None);
 
-            action.ShouldThrow<ArgumentException>("because a Magnet link is invalid without an info hash.");
+            action.Should().Throw<ArgumentException>("because a Magnet link is invalid without an info hash.");
         }
 
         [Theory]

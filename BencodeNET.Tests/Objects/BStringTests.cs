@@ -14,7 +14,7 @@ namespace BencodeNET.Tests.Objects
         {
             Action action = () => new BString((string) null);
 
-            action.ShouldThrow<ArgumentNullException>();
+            action.Should().Throw<ArgumentNullException>();
         }
 
         [Theory]

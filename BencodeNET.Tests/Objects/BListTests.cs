@@ -14,7 +14,7 @@ namespace BencodeNET.Tests.Objects
         {
             var blist = new BList();
             Action action = () => blist.Add((IBObject) null);
-            action.ShouldThrow<ArgumentNullException>();
+            action.Should().Throw<ArgumentNullException>();
         }
 
         [Fact]
@@ -34,7 +34,7 @@ namespace BencodeNET.Tests.Objects
         {
             var blist = new BList {0};
             Action action = () => blist[0] = null;
-            action.ShouldThrow<ArgumentNullException>();
+            action.Should().Throw<ArgumentNullException>();
         }
 
         [Fact]
@@ -155,7 +155,7 @@ namespace BencodeNET.Tests.Objects
         {
             var blist = new BList {1, "2", 3};
             Action action = () => blist.AsType<BNumber>();
-            action.ShouldThrow<InvalidCastException>();
+            action.Should().Throw<InvalidCastException>();
         }
 
         [Fact]
@@ -173,7 +173,7 @@ namespace BencodeNET.Tests.Objects
         {
             var blist = new BList {"a", "b", 3};
             Action action = () => blist.AsStrings();
-            action.ShouldThrow<InvalidCastException>();
+            action.Should().Throw<InvalidCastException>();
         }
 
         [Fact]
@@ -191,7 +191,7 @@ namespace BencodeNET.Tests.Objects
         {
             var blist = new BList {1, 2, "3"};
             Action action = () => blist.AsNumbers();
-            action.ShouldThrow<InvalidCastException>();
+            action.Should().Throw<InvalidCastException>();
         }
     }
 }

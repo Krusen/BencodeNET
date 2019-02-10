@@ -14,7 +14,7 @@ namespace BencodeNET.Tests.Objects
         {
             var dict = new BDictionary();
             Action action = () => dict.Add("key", null);
-            action.ShouldThrow<ArgumentNullException>();
+            action.Should().Throw<ArgumentNullException>();
         }
 
         [Fact]
@@ -22,7 +22,7 @@ namespace BencodeNET.Tests.Objects
         {
             var dict = new BDictionary();
             Action action = () => dict.Add("key", (IBObject)null);
-            action.ShouldThrow<ArgumentNullException>();
+            action.Should().Throw<ArgumentNullException>();
         }
 
         [Fact]
@@ -30,7 +30,7 @@ namespace BencodeNET.Tests.Objects
         {
             var dict = new BDictionary();
             Action action = () => dict.Add(new KeyValuePair<BString, IBObject>("key", null));
-            action.ShouldThrow<ArgumentException>();
+            action.Should().Throw<ArgumentException>();
         }
 
         [Fact]
@@ -38,7 +38,7 @@ namespace BencodeNET.Tests.Objects
         {
             var dict = new BDictionary {{"key", "value"}};
             Action action = () => dict["key"] = null;
-            action.ShouldThrow<ArgumentNullException>();
+            action.Should().Throw<ArgumentNullException>();
         }
 
         [Fact]

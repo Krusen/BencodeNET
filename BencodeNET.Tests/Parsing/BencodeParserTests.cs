@@ -123,7 +123,7 @@ namespace BencodeNET.Tests.Parsing
             var bparser = new BencodeParser();
             Action action = () => bparser.ParseString(bencode);
 
-            action.ShouldThrow<InvalidBencodeException<IBObject>>();
+            action.Should().Throw<InvalidBencodeException<IBObject>>();
         }
 
         [Fact]

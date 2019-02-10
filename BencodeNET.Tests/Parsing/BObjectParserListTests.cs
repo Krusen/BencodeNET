@@ -63,7 +63,7 @@ namespace BencodeNET.Tests.Parsing
             var list = new BObjectParserList();
             Action action = () => list.Add(type, parser);
 
-            action.ShouldThrow<ArgumentException>("because only IBObject types are allowed");
+            action.Should().Throw<ArgumentException>("because only IBObject types are allowed");
         }
 
         [Theory]

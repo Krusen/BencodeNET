@@ -66,14 +66,14 @@ namespace BencodeNET.Tests.Parsing
         public void LeadingZeros_ThrowsInvalidBencodeException(string bencode)
         {
             Action action = () => Parser.ParseString(bencode);
-            action.ShouldThrow<InvalidBencodeException<BNumber>>();
+            action.Should().Throw<InvalidBencodeException<BNumber>>();
         }
 
         [Fact]
         public void MinusZero_ThrowsInvalidBencodeException()
         {
             Action action = () => Parser.ParseString("i-0e");
-            action.ShouldThrow<InvalidBencodeException<BNumber>>();
+            action.Should().Throw<InvalidBencodeException<BNumber>>();
         }
 
         [Theory]
@@ -84,7 +84,7 @@ namespace BencodeNET.Tests.Parsing
         public void MissingEndChar_ThrowsInvalidBencodeException(string bencode)
         {
             Action action = () => Parser.ParseString(bencode);
-            action.ShouldThrow<InvalidBencodeException<BNumber>>();
+            action.Should().Throw<InvalidBencodeException<BNumber>>();
         }
 
         [Theory]
@@ -95,14 +95,14 @@ namespace BencodeNET.Tests.Parsing
         public void InvalidFirstChar_ThrowsInvalidBencodeException(string bencode)
         {
             Action action = () => Parser.ParseString(bencode);
-            action.ShouldThrow<InvalidBencodeException<BNumber>>();
+            action.Should().Throw<InvalidBencodeException<BNumber>>();
         }
 
         [Fact]
         public void JustNegativeSign_ThrowsInvalidBencodeException()
         {
             Action action = () => Parser.ParseString("i-e");
-            action.ShouldThrow<InvalidBencodeException<BNumber>>();
+            action.Should().Throw<InvalidBencodeException<BNumber>>();
         }
 
         [Theory]
@@ -113,7 +113,7 @@ namespace BencodeNET.Tests.Parsing
         public void MoreThanOneNegativeSign_ThrowsInvalidBencodeException(string bencode)
         {
             Action action = () => Parser.ParseString(bencode);
-            action.ShouldThrow<InvalidBencodeException<BNumber>>();
+            action.Should().Throw<InvalidBencodeException<BNumber>>();
         }
 
         [Theory]
@@ -126,14 +126,14 @@ namespace BencodeNET.Tests.Parsing
         public void NonDigit_ThrowsInvalidBencodeException(string bencode)
         {
             Action action = () => Parser.ParseString(bencode);
-            action.ShouldThrow<InvalidBencodeException<BNumber>>();
+            action.Should().Throw<InvalidBencodeException<BNumber>>();
         }
 
         [Fact]
         public void BelowMinimumLength_ThrowsInvalidBencodeException()
         {
             Action action = () => Parser.ParseString("ie");
-            action.ShouldThrow<InvalidBencodeException<BNumber>>();
+            action.Should().Throw<InvalidBencodeException<BNumber>>();
         }
 
         [Theory]
@@ -142,7 +142,7 @@ namespace BencodeNET.Tests.Parsing
         public void LargerThanInt64_ThrowsUnsupportedException(string bencode)
         {
             Action action = () => Parser.ParseString(bencode);
-            action.ShouldThrow<UnsupportedBencodeException<BNumber>>();
+            action.Should().Throw<UnsupportedBencodeException<BNumber>>();
         }
 
         [Theory]
@@ -152,7 +152,7 @@ namespace BencodeNET.Tests.Parsing
         public void LongerThanMaxDigits19_ThrowsUnsupportedException(string bencode)
         {
             Action action = () => Parser.ParseString(bencode);
-            action.ShouldThrow<UnsupportedBencodeException<BNumber>>();
+            action.Should().Throw<UnsupportedBencodeException<BNumber>>();
         }
     }
 }

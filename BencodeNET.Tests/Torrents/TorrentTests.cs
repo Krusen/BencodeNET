@@ -90,7 +90,7 @@ namespace BencodeNET.Tests.Torrents
             Func<string> act = () => torrent.DisplayName;
 
             torrent.FileMode.Should().Be(TorrentFileMode.Unknown);
-            act.Invoking(x => x()).ShouldThrow<BencodeException>();
+            act.Should().Throw<BencodeException>();
         }
 
         [Fact]
@@ -121,7 +121,7 @@ namespace BencodeNET.Tests.Torrents
         {
             var torrent = new Torrent();
             Action action = () => torrent.PiecesAsHexString = null;
-            action.ShouldThrow<ArgumentException>();
+            action.Should().Throw<ArgumentException>();
         }
 
         [Theory]
@@ -132,7 +132,7 @@ namespace BencodeNET.Tests.Torrents
         {
             var torrent = new Torrent();
             Action action = () => torrent.PiecesAsHexString = value;
-            action.ShouldThrow<ArgumentException>();
+            action.Should().Throw<ArgumentException>();
         }
 
         [Theory]
@@ -149,7 +149,7 @@ namespace BencodeNET.Tests.Torrents
         {
             var torrent = new Torrent();
             Action action = () => torrent.PiecesAsHexString = value;
-            action.ShouldThrow<ArgumentException>();
+            action.Should().Throw<ArgumentException>();
         }
 
         [Theory]
@@ -480,7 +480,7 @@ namespace BencodeNET.Tests.Torrents
             var torrent = new Torrent();
             var result = torrent.ToBDictionary();
             result.Should().HaveCount(0);
-            result.ShouldBeEquivalentTo(new BDictionary());
+            result.Should().BeEquivalentTo(new BDictionary());
         }
 
         [Theory]

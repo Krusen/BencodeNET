@@ -44,7 +44,7 @@ namespace BencodeNET.Tests.Parsing
             var parser = new BDictionaryParser(bparser);
             Action action = () => parser.ParseString(bencode);
 
-            action.ShouldThrow<InvalidBencodeException<BDictionary>>();
+            action.Should().Throw<InvalidBencodeException<BDictionary>>();
         }
 
         [Theory]
@@ -57,7 +57,7 @@ namespace BencodeNET.Tests.Parsing
             var parser = new BDictionaryParser(bparser);
             Action action = () => parser.ParseString(bencode);
 
-            action.ShouldThrow<InvalidBencodeException<BDictionary>>();
+            action.Should().Throw<InvalidBencodeException<BDictionary>>();
         }
 
         [Theory]
@@ -71,7 +71,7 @@ namespace BencodeNET.Tests.Parsing
             var parser = new BDictionaryParser(bparser);
             Action action = () => parser.ParseString(bencode);
 
-            action.ShouldThrow<InvalidBencodeException<BDictionary>>();
+            action.Should().Throw<InvalidBencodeException<BDictionary>>();
         }
 
         private static void SetupBencodeParser(IBencodeParser bparser, string bencode, BString key, IBObject value, bool hasEndChar)

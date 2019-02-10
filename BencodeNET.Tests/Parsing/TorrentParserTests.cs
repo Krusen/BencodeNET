@@ -291,7 +291,7 @@ namespace BencodeNET.Tests.Parsing
             // Assert
             torrent.Trackers.Should().HaveCount(1);
             torrent.Trackers[0].Should().HaveCount(announceList.Count);
-            torrent.Trackers[0].ShouldAllBeEquivalentTo(announceList);
+            torrent.Trackers[0].Should().BeEquivalentTo(announceList);
         }
 
         [Theory]
@@ -313,9 +313,9 @@ namespace BencodeNET.Tests.Parsing
             // Assert
             torrent.Trackers.Should().HaveCount(2);
             torrent.Trackers[0].Should().HaveCount(announceList1.Count);
-            torrent.Trackers[0].ShouldAllBeEquivalentTo(announceList1);
+            torrent.Trackers[0].Should().BeEquivalentTo(announceList1);
             torrent.Trackers[1].Should().HaveCount(announceList2.Count);
-            torrent.Trackers[1].ShouldAllBeEquivalentTo(announceList2);
+            torrent.Trackers[1].Should().BeEquivalentTo(announceList2);
         }
 
         [Theory]
@@ -341,9 +341,9 @@ namespace BencodeNET.Tests.Parsing
             primary.AddRange(announceList1);
             torrent.Trackers.Should().HaveCount(2);
             torrent.Trackers[0].Should().HaveCount(primary.Count);
-            torrent.Trackers[0].ShouldAllBeEquivalentTo(primary);
+            torrent.Trackers[0].Should().BeEquivalentTo(primary);
             torrent.Trackers[1].Should().HaveCount(announceList2.Count);
-            torrent.Trackers[1].ShouldAllBeEquivalentTo(announceList2);
+            torrent.Trackers[1].Should().BeEquivalentTo(announceList2);
         }
 
         [Theory]
@@ -428,10 +428,10 @@ namespace BencodeNET.Tests.Parsing
             torrent.Files.DirectoryName.Should().Be(directoryName);
             torrent.Files.Should().HaveCount(2);
             torrent.Files[0].FileSize.Should().Be(length1);
-            torrent.Files[0].Path.ShouldAllBeEquivalentTo(paths1);
+            torrent.Files[0].Path.Should().BeEquivalentTo(paths1);
             torrent.Files[0].Md5Sum.Should().Be(md5Sum1);
             torrent.Files[1].FileSize.Should().Be(length2);
-            torrent.Files[1].Path.ShouldAllBeEquivalentTo(paths2);
+            torrent.Files[1].Path.Should().BeEquivalentTo(paths2);
             torrent.Files[1].Md5Sum.Should().Be(md5Sum2);
         }
 
@@ -447,7 +447,7 @@ namespace BencodeNET.Tests.Parsing
             Action action = () => parser.Parse((BencodeStream)null);
 
             // Assert
-            action.ShouldThrow<InvalidTorrentException>()
+            action.Should().Throw<InvalidTorrentException>()
                 .Where(ex => ex.InvalidField == TorrentFields.Info);
         }
 
@@ -465,7 +465,7 @@ namespace BencodeNET.Tests.Parsing
             Action action = () => parser.Parse((BencodeStream)null);
 
             // Assert
-            action.ShouldThrow<InvalidTorrentException>()
+            action.Should().Throw<InvalidTorrentException>()
                 .WithMessage($"*{TorrentInfoFields.Length}*")
                 .WithMessage($"*{TorrentInfoFields.Files}*");
         }
@@ -483,7 +483,7 @@ namespace BencodeNET.Tests.Parsing
             Action action = () => parser.Parse((BencodeStream)null);
 
             // Assert
-            action.ShouldThrow<InvalidTorrentException>()
+            action.Should().Throw<InvalidTorrentException>()
                 .Where(ex => ex.InvalidField == TorrentInfoFields.PieceLength);
         }
 
@@ -500,7 +500,7 @@ namespace BencodeNET.Tests.Parsing
             Action action = () => parser.Parse((BencodeStream)null);
 
             // Assert
-            action.ShouldThrow<InvalidTorrentException>()
+            action.Should().Throw<InvalidTorrentException>()
                 .Where(ex => ex.InvalidField == TorrentInfoFields.Pieces);
         }
 
@@ -517,7 +517,7 @@ namespace BencodeNET.Tests.Parsing
             Action action = () => parser.Parse((BencodeStream)null);
 
             // Assert
-            action.ShouldThrow<InvalidTorrentException>()
+            action.Should().Throw<InvalidTorrentException>()
                 .Where(ex => ex.InvalidField == TorrentInfoFields.Name);
         }
 
@@ -534,7 +534,7 @@ namespace BencodeNET.Tests.Parsing
             Action action = () => parser.Parse((BencodeStream)null);
 
             // Assert
-            action.ShouldThrow<InvalidTorrentException>()
+            action.Should().Throw<InvalidTorrentException>()
                 .Where(ex => ex.InvalidField == TorrentInfoFields.Files);
         }
 
@@ -557,7 +557,7 @@ namespace BencodeNET.Tests.Parsing
             Action action = () => parser.Parse((BencodeStream)null);
 
             // Assert
-            action.ShouldThrow<InvalidTorrentException>()
+            action.Should().Throw<InvalidTorrentException>()
                 .Where(ex => ex.InvalidField == TorrentFilesFields.Length);
         }
 
@@ -580,7 +580,7 @@ namespace BencodeNET.Tests.Parsing
             Action action = () => parser.Parse((BencodeStream)null);
 
             // Assert
-            action.ShouldThrow<InvalidTorrentException>()
+            action.Should().Throw<InvalidTorrentException>()
                 .Where(ex => ex.InvalidField == TorrentFilesFields.Path);
         }
 

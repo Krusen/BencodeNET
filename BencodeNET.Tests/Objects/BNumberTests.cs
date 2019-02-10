@@ -215,7 +215,7 @@ namespace BencodeNET.Tests.Objects
         {
             BNumber bnumber = null;
             Action action = () => { var b = (bool) bnumber; };
-            action.ShouldThrow<InvalidCastException>();
+            action.Should().Throw<InvalidCastException>();
         }
     }
 }

@@ -50,7 +50,7 @@ namespace BencodeNET.Tests.Parsing
             var parser = new BListParser(bparser);
             Action action = () => parser.ParseString(bencode);
 
-            action.ShouldThrow<InvalidBencodeException<BList>>();
+            action.Should().Throw<InvalidBencodeException<BList>>();
         }
 
         [Theory]
@@ -65,7 +65,7 @@ namespace BencodeNET.Tests.Parsing
             var parser = new BListParser(bparser);
             Action action = () => parser.ParseString(bencode);
 
-            action.ShouldThrow<InvalidBencodeException<BList>>();
+            action.Should().Throw<InvalidBencodeException<BList>>();
         }
 
         [Theory]
@@ -84,7 +84,7 @@ namespace BencodeNET.Tests.Parsing
             Action action = () => parser.ParseString(bencode);
 
             // Assert
-            action.ShouldThrow<InvalidBencodeException<BList>>();
+            action.Should().Throw<InvalidBencodeException<BList>>();
         }
 
         private static void SetupBencodeParser(IBencodeParser bparser, string bencode, IBObject obj, bool hasEndChar)
