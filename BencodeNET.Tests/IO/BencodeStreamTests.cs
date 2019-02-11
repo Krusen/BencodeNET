@@ -28,7 +28,7 @@ namespace BencodeNET.Tests.IO
             using (var bs = new BencodeStream(ms))
             {
                 var bytes = bs.Read(0);
-                Assert.Equal(0, bytes.Length);
+                Assert.Empty(bytes);
                 Assert.Equal("", Encoding.UTF8.GetString(bytes));
             }
         }
@@ -316,7 +316,7 @@ namespace BencodeNET.Tests.IO
             {
                 bs.Read(12);
                 Assert.Equal(-1, bs.Peek());
-                Assert.Equal(0, bs.Read(4).Length);
+                Assert.Empty(bs.Read(4));
             }
         }
 
