@@ -176,7 +176,7 @@ namespace BencodeNET.Tests.Objects
         }
 
         [Fact]
-        public void CanCastFromNullableInt()
+        public void CanCastFromNullableInt_WhenNull()
         {
             int? number = null;
             var bnumber = (BNumber)number;
@@ -184,11 +184,27 @@ namespace BencodeNET.Tests.Objects
         }
 
         [Fact]
-        public void CanCastFromNullableLong()
+        public void CanCastFromNullableLong_WhenNull()
         {
             long? number = null;
             var bnumber = (BNumber)number;
             bnumber.Should().BeNull();
+        }
+
+        [Fact]
+        public void CanCastFromNullableInt_WhenNotNull()
+        {
+            int? number = 12345;
+            var bnumber = (BNumber)number;
+            bnumber.Should().Be(12345);
+        }
+
+        [Fact]
+        public void CanCastFromNullableLong_WhenNotNull()
+        {
+            long? number = 12345;
+            var bnumber = (BNumber)number;
+            bnumber.Should().Be(12345);
         }
 
         [Fact]
