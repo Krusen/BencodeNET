@@ -1,7 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFrameworks>net452;netcoreapp2.1</TargetFrameworks>
+  </PropertyGroup>
+
+  <!-- If 'UseDefaultNetStandardVersion' is not set, default to netstandard1.3 -->
+  <PropertyGroup Condition="'$(UseDefaultNetStandardVersion)' == '' and '$(TargetFramework)' != 'net452'">
+    <ReferringTargetFrameworkForProjectReferences>netstandard1.3</ReferringTargetFrameworkForProjectReferences>
+  </PropertyGroup>
+
+  <!-- If 'TargetNetStandardVersion' is set, use that instead of above -->
+  <PropertyGroup Condition="'$(TargetNetStandardVersion)' != '' and '$(TargetFramework)' != 'net452'">
+    <ReferringTargetFrameworkForProjectReferences>$(TargetNetStandardVersion)</ReferringTargetFrameworkForProjectReferences>
   </PropertyGroup>
 
   <ItemGroup>

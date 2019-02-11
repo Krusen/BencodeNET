@@ -105,6 +105,13 @@ Task("Run-Unit-Tests")
         NoBuild = true,
         Configuration = configuration
     });
+
+    DotNetCoreTest(testProjectFile, new DotNetCoreTestSettings
+    {
+        NoBuild = true,
+        Configuration = configuration,
+		ArgumentCustomization = args => args.Append("-- UseDefaultNetStandardVersion=true")
+    });
 });
 
 Task("Disable-xUnit-ShadowCopy")
@@ -119,11 +126,21 @@ Task("Run-Code-Coverage")
     .IsDependentOn("Build")
     .Does(() =>
 {
-    Action<ICakeContext> testAction = ctx => ctx.DotNetCoreTest(testProjectFile, new DotNetCoreTestSettings
+    Action<ICakeContext> testAction = ctx =>
     {
-        NoBuild = true,
-        Configuration = configuration
-    });
+        ctx.DotNetCoreTest(testProjectFile, new DotNetCoreTestSettings
+        {
+            NoBuild = true,
+            Configuration = configuration
+        });
+
+        ctx.DotNetCoreTest(testProjectFile, new DotNetCoreTestSettings
+        {
+            NoBuild = true,
+            Configuration = configuration,
+			ArgumentCustomization = args => args.Append("-- UseDefaultNetStandardVersion=true")
+        });
+    };
 
     OpenCover(testAction,
         codeCoverageOutput,
