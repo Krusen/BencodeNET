@@ -49,6 +49,18 @@ namespace BencodeNET.Objects
             stream.Write(Value);
             stream.Write('e');
         }
+        
+        public static implicit operator int?(BNumber bint)
+        {
+            if (bint == null) return null;
+            return (int)bint.Value;
+        }
+
+        public static implicit operator long?(BNumber bint)
+        {
+            if (bint == null) return null;
+            return bint.Value;
+        }
 
         public static implicit operator int(BNumber bint)
         {
