@@ -1,14 +1,13 @@
 // For inspiration see: https://github.com/Jericho/Picton/blob/develop/build.cake
 
-// Install addins.
-#addin "nuget:?package=Cake.Coveralls&version=0.5.0"
-#addin "nuget:?package=Cake.Json&version=1.0.2.13"
+// Install addins
+#addin "nuget:?package=Cake.Coveralls&version=0.9.0"
+#addin "nuget:?package=Cake.Coverlet&version=2.2.1"
 
-// Install tools.
-#tool "nuget:?package=GitVersion.CommandLine&version=4.0.0-beta0012"
-#tool "nuget:?package=OpenCover&version=4.6.519"
-#tool "nuget:?package=coveralls.io&version=1.3.4"
-#tool "nuget:?package=xunit.runner.console&version=2.2.0"
+// Install tools
+#tool "nuget:?package=GitVersion.CommandLine&version=4.0.0"
+#tool "nuget:?package=coveralls.io&version=1.4.2"
+#tool "nuget:?package=xunit.runner.console&version=2.4.1"
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -27,10 +26,8 @@ var libraryName = "BencodeNET";
 
 var sourceFolder = "./";
 
-var xunitRunnerJsonFile = "./BencodeNET.Tests/xunit.runner.json";
 var testProjectFile = "./BencodeNET.Tests/BencodeNET.Tests.csproj";
-var codeCoverageOutput = "coverage.xml";
-var codeCoverageFilter = "+[*]* -[*.Tests]*";
+var codeCoverageInclude = "[BencodeNET]*";
 
 var cakeVersion = typeof(ICakeContext).Assembly.GetName().Version.ToString();
 var versionInfo = GitVersion(new GitVersionSettings() { OutputType = GitVersionOutput.Json });
@@ -100,68 +97,31 @@ Task("Run-Unit-Tests")
     .IsDependentOn("Build")
     .Does(() =>
 {
-    DotNetCoreTest(testProjectFile, new DotNetCoreTestSettings
+    var testSettings = new DotNetCoreTestSettings
     {
-        NoBuild = true,
+        // We need to rebuild for each run to use a different value for 'UseDefaultNetStandardVersion'
+        //NoBuild = true,
         Configuration = configuration
-    });
-
-    DotNetCoreTest(testProjectFile, new DotNetCoreTestSettings
-    {
-        NoBuild = true,
-        Configuration = configuration,
-		ArgumentCustomization = args => args.Append("-- UseDefaultNetStandardVersion=true")
-    });
-});
-
-Task("Disable-xUnit-ShadowCopy")
-    .Does(() =>
-{
-    Information("Disabling xUnit shadow copying assemblies for code coverage to work...");
-    SerializeJsonToFile(xunitRunnerJsonFile, new { shadowCopy = false });
-});
-
-Task("Run-Code-Coverage")
-    .IsDependentOn("Disable-xUnit-ShadowCopy")
-    .IsDependentOn("Build")
-    .Does(() =>
-{
-    Action<ICakeContext> testAction = ctx =>
-    {
-        ctx.DotNetCoreTest(testProjectFile, new DotNetCoreTestSettings
-        {
-            NoBuild = true,
-            Configuration = configuration
-        });
-
-        ctx.DotNetCoreTest(testProjectFile, new DotNetCoreTestSettings
-        {
-            NoBuild = true,
-            Configuration = configuration,
-			ArgumentCustomization = args => args.Append("-- UseDefaultNetStandardVersion=true")
-        });
     };
 
-    OpenCover(testAction,
-        codeCoverageOutput,
-        new OpenCoverSettings
-        {
-            OldStyle = true,
-            SkipAutoProps = true,
-            MergeOutput = false
-        }
-        .WithFilter(codeCoverageFilter)
-    );
+    Func<ProcessArgumentBuilder, ProcessArgumentBuilder> argsBuilder = args => args
+        .Append("/p:CollectCoverage=true")
+        .AppendSwitch("/p:CoverletOutputFormat", "=", "\\\"json,opencover\\\"") // Quotes needs to be escaped for 'dotnet test' (see https://github.com/Microsoft/msbuild/issues/2999)
+        .Append("/p:CoverletOutput=../")
+        .AppendSwitchQuoted("/p:Include", "=", codeCoverageInclude);
 
-    if (FileExists(xunitRunnerJsonFile))
-        DeleteFile(xunitRunnerJsonFile);
+    testSettings.ArgumentCustomization = args => argsBuilder(args).Append("/p:UseDefaultNetStandardVersion=true");
+    DotNetCoreTest(testProjectFile, testSettings);
+
+    testSettings.ArgumentCustomization = args => argsBuilder(args).Append("/p:MergeWith=../coverage.json");
+    DotNetCoreTest(testProjectFile, testSettings);
 });
 
 Task("Upload-Coverage-Result")
     .WithCriteria(() => !isLocalBuild)
     .Does(() =>
 {
-    CoverallsIo(codeCoverageOutput);
+    CoverallsIo("coverage.opencover.xml");
 });
 
 
@@ -171,7 +131,7 @@ Task("Upload-Coverage-Result")
 
 Task("AppVeyor")
     .IsDependentOn("AppVeyor_Set-Build-Version")
-    .IsDependentOn("Run-Code-Coverage")
+    .IsDependentOn("Run-Unit-Tests")
     .IsDependentOn("Upload-Coverage-Result");
 
 Task("Default")

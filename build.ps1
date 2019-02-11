@@ -5,11 +5,14 @@
 ##########################################################################
 
 <#
+
 .SYNOPSIS
 This is a Powershell script to bootstrap a Cake build.
+
 .DESCRIPTION
 This Powershell script will download NuGet if missing, restore NuGet tools (including Cake)
 and execute your Cake build script with the parameters you provide.
+
 .PARAMETER Script
 The build script to execute.
 .PARAMETER Target
@@ -18,37 +21,48 @@ The build script target to run.
 The build configuration to use.
 .PARAMETER Verbosity
 Specifies the amount of information to be displayed.
-.PARAMETER Experimental
-Tells Cake to use the latest Roslyn release.
-.PARAMETER WhatIf
-Performs a dry run of the build script.
-No tasks will be executed.
-.PARAMETER Mono
-Tells Cake to use the Mono scripting engine.
+.PARAMETER ShowDescription
+Shows description about tasks.
+.PARAMETER DryRun
+Performs a dry run.
 .PARAMETER SkipToolPackageRestore
 Skips restoring of packages.
 .PARAMETER ScriptArgs
 Remaining arguments are added here.
+
 .LINK
-http://cakebuild.net
+https://cakebuild.net
+
 #>
 
 [CmdletBinding()]
 Param(
     [string]$Script = "build.cake",
-    [string]$Target = "Default",
-    [ValidateSet("Release", "Debug")]
-    [string]$Configuration = "Release",
+    [string]$Target,
+    [string]$Configuration,
     [ValidateSet("Quiet", "Minimal", "Normal", "Verbose", "Diagnostic")]
-    [string]$Verbosity = "Verbose",
-    [switch]$Experimental,
-    [Alias("DryRun","Noop")]
-    [switch]$WhatIf,
-    [switch]$Mono,
+    [string]$Verbosity,
+    [switch]$ShowDescription,
+    [Alias("WhatIf", "Noop")]
+    [switch]$DryRun,
     [switch]$SkipToolPackageRestore,
     [Parameter(Position=0,Mandatory=$false,ValueFromRemainingArguments=$true)]
     [string[]]$ScriptArgs
 )
+
+# Attempt to set highest encryption available for SecurityProtocol.
+# PowerShell will not set this by default (until maybe .NET 4.6.x). This
+# will typically produce a message for PowerShell v2 (just an info
+# message though)
+try {
+    # Set TLS 1.2 (3072), then TLS 1.1 (768), then TLS 1.0 (192), finally SSL 3.0 (48)
+    # Use integers because the enumeration values for TLS 1.2 and TLS 1.1 won't
+    # exist in .NET 4.0, even though they are addressable if .NET 4.5+ is
+    # installed (.NET 4.5 is an in-place upgrade).
+    [System.Net.ServicePointManager]::SecurityProtocol = 3072 -bor 768 -bor 192 -bor 48
+  } catch {
+    Write-Output 'Unable to set PowerShell to use TLS 1.2 and TLS 1.1 due to old .NET Framework installed. If you see underlying connection closed or trust errors, you may need to upgrade to .NET Framework 4.5+ and PowerShell v3'
+  }
 
 [Reflection.Assembly]::LoadWithPartialName("System.Security") | Out-Null
 function MD5HashFile([string] $filePath)
@@ -75,6 +89,15 @@ function MD5HashFile([string] $filePath)
     }
 }
 
+function GetProxyEnabledWebClient
+{
+    $wc = New-Object System.Net.WebClient
+    $proxy = [System.Net.WebRequest]::GetSystemWebProxy()
+    $proxy.Credentials = [System.Net.CredentialCache]::DefaultCredentials
+    $wc.Proxy = $proxy
+    return $wc
+}
+
 Write-Host "Preparing to run build script..."
 
 if(!$PSScriptRoot){
@@ -92,27 +115,6 @@ $PACKAGES_CONFIG_MD5 = Join-Path $TOOLS_DIR "packages.config.md5sum"
 $ADDINS_PACKAGES_CONFIG = Join-Path $ADDINS_DIR "packages.config"
 $MODULES_PACKAGES_CONFIG = Join-Path $MODULES_DIR "packages.config"
 
-# Should we use mono?
-$UseMono = "";
-if($Mono.IsPresent) {
-    Write-Verbose -Message "Using the Mono based scripting engine."
-    $UseMono = "-mono"
-}
-
-# Should we use the new Roslyn?
-# $UseExperimental = "";
-$UseExperimental = "-experimental"; # Always use experimental
-if($Experimental.IsPresent -and !($Mono.IsPresent)) {
-    Write-Verbose -Message "Using experimental version of Roslyn."
-    $UseExperimental = "-experimental"
-}
-
-# Is this a dry run?
-$UseDryRun = "";
-if($WhatIf.IsPresent) {
-    $UseDryRun = "-dryrun"
-}
-
 # Make sure tools folder exists
 if ((Test-Path $PSScriptRoot) -and !(Test-Path $TOOLS_DIR)) {
     Write-Verbose -Message "Creating tools directory..."
@@ -122,7 +124,10 @@ if ((Test-Path $PSScriptRoot) -and !(Test-Path $TOOLS_DIR)) {
 # Make sure that packages.config exist.
 if (!(Test-Path $PACKAGES_CONFIG)) {
     Write-Verbose -Message "Downloading packages.config..."
-    try { (New-Object System.Net.WebClient).DownloadFile("http://cakebuild.net/download/bootstrapper/packages", $PACKAGES_CONFIG) } catch {
+    try {
+        $wc = GetProxyEnabledWebClient
+        $wc.DownloadFile("https://cakebuild.net/download/bootstrapper/packages", $PACKAGES_CONFIG)
+    } catch {
         Throw "Could not download packages.config."
     }
 }
@@ -142,7 +147,8 @@ if (!(Test-Path $NUGET_EXE)) {
 if (!(Test-Path $NUGET_EXE)) {
     Write-Verbose -Message "Downloading NuGet.exe..."
     try {
-        (New-Object System.Net.WebClient).DownloadFile($NUGET_URL, $NUGET_EXE)
+        $wc = GetProxyEnabledWebClient
+        $wc.DownloadFile($NUGET_URL, $NUGET_EXE)
     } catch {
         Throw "Could not download NuGet.exe."
     }
@@ -161,14 +167,15 @@ if(-Not $SkipToolPackageRestore.IsPresent) {
     if((!(Test-Path $PACKAGES_CONFIG_MD5)) -Or
       ($md5Hash -ne (Get-Content $PACKAGES_CONFIG_MD5 ))) {
         Write-Verbose -Message "Missing or changed package.config hash..."
-        Remove-Item * -Recurse -Exclude packages.config,nuget.exe
+        Get-ChildItem -Exclude packages.config,nuget.exe,Cake.Bakery |
+        Remove-Item -Recurse
     }
 
     Write-Verbose -Message "Restoring tools from NuGet..."
     $NuGetOutput = Invoke-Expression "&`"$NUGET_EXE`" install -ExcludeVersion -OutputDirectory `"$TOOLS_DIR`""
 
     if ($LASTEXITCODE -ne 0) {
-        Throw "An error occured while restoring NuGet tools."
+        Throw "An error occurred while restoring NuGet tools."
     }
     else
     {
@@ -188,7 +195,7 @@ if (Test-Path $ADDINS_PACKAGES_CONFIG) {
     $NuGetOutput = Invoke-Expression "&`"$NUGET_EXE`" install -ExcludeVersion -OutputDirectory `"$ADDINS_DIR`""
 
     if ($LASTEXITCODE -ne 0) {
-        Throw "An error occured while restoring NuGet addins."
+        Throw "An error occurred while restoring NuGet addins."
     }
 
     Write-Verbose -Message ($NuGetOutput | out-string)
@@ -205,7 +212,7 @@ if (Test-Path $MODULES_PACKAGES_CONFIG) {
     $NuGetOutput = Invoke-Expression "&`"$NUGET_EXE`" install -ExcludeVersion -OutputDirectory `"$MODULES_DIR`""
 
     if ($LASTEXITCODE -ne 0) {
-        Throw "An error occured while restoring NuGet modules."
+        Throw "An error occurred while restoring NuGet modules."
     }
 
     Write-Verbose -Message ($NuGetOutput | out-string)
@@ -218,7 +225,18 @@ if (!(Test-Path $CAKE_EXE)) {
     Throw "Could not find Cake.exe at $CAKE_EXE"
 }
 
+
+
+# Build Cake arguments
+$cakeArguments = @("$Script");
+if ($Target) { $cakeArguments += "-target=$Target" }
+if ($Configuration) { $cakeArguments += "-configuration=$Configuration" }
+if ($Verbosity) { $cakeArguments += "-verbosity=$Verbosity" }
+if ($ShowDescription) { $cakeArguments += "-showdescription" }
+if ($DryRun) { $cakeArguments += "-dryrun" }
+$cakeArguments += $ScriptArgs
+
 # Start Cake
 Write-Host "Running build script..."
-Invoke-Expression "& `"$CAKE_EXE`" `"$Script`" -target=`"$Target`" -configuration=`"$Configuration`" -verbosity=`"$Verbosity`" $UseMono $UseDryRun $UseExperimental $ScriptArgs"
+&$CAKE_EXE $cakeArguments
 exit $LASTEXITCODE

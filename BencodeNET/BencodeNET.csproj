@@ -5,11 +5,6 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
-  <!-- Needed for code coverage -->
-  <PropertyGroup>
-    <DebugType>full</DebugType>
-  </PropertyGroup>
-
   <PropertyGroup>
     <PackageId>BencodeNET</PackageId>
     <Version>$(SemVer)</Version>
