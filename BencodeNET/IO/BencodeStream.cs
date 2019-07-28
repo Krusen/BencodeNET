@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Buffers;
 using System.IO;
 using System.Text;
 
@@ -12,6 +13,8 @@ namespace BencodeNET.IO
     public class BencodeStream : IDisposable
     {
         private static readonly byte[] EmptyByteArray = new byte[0];
+
+        private byte[] SingleByteBuffer { get; } = new byte[1];
 
         private bool _hasPeeked;
         private int _peekedByte;
@@ -213,13 +216,11 @@ namespace BencodeNET.IO
 
             InnerStream.Position -= 1;
 
-            var bytes = new byte[1];
-
-            var readBytes = InnerStream.Read(bytes, 0, 1);
+            var readBytes = InnerStream.Read(SingleByteBuffer, 0, 1);
             if (readBytes == 0)
                 return -1;
 
-            return bytes[0];
+            return SingleByteBuffer[0];
         }
 
         /// <summary>
