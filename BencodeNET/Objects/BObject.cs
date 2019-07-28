@@ -34,6 +34,10 @@ namespace BencodeNET.Objects
         {
             using (var stream = EncodeTo(new MemoryStream()))
             {
+                if (stream.TryGetBuffer(out var buffer) && stream.Length <=  int.MaxValue)
+                {
+                    return encoding.GetString(buffer);
+                }
                 return encoding.GetString(stream.ToArray());
             }
         }
