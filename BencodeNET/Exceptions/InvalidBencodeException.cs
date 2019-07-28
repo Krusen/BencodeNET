@@ -1,7 +1,4 @@
 ﻿using System;
-#if !NETSTANDARD
-using System.Runtime.Serialization;
-#endif
 
 #pragma warning disable 1591
 namespace BencodeNET.Exceptions
@@ -10,9 +7,6 @@ namespace BencodeNET.Exceptions
     /// Represents parse errors when encountering invalid bencode of some sort.
     /// </summary>
     /// <typeparam name="T">The type being parsed.</typeparam>
-#if !NETSTANDARD
-    [Serializable]
-#endif
     public class InvalidBencodeException<T> : BencodeException<T>
     {
         /// <summary>
@@ -43,22 +37,6 @@ namespace BencodeNET.Exceptions
         {
             StreamPosition = streamPosition;
         }
-
-#if !NETSTANDARD
-        protected InvalidBencodeException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-            if (info == null) return;
-            StreamPosition = info.GetInt64(nameof(StreamPosition));
-        }
-
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue(nameof(StreamPosition), StreamPosition);
-        }
-#endif
 
         internal static InvalidBencodeException<T> InvalidBeginningChar(char invalidChar, long streamPosition)
         {
