@@ -11,6 +11,8 @@ namespace BencodeNET.Parsing
     /// </summary>
     public class BStringParser : BObjectParser<BString>
     {
+        private StringBuilder LengthString { get; } = new StringBuilder(BString.LengthMaxDigits);
+
         /// <summary>
         /// The minimum stream length in bytes for a valid string ('0:').
         /// </summary>
@@ -56,23 +58,23 @@ namespace BencodeNET.Parsing
 
             var startPosition = stream.Position;
 
-            var lengthString = new StringBuilder();
+            LengthString.Clear();
             for (var c = stream.ReadChar(); c != ':' && c != default(char); c = stream.ReadChar())
             {
                 // Because of memory limitations (~1-2 GB) we know for certain we cannot handle more than 10 digits (10GB)
-                if (lengthString.Length >= BString.LengthMaxDigits)
+                if (LengthString.Length >= BString.LengthMaxDigits)
                 {
                     throw UnsupportedException(
                         $"Length of string is more than {BString.LengthMaxDigits} digits (>10GB) and is not supported (max is ~1-2GB).",
                         startPosition);
                 }
 
-                lengthString.Append(c);
+                LengthString.Append(c);
             }
 
             long stringLength;
-            if (!ParseUtil.TryParseLongFast(lengthString.ToString(), out stringLength))
-                throw InvalidException($"Invalid length '{lengthString}' of string.", startPosition);
+            if (!ParseUtil.TryParseLongFast(LengthString.ToString(), out stringLength))
+                throw InvalidException($"Invalid length '{LengthString}' of string.", startPosition);
 
             // Int32.MaxValue is ~2GB and is the absolute maximum that can be handled in memory
             if (stringLength > int.MaxValue)
