@@ -156,7 +156,14 @@ namespace BencodeNET.Objects
         /// <returns>
         /// A <see cref="System.String" /> that represents this instance.
         /// </returns>
-        public override string ToString() => _encoding.GetString(_value.AsSpan());
+        public override string ToString()
+        {
+#if NETCOREAPP2_1
+            return _encoding.GetString(_value.AsSpan());
+#else
+            return _encoding.GetString(_value);
+#endif
+        }
 
         /// <summary>
         /// Converts the underlying bytes to a string representation using the specified encoding.
@@ -168,7 +175,11 @@ namespace BencodeNET.Objects
         public string ToString(Encoding encoding)
         {
             encoding = encoding ?? _encoding;
+#if NETCOREAPP2_1
             return encoding.GetString(_value.AsSpan());
+#else
+            return encoding.GetString(_value);
+#endif
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -106,22 +107,45 @@ namespace BencodeNET
 
         public static void Write(this Stream stream, int number)
         {
+#if NETCOREAPP2_1
             Span<byte> buffer = stackalloc byte[11];
             var bytesRead = Encoding.ASCII.GetBytes(number.ToString().AsSpan(), buffer);
             stream.Write(buffer.Slice(0, bytesRead));
+#else
+            var str = number.ToString();
+            var buffer = ArrayPool<byte>.Shared.Rent(str.Length);
+            var count = Encoding.ASCII.GetBytes(str, 0, str.Length, buffer, 0);
+            stream.Write(buffer, 0, count);
+            ArrayPool<byte>.Shared.Return(buffer);
+#endif
         }
 
         public static void Write(this Stream stream, long number)
         {
+#if NETCOREAPP2_1
             Span<byte> buffer = stackalloc byte[20];
             var bytesRead = Encoding.ASCII.GetBytes(number.ToString().AsSpan(), buffer);
             stream.Write(buffer.Slice(0, bytesRead));
+#else
+            var str = number.ToString();
+            var buffer = ArrayPool<byte>.Shared.Rent(str.Length);
+            var count = Encoding.ASCII.GetBytes(str, 0, str.Length, buffer, 0);
+            stream.Write(buffer, 0, count);
+            ArrayPool<byte>.Shared.Return(buffer);
+#endif
         }
 
         public static void Write(this Stream stream, char c)
         {
             stream.WriteByte((byte) c);
         }
+
+#if !NETCOREAPP2_1
+        public static void Write(this Stream stream, byte[] bytes)
+        {
+            stream.Write(bytes, 0, bytes.Length);
+        }
+#endif
 
 #if NETSTANDARD1_3
         public static bool IsAssignableFrom(this Type type, Type otherType)

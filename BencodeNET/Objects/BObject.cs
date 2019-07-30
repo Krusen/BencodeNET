@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Buffers.Text;
 using System.IO;
+using System.Linq;
 using System.Text;
 using BencodeNET.IO;
 
@@ -38,10 +40,12 @@ namespace BencodeNET.Objects
             var size = GetSizeInBytes();
             using (var stream = EncodeTo(new MemoryStream(size)))
             {
+#if NETCOREAPP2_1
                 if (stream.TryGetBuffer(out var buffer) && stream.Length <=  int.MaxValue)
                 {
                     return encoding.GetString(buffer);
                 }
+#endif
                 return encoding.GetString(stream.ToArray());
             }
         }
