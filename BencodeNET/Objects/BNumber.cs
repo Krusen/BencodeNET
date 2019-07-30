@@ -1,5 +1,5 @@
 ﻿using System;
-using BencodeNET.IO;
+using System.IO;
 
 namespace BencodeNET.Objects
 {
@@ -46,7 +46,7 @@ namespace BencodeNET.Objects
         public override int GetSizeInBytes() => Value.DigitCount() + 2;
 
         /// <inheritdoc/>
-        protected override void EncodeObject(BencodeStream stream)
+        protected override void EncodeObject(Stream stream)
         {
             stream.Write('i');
             stream.Write(Value);

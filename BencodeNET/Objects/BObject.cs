@@ -72,17 +72,6 @@ namespace BencodeNET.Objects
         /// <returns>The used stream.</returns>
         public TStream EncodeTo<TStream>(TStream stream) where TStream : Stream
         {
-            EncodeObject(new BencodeStream(stream));
-            return stream;
-        }
-
-        /// <summary>
-        /// Writes the object as bencode to the specified stream.
-        /// </summary>
-        /// <param name="stream">The stream to write to.</param>
-        /// <returns>The used stream.</returns>
-        public BencodeStream EncodeTo(BencodeStream stream)
-        {
             var size = GetSizeInBytes();
             stream.TrySetLength(size);
             EncodeObject(stream);
@@ -106,7 +95,7 @@ namespace BencodeNET.Objects
         /// underlying value to bencode and write it to the stream.
         /// </summary>
         /// <param name="stream">The stream to encode to.</param>
-        protected abstract void EncodeObject(BencodeStream stream);
+        protected abstract void EncodeObject(Stream stream);
     }
 
     /// <summary>

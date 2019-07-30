@@ -338,7 +338,7 @@ namespace BencodeNET.Torrents
         /// </summary>
         /// <param name="stream"></param>
         /// <returns></returns>
-        protected override void EncodeObject(BencodeStream stream)
+        protected override void EncodeObject(Stream stream)
         {
             var torrent = ToBDictionary();
             torrent.EncodeTo(stream);

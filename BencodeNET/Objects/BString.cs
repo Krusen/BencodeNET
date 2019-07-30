@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using BencodeNET.IO;
@@ -84,7 +85,7 @@ namespace BencodeNET.Objects
         public override string EncodeAsString() => EncodeAsString(_encoding);
 
         /// <inheritdoc/>
-        protected override void EncodeObject(BencodeStream stream)
+        protected override void EncodeObject(Stream stream)
         {
             stream.Write(_value.Length);
             stream.Write(':');

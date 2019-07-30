@@ -1,5 +1,4 @@
 using System;
-using System.Buffers;
 using System.IO;
 using System.Text;
 
@@ -236,89 +235,6 @@ namespace BencodeNET.IO
             if (value == -1)
                 return default;
             return (char)value;
-        }
-
-        /// <summary>
-        /// Writes a number to the stream.
-        /// </summary>
-        /// <param name="number">The number to write to the stream.</param>
-        public void Write(int number)
-        {
-            Span<byte> buffer = stackalloc byte[10];
-            Span<byte> buffer = stackalloc byte[11];
-            var bytesRead = Encoding.ASCII.GetBytes(number.ToString().AsSpan(), buffer);
-            Write(buffer.Slice(0, bytesRead));
-        }
-
-        /// <summary>
-        /// Writes the number to the stream.
-        /// </summary>
-        /// <param name="number">The number to write to the stream.</param>
-        public void Write(long number)
-        {
-            Span<byte> buffer = stackalloc byte[20];
-            var bytesRead = Encoding.ASCII.GetBytes(number.ToString().AsSpan(), buffer);
-            Write(buffer.Slice(0, bytesRead));
-        }
-
-        /// <summary>
-        /// Writes a char to the stream.
-        /// </summary>
-        /// <param name="c">The char to write to the stream.</param>
-        public void Write(char c)
-        {
-            InnerStream.WriteByte((byte) c);
-        }
-
-        /// <summary>
-        /// Writes the bytes to the stream.
-        /// </summary>
-        /// <param name="bytes">The bytes to write to the stream.</param>
-        public void Write(ReadOnlySpan<byte> bytes)
-        {
-            InnerStream.Write(bytes);
-        }
-
-        /// <summary>
-        /// Writes a sequence of bytes to the stream and advances the position by the number of bytes written.
-        /// </summary>
-        /// <param name="buffer">An array of bytes to copy from.</param>
-        /// <param name="offset">The zero-based offset in <paramref name="buffer"/> to start copying from to the stream.</param>
-        /// <param name="count">The number of bytes to be written to the stream</param>
-        public void Write(byte[] buffer, int offset, int count)
-        {
-            InnerStream.Write(buffer, offset, count);
-        }
-
-        /// <summary>
-        /// Attempts to set the length of the stream to the specified <paramref name="length"/> if supported.
-        /// </summary>
-        /// <param name="length"></param>
-        public bool TrySetLength(long length)
-        {
-            if (!InnerStream.CanWrite || !InnerStream.CanSeek)
-                return false;
-
-            try
-            {
-                if (InnerStream.Length >= length)
-                    return false;
-
-                InnerStream.SetLength(length);
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Clears all buffers for this stream and causes any buffered data to be written.
-        /// </summary>
-        public void Flush()
-        {
-            InnerStream.Flush();
         }
 
         /// <summary>

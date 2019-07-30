@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using BencodeNET.IO;
 
@@ -135,7 +136,7 @@ namespace BencodeNET.Objects
         public override int GetSizeInBytes() => this.Sum(x => x.Key.GetSizeInBytes() + x.Value.GetSizeInBytes()) + 2;
 
 #pragma warning disable 1591
-        protected override void EncodeObject(BencodeStream stream)
+        protected override void EncodeObject(Stream stream)
         {
             stream.Write('d');
             foreach (var entry in this)

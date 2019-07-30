@@ -85,6 +85,44 @@ namespace BencodeNET
             return sign + 19;
         }
 
+        public static bool TrySetLength(this Stream stream, long length)
+        {
+            if (!stream.CanWrite || !stream.CanSeek)
+                return false;
+
+            try
+            {
+                if (stream.Length >= length)
+                    return false;
+
+                stream.SetLength(length);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public static void Write(this Stream stream, int number)
+        {
+            Span<byte> buffer = stackalloc byte[11];
+            var bytesRead = Encoding.ASCII.GetBytes(number.ToString().AsSpan(), buffer);
+            stream.Write(buffer.Slice(0, bytesRead));
+        }
+
+        public static void Write(this Stream stream, long number)
+        {
+            Span<byte> buffer = stackalloc byte[20];
+            var bytesRead = Encoding.ASCII.GetBytes(number.ToString().AsSpan(), buffer);
+            stream.Write(buffer.Slice(0, bytesRead));
+        }
+
+        public static void Write(this Stream stream, char c)
+        {
+            stream.WriteByte((byte) c);
+        }
+
 #if NETSTANDARD1_3
         public static bool IsAssignableFrom(this Type type, Type otherType)
         {

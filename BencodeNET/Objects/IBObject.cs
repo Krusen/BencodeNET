@@ -47,13 +47,6 @@ namespace BencodeNET.Objects
         TStream EncodeTo<TStream>(TStream stream) where TStream : Stream;
 
         /// <summary>
-        /// Writes the object as bencode to the specified stream.
-        /// </summary>
-        /// <param name="stream">The stream to write to.</param>
-        /// <returns>The used stream.</returns>
-        BencodeStream EncodeTo(BencodeStream stream);
-
-        /// <summary>
         /// Writes the object as bencode to the specified file.
         /// </summary>
         /// <param name="filePath">The file path to write the encoded object to.</param>
