@@ -157,6 +157,7 @@ namespace BencodeNET.Torrents
         public virtual long PieceSize { get; set; }
 
         // TODO: Split into list of 20-byte hashes and rename to something appropriate?
+
         /// <summary>
         /// A concatenation of all 20-byte SHA1 hash values (one for each piece).
         /// Use <see cref="PiecesAsHexString"/> to get/set this value as a hex string instead.
@@ -328,6 +329,9 @@ namespace BencodeNET.Torrents
         {
             return TorrentUtil.CreateMagnetLink(this, options);
         }
+
+        /// <inheritdoc/>
+        public override int GetSizeInBytes() => ToBDictionary().GetSizeInBytes();
 
         /// <summary>
         /// Encodes the torrent and writes it to the stream.

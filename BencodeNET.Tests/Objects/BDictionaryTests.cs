@@ -366,5 +366,22 @@ namespace BencodeNET.Tests.Objects
             bencode.Should()
                 .Be("d6:A Listl3:foo3:bari123ed9:more spam9:more eggsee6:foobard7:numbersli1ei2ei3eee4:spam3:egge");
         }
+
+        [Fact]
+        public void GetSizeInBytes()
+        {
+            var bdict = new BDictionary
+            {
+                // 6 + 5
+                {"spam", "egg"},
+                // 6 + 3 + 3 + 3 + 3 (+ 2)
+                { "list", new BList { 1, 2, 3} },
+                // 5 + 5
+                { "str", "abc" },
+                // 5 + 4
+                { "num", 42 }
+            }; // 2
+            bdict.GetSizeInBytes().Should().Be(49);
+        }
     }
 }

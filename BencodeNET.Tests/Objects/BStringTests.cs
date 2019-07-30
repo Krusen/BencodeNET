@@ -234,5 +234,19 @@ namespace BencodeNET.Tests.Objects
                 stream.AsString().Should().Be("11:hello world");
             }
         }
+
+        [Fact]
+        public void GetSizeInBytes()
+        {
+            var bstring = new BString("abc", Encoding.UTF8);
+            bstring.GetSizeInBytes().Should().Be(5);
+        }
+
+        [Fact]
+        public void GetSizeInBytes_UTF8()
+        {
+            var bstring = new BString("æøå äö èéê ñ", Encoding.UTF8);
+            bstring.GetSizeInBytes().Should().Be(24);
+        }
     }
 }

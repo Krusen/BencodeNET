@@ -43,6 +43,9 @@ namespace BencodeNET.Objects
         }
 
         /// <inheritdoc/>
+        public override int GetSizeInBytes() => Value.DigitCount() + 2;
+
+        /// <inheritdoc/>
         protected override void EncodeObject(BencodeStream stream)
         {
             stream.Write('i');

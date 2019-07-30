@@ -313,5 +313,12 @@ namespace BencodeNET.Tests.Objects
             Action action = () => { var b = (bool) bnumber; };
             action.Should().Throw<InvalidCastException>();
         }
+
+        [Fact]
+        public void GetSizeInBytes()
+        {
+            var bnumber = new BNumber(42);
+            bnumber.GetSizeInBytes().Should().Be(4);
+        }
     }
 }

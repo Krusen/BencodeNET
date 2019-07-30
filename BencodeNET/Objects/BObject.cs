@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Text;
 using BencodeNET.IO;
 
@@ -11,6 +11,11 @@ namespace BencodeNET.Objects
     {
         internal BObject()
         { }
+
+        /// <summary>
+        /// Calculates the (encoded) size of the object in bytes.
+        /// </summary>
+        public abstract int GetSizeInBytes();
 
         /// <summary>
         /// Encodes the object and returns the result as a string using <see cref="Encoding.UTF8"/>.
@@ -29,7 +34,8 @@ namespace BencodeNET.Objects
         /// </returns>
         public virtual string EncodeAsString(Encoding encoding)
         {
-            using (var stream = EncodeTo(new MemoryStream()))
+            var size = GetSizeInBytes();
+            using (var stream = EncodeTo(new MemoryStream(size)))
             {
                 if (stream.TryGetBuffer(out var buffer) && stream.Length <=  int.MaxValue)
                 {
@@ -45,7 +51,8 @@ namespace BencodeNET.Objects
         /// <returns>The raw bytes of the bencoded object.</returns>
         public virtual byte[] EncodeAsBytes()
         {
-            using (var stream = new MemoryStream())
+            var size = GetSizeInBytes();
+            using (var stream = new MemoryStream(size))
             {
                 EncodeTo(stream);
                 return stream.ToArray();
@@ -71,6 +78,8 @@ namespace BencodeNET.Objects
         /// <returns>The used stream.</returns>
         public BencodeStream EncodeTo(BencodeStream stream)
         {
+            var size = GetSizeInBytes();
+            stream.TrySetLength(size);
             EncodeObject(stream);
             return stream;
         }

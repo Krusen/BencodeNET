@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -129,6 +129,10 @@ namespace BencodeNET.Objects
                 }
             }
         }
+
+        // TODO: Tests, and maybe store change to CalculateSizeInBytes or cache value or something
+        /// <inheritdoc/>
+        public override int GetSizeInBytes() => this.Sum(x => x.Key.GetSizeInBytes() + x.Value.GetSizeInBytes()) + 2;
 
 #pragma warning disable 1591
         protected override void EncodeObject(BencodeStream stream)

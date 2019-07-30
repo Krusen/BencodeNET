@@ -71,6 +71,9 @@ namespace BencodeNET.Objects
             _value = _encoding.GetBytes(str);
         }
 
+        /// <inheritdoc/>
+        public override int GetSizeInBytes() => _value.Length + 1 + _value.Length.DigitCount();
+
         /// <summary>
         /// Encodes this byte-string as bencode and returns the encoded string.
         /// Uses the current value of the <see cref="Encoding"/> property.

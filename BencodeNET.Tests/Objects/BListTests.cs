@@ -193,5 +193,12 @@ namespace BencodeNET.Tests.Objects
             Action action = () => blist.AsNumbers();
             action.Should().Throw<InvalidCastException>();
         }
+
+        [Fact]
+        public void GetSizeInBytes()
+        {
+            var blist = new BList{1, 2, "abc"};
+            blist.GetSizeInBytes().Should().Be(13);
+        }
     }
 }

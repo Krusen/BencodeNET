@@ -288,6 +288,29 @@ namespace BencodeNET.IO
         }
 
         /// <summary>
+        /// Attempts to set the length of the stream to the specified <paramref name="length"/> if supported.
+        /// </summary>
+        /// <param name="length"></param>
+        public bool TrySetLength(long length)
+        {
+            if (!InnerStream.CanWrite || !InnerStream.CanSeek)
+                return false;
+
+            try
+            {
+                if (InnerStream.Length >= length)
+                    return false;
+
+                InnerStream.SetLength(length);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Clears all buffers for this stream and causes any buffered data to be written.
         /// </summary>
         public void Flush()

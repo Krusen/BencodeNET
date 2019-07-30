@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -149,6 +149,9 @@ namespace BencodeNET.Objects
                 throw new InvalidCastException($"Not all elements are of type '{typeof(T).FullName}'.", ex);
             }
         }
+
+        /// <inheritdoc/>
+        public override int GetSizeInBytes() => this.Sum(x => x.GetSizeInBytes()) + 2;
 
         /// <inheritdoc/>
         protected override void EncodeObject(BencodeStream stream)

@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Text;
 using BencodeNET.IO;
 
@@ -9,6 +9,11 @@ namespace BencodeNET.Objects
     /// </summary>
     public interface IBObject
     {
+        /// <summary>
+        /// Calculates the (encoded) size of the object in bytes.
+        /// </summary>
+        int GetSizeInBytes();
+
         /// <summary>
         /// Encodes the object and returns the result as a string using <see cref="Encoding.UTF8"/>.
         /// </summary>
