@@ -83,8 +83,7 @@ namespace BencodeNET.Parsing
             if (firstDigit == '0' && numberOfDigits == 1 && isNegative)
                 throw InvalidException("'-0' is not a valid number.", startPosition);
 
-            long number;
-            if (!ParseUtil.TryParseLongFast(Digits.ToString(), out number))
+            if (!ParseUtil.TryParseLongFast(Digits.ToString(), out var number))
             {
                 var nonSignChars = isNegative ? Digits.ToString(1, Digits.Length - 1) : Digits.ToString();
                 if (nonSignChars.Any(x => !x.IsDigit()))

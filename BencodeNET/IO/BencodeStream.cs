@@ -14,7 +14,7 @@ namespace BencodeNET.IO
     {
         private static readonly byte[] EmptyByteArray = new byte[0];
 
-        private byte[] SingleByteBuffer { get; } = new byte[1];
+        private readonly byte[] _singleByteBuffer = new byte[1];
 
         private bool _hasPeeked;
         private int _peekedByte;
@@ -24,7 +24,8 @@ namespace BencodeNET.IO
         /// to bytes using <see cref="Encoding.UTF8"/> and storing them in a <see cref="MemoryStream"/>.
         /// </summary>
         /// <param name="str"></param>
-        public BencodeStream(string str) : this(str, Encoding.UTF8)
+        public BencodeStream(string str)
+            : this(str, Encoding.UTF8)
         { }
 
         /// <summary>
@@ -33,7 +34,8 @@ namespace BencodeNET.IO
         /// </summary>
         /// <param name="str"></param>
         /// <param name="encoding"></param>
-        public BencodeStream(string str, Encoding encoding) : this(encoding.GetBytes(str))
+        public BencodeStream(string str, Encoding encoding)
+            : this(encoding.GetBytes(str))
         { }
 
         /// <summary>
@@ -41,7 +43,8 @@ namespace BencodeNET.IO
         /// using a <see cref="MemoryStream"/> as the <see cref="InnerStream"/>.
         /// </summary>
         /// <param name="bytes"></param>
-        public BencodeStream(byte[] bytes) : this(new MemoryStream(bytes), false)
+        public BencodeStream(byte[] bytes)
+            : this(new MemoryStream(bytes))
         { }
 
         /// <summary>
@@ -69,7 +72,7 @@ namespace BencodeNET.IO
         public bool LeaveOpen { get; }
 
         /// <summary>
-        /// Gets the lenght in bytes of the stream.
+        /// Gets the length of the stream in bytes.
         /// </summary>
         public long Length => InnerStream.Length;
 
@@ -216,11 +219,11 @@ namespace BencodeNET.IO
 
             InnerStream.Position -= 1;
 
-            var readBytes = InnerStream.Read(SingleByteBuffer, 0, 1);
+            var readBytes = InnerStream.Read(_singleByteBuffer, 0, 1);
             if (readBytes == 0)
                 return -1;
 
-            return SingleByteBuffer[0];
+            return _singleByteBuffer[0];
         }
 
         /// <summary>
@@ -231,7 +234,7 @@ namespace BencodeNET.IO
         {
             var value = ReadPrevious();
             if (value == -1)
-                return default(char);
+                return default;
             return (char)value;
         }
 
@@ -261,7 +264,7 @@ namespace BencodeNET.IO
         /// <param name="c">The char to write to the stream.</param>
         public void Write(char c)
         {
-            InnerStream.Write(c);
+            InnerStream.WriteByte((byte) c);
         }
 
         /// <summary>

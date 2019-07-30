@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -24,12 +24,7 @@ namespace BencodeNET
 
         public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
         {
-            return dictionary.TryGetValue(key, out TValue value) ? value : default(TValue);
-        }
-
-        public static void Write(this Stream stream, char c)
-        {
-            stream.WriteByte((byte)c);
+            return dictionary.TryGetValue(key, out var value) ? value : default;
         }
 
         public static IEnumerable<T> Flatten<T>(this IEnumerable<IEnumerable<T>> source)

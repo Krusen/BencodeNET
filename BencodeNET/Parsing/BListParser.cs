@@ -22,9 +22,7 @@ namespace BencodeNET.Parsing
         /// <param name="bencodeParser">The parser used for parsing contained objects.</param>
         public BListParser(IBencodeParser bencodeParser)
         {
-            if (bencodeParser == null) throw new ArgumentNullException(nameof(bencodeParser));
-
-            BencodeParser = bencodeParser;
+            BencodeParser = bencodeParser ?? throw new ArgumentNullException(nameof(bencodeParser));
         }
 
         /// <summary>

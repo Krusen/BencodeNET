@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,20 +48,14 @@ namespace BencodeNET.Objects
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
-        public void Add(string key, string value)
-        {
-            Add(new BString(key), new BString(value));
-        }
+        public void Add(string key, string value) => Add(new BString(key), new BString(value));
 
         /// <summary>
         /// Adds the specified key and value to the dictionary as <see cref="BNumber"/>.
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
-        public void Add(string key, long value)
-        {
-            Add(new BString(key), new BNumber(value));
-        }
+        public void Add(string key, long value) => Add(new BString(key), new BNumber(value));
 
         /// <summary>
         /// Gets the value associated with the specified key and casts it as <typeparamref name="T"/>.
@@ -99,38 +93,39 @@ namespace BencodeNET.Objects
                 if (existingKeyAction == ExistingKeyAction.Skip)
                     continue;
 
-                // Replace strings and numbers
-                if (field.Value is BString || field.Value is BNumber)
+                switch (field.Value)
                 {
-                    this[field.Key] = field.Value;
-                    continue;
-                }
-
-                // Append list to existing list or replace other types
-                var newList = field.Value as BList;
-                if (newList != null)
-                {
-                    var existingList = Get<BList>(field.Key);
-                    if (existingList == null || existingKeyAction == ExistingKeyAction.Replace)
-                    {
+                    // Replace strings and numbers
+                    case BString _:
+                    case BNumber _:
                         this[field.Key] = field.Value;
                         continue;
-                    }
-                    existingList.AddRange(newList);
-                    continue;
-                }
 
-                // Merge dictionary with existing or replace other types
-                var newDictionary = field.Value as BDictionary;
-                if (newDictionary != null)
-                {
-                    var existingDictionary = Get<BDictionary>(field.Key);
-                    if (existingDictionary == null || existingKeyAction == ExistingKeyAction.Replace)
+                    // Append list to existing list or replace other types
+                    case BList newList:
                     {
-                        this[field.Key] = field.Value;
+                        var existingList = Get<BList>(field.Key);
+                        if (existingList == null || existingKeyAction == ExistingKeyAction.Replace)
+                        {
+                            this[field.Key] = field.Value;
+                            continue;
+                        }
+                        existingList.AddRange(newList);
                         continue;
                     }
-                    existingDictionary.MergeWith(newDictionary);
+
+                    // Merge dictionary with existing or replace other types
+                    case BDictionary newDictionary:
+                    {
+                        var existingDictionary = Get<BDictionary>(field.Key);
+                        if (existingDictionary == null || existingKeyAction == ExistingKeyAction.Replace)
+                        {
+                            this[field.Key] = field.Value;
+                            continue;
+                        }
+                        existingDictionary.MergeWith(newDictionary);
+                        break;
+                    }
                 }
             }
         }
@@ -139,10 +134,10 @@ namespace BencodeNET.Objects
         protected override void EncodeObject(BencodeStream stream)
         {
             stream.Write('d');
-            foreach (var kvPair in this)
+            foreach (var entry in this)
             {
-                kvPair.Key.EncodeTo(stream);
-                kvPair.Value.EncodeTo(stream);
+                entry.Key.EncodeTo(stream);
+                entry.Value.EncodeTo(stream);
             }
             stream.Write('e');
         }
@@ -162,13 +157,8 @@ namespace BencodeNET.Objects
         /// </summary>
         public IBObject this[BString key]
         {
-            get { return ContainsKey(key) ? Value[key] : null; }
-            set
-            {
-                if (value == null)
-                    throw new ArgumentNullException(nameof(value), "A null value cannot be added to a BDictionary");
-                Value[key] = value;
-            }
+            get => ContainsKey(key) ? Value[key] : null;
+            set => Value[key] = value ?? throw new ArgumentNullException(nameof(value), "A null value cannot be added to a BDictionary");
         }
 
         public void Add(KeyValuePair<BString, IBObject> item)
@@ -183,57 +173,30 @@ namespace BencodeNET.Objects
             Value.Add(key, value);
         }
 
-        public void Clear()
-        {
-            Value.Clear();
-        }
+        public void Clear() => Value.Clear();
 
-        public bool Contains(KeyValuePair<BString, IBObject> item)
-        {
-            return Value.Contains(item);
-        }
+        public bool Contains(KeyValuePair<BString, IBObject> item) => Value.Contains(item);
 
-        public bool ContainsKey(BString key)
-        {
-            return Value.ContainsKey(key);
-        }
+        public bool ContainsKey(BString key) => Value.ContainsKey(key);
 
-        public void CopyTo(KeyValuePair<BString, IBObject>[] array, int arrayIndex)
-        {
-            Value.CopyTo(array, arrayIndex);
-        }
+        public void CopyTo(KeyValuePair<BString, IBObject>[] array, int arrayIndex) => Value.CopyTo(array, arrayIndex);
 
-        public IEnumerator<KeyValuePair<BString, IBObject>> GetEnumerator()
-        {
-            return Value.GetEnumerator();
-        }
+        public IEnumerator<KeyValuePair<BString, IBObject>> GetEnumerator() => Value.GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public bool Remove(KeyValuePair<BString, IBObject> item)
-        {
-            return Value.Remove(item);
-        }
+        public bool Remove(KeyValuePair<BString, IBObject> item) => Value.Remove(item);
 
-        public bool Remove(BString key)
-        {
-            return Value.Remove(key);
-        }
+        public bool Remove(BString key) => Value.Remove(key);
 
-        public bool TryGetValue(BString key, out IBObject value)
-        {
-            return Value.TryGetValue(key, out value);
-        }
+        public bool TryGetValue(BString key, out IBObject value) => Value.TryGetValue(key, out value);
 
         #endregion
 #pragma warning restore 1591
     }
 
     /// <summary>
-    /// Specifices the action to take when encountering an already existing key when merging two <see cref="BDictionary"/>.
+    /// Specifies the action to take when encountering an already existing key when merging two <see cref="BDictionary"/>.
     /// </summary>
     public enum ExistingKeyAction
     {

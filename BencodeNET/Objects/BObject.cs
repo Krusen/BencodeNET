@@ -18,10 +18,7 @@ namespace BencodeNET.Objects
         /// <returns>
         /// The object bencoded and converted to a string using <see cref="Encoding.UTF8"/>.
         /// </returns>
-        public virtual string EncodeAsString()
-        {
-            return EncodeAsString(Encoding.UTF8);
-        }
+        public virtual string EncodeAsString() => EncodeAsString(Encoding.UTF8);
 
         /// <summary>
         /// Encodes the object and returns the result as a string using the specified encoding.

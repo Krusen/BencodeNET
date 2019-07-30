@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -78,12 +78,9 @@ namespace BencodeNET.Objects
         /// <returns>
         /// This byte-string as a bencoded string.
         /// </returns>
-        public override string EncodeAsString()
-        {
-            return EncodeAsString(_encoding);
-        }
+        public override string EncodeAsString() => EncodeAsString(_encoding);
 
-#pragma warning disable 1591
+        /// <inheritdoc/>
         protected override void EncodeObject(BencodeStream stream)
         {
             stream.Write(_value.Length);
@@ -91,10 +88,8 @@ namespace BencodeNET.Objects
             stream.Write(_value);
         }
 
-        public static implicit operator BString(string value)
-        {
-            return new BString(value);
-        }
+#pragma warning disable 1591
+        public static implicit operator BString(string value) => new BString(value);
 
         public static bool operator ==(BString first, BString second)
         {
@@ -104,25 +99,11 @@ namespace BencodeNET.Objects
             return first.Equals(second);
         }
 
-        public static bool operator !=(BString first, BString second)
-        {
-            return !(first == second);
-        }
+        public static bool operator !=(BString first, BString second) => !(first == second);
 
-        public override bool Equals(object other)
-        {
-            if (other is BString bstring)
-                return Value.SequenceEqual(bstring.Value);
+        public override bool Equals(object other) => other is BString bstring && Value.SequenceEqual(bstring.Value);
 
-            return false;
-        }
-
-        public bool Equals(BString bstring)
-        {
-            if (bstring == null)
-                return false;
-            return Value.SequenceEqual(bstring.Value);
-        }
+        public bool Equals(BString bstring) => bstring != null && Value.SequenceEqual(bstring.Value);
 
         public override int GetHashCode()
         {

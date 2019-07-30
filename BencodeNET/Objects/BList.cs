@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -60,38 +60,26 @@ namespace BencodeNET.Objects
         /// Adds a string to the list using <see cref="Encoding.UTF8"/>.
         /// </summary>
         /// <param name="value"></param>
-        public void Add(string value)
-        {
-            Add(new BString(value));
-        }
+        public void Add(string value) => Add(new BString(value));
 
         /// <summary>
         /// Adds a string to the list using the specified encoding.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="encoding"></param>
-        public void Add(string value, Encoding encoding)
-        {
-            Add(new BString(value, encoding));
-        }
+        public void Add(string value, Encoding encoding) => Add(new BString(value, encoding));
 
         /// <summary>
         /// Adds an integer to the list.
         /// </summary>
         /// <param name="value"></param>
-        public void Add(int value)
-        {
-            Add((IBObject) new BNumber(value));
-        }
+        public void Add(int value) => Add((IBObject) new BNumber(value));
 
         /// <summary>
         /// Adds a long to the list.
         /// </summary>
         /// <param name="value"></param>
-        public void Add(long value)
-        {
-            Add((IBObject) new BNumber(value));
-        }
+        public void Add(long value) => Add((IBObject) new BNumber(value));
 
         /// <summary>
         /// Appends a list to the end of this instance.
@@ -120,10 +108,7 @@ namespace BencodeNET.Objects
         /// Assumes all elements are <see cref="BString"/>
         /// and returns an enumerable of their string representation.
         /// </summary>
-        public IEnumerable<string> AsStrings()
-        {
-            return AsStrings(Encoding.UTF8);
-        }
+        public IEnumerable<string> AsStrings() => AsStrings(Encoding.UTF8);
 
         /// <summary>
         /// Assumes all elements are <see cref="BString"/> and returns
@@ -165,7 +150,7 @@ namespace BencodeNET.Objects
             }
         }
 
-#pragma warning disable 1591
+        /// <inheritdoc/>
         protected override void EncodeObject(BencodeStream stream)
         {
             stream.Write('l');
@@ -175,7 +160,6 @@ namespace BencodeNET.Objects
             }
             stream.Write('e');
         }
-#pragma warning restore 1591
 
         #region IList<IBObject> Members
 #pragma warning disable 1591
@@ -186,12 +170,8 @@ namespace BencodeNET.Objects
 
         public IBObject this[int index]
         {
-            get { return Value[index]; }
-            set
-            {
-                if (value == null) throw new ArgumentNullException(nameof(value));
-                Value[index] = value;
-            }
+            get => Value[index];
+            set => Value[index] = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         public void Add(IBObject item)
@@ -200,50 +180,23 @@ namespace BencodeNET.Objects
             Value.Add(item);
         }
 
-        public void Clear()
-        {
-            Value.Clear();
-        }
+        public void Clear() => Value.Clear();
 
-        public bool Contains(IBObject item)
-        {
-            return Value.Contains(item);
-        }
+        public bool Contains(IBObject item) => Value.Contains(item);
 
-        public void CopyTo(IBObject[] array, int arrayIndex)
-        {
-            Value.CopyTo(array, arrayIndex);
-        }
+        public void CopyTo(IBObject[] array, int arrayIndex) => Value.CopyTo(array, arrayIndex);
 
-        public IEnumerator<IBObject> GetEnumerator()
-        {
-            return Value.GetEnumerator();
-        }
+        public IEnumerator<IBObject> GetEnumerator() => Value.GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public int IndexOf(IBObject item)
-        {
-            return Value.IndexOf(item);
-        }
+        public int IndexOf(IBObject item) => Value.IndexOf(item);
 
-        public void Insert(int index, IBObject item)
-        {
-            Value.Insert(index, item);
-        }
+        public void Insert(int index, IBObject item) => Value.Insert(index, item);
 
-        public bool Remove(IBObject item)
-        {
-            return Value.Remove(item);
-        }
+        public bool Remove(IBObject item) => Value.Remove(item);
 
-        public void RemoveAt(int index)
-        {
-            Value.RemoveAt(index);
-        }
+        public void RemoveAt(int index) => Value.RemoveAt(index);
 
 #pragma warning restore 1591
         #endregion
@@ -298,15 +251,9 @@ namespace BencodeNET.Objects
             Value.Add(item);
         }
 
-        public bool Contains(T item)
-        {
-            return Value.Contains(item);
-        }
+        public bool Contains(T item) => Value.Contains(item);
 
-        public void CopyTo(T[] array, int arrayIndex)
-        {
-            Value.CopyTo(array.Cast<IBObject>().ToArray(), arrayIndex);
-        }
+        public void CopyTo(T[] array, int arrayIndex) => Value.CopyTo(array.Cast<IBObject>().ToArray(), arrayIndex);
 
         public new IEnumerator<T> GetEnumerator()
         {
@@ -321,20 +268,11 @@ namespace BencodeNET.Objects
             }
         }
 
-        public int IndexOf(T item)
-        {
-            return Value.IndexOf(item);
-        }
+        public int IndexOf(T item) => Value.IndexOf(item);
 
-        public void Insert(int index, T item)
-        {
-            Value.Insert(index, item);
-        }
+        public void Insert(int index, T item) => Value.Insert(index, item);
 
-        public bool Remove(T item)
-        {
-            return Value.Remove(item);
-        }
+        public bool Remove(T item) => Value.Remove(item);
 
 #pragma warning restore 1591
         #endregion
