@@ -244,8 +244,10 @@ namespace BencodeNET.IO
         /// <param name="number">The number to write to the stream.</param>
         public void Write(int number)
         {
-            var bytes = Encoding.ASCII.GetBytes(number.ToString());
-            Write(bytes);
+            Span<byte> buffer = stackalloc byte[10];
+            Span<byte> buffer = stackalloc byte[11];
+            var bytesRead = Encoding.ASCII.GetBytes(number.ToString().AsSpan(), buffer);
+            Write(buffer.Slice(0, bytesRead));
         }
 
         /// <summary>
@@ -254,8 +256,9 @@ namespace BencodeNET.IO
         /// <param name="number">The number to write to the stream.</param>
         public void Write(long number)
         {
-            var bytes = Encoding.ASCII.GetBytes(number.ToString());
-            Write(bytes);
+            Span<byte> buffer = stackalloc byte[20];
+            var bytesRead = Encoding.ASCII.GetBytes(number.ToString().AsSpan(), buffer);
+            Write(buffer.Slice(0, bytesRead));
         }
 
         /// <summary>
@@ -268,12 +271,12 @@ namespace BencodeNET.IO
         }
 
         /// <summary>
-        /// Writes an array of bytes to the stream.
+        /// Writes the bytes to the stream.
         /// </summary>
         /// <param name="bytes">The bytes to write to the stream.</param>
-        public void Write(byte[] bytes)
+        public void Write(ReadOnlySpan<byte> bytes)
         {
-            Write(bytes, 0, bytes.Length);
+            InnerStream.Write(bytes);
         }
 
         /// <summary>

@@ -1,3 +1,4 @@
+﻿using System;
 using System.IO;
 using System.Text;
 using BencodeNET.IO;
@@ -35,7 +36,7 @@ namespace BencodeNET.Objects
         /// Encodes the object and returns the raw bytes.
         /// </summary>
         /// <returns>The raw bytes of the bencoded object.</returns>
-        byte[] EncodeAsBytes();
+        ReadOnlySpan<byte> EncodeAsBytes();
 
         /// <summary>
         /// Writes the object as bencode to the specified stream.

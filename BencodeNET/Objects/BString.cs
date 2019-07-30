@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -155,10 +155,7 @@ namespace BencodeNET.Objects
         /// <returns>
         /// A <see cref="System.String" /> that represents this instance.
         /// </returns>
-        public override string ToString()
-        {
-            return _encoding.GetString(Value.ToArray());
-        }
+        public override string ToString() => _encoding.GetString(_value.AsSpan());
 
         /// <summary>
         /// Converts the underlying bytes to a string representation using the specified encoding.
@@ -170,7 +167,7 @@ namespace BencodeNET.Objects
         public string ToString(Encoding encoding)
         {
             encoding = encoding ?? _encoding;
-            return encoding.GetString(Value.ToArray());
+            return encoding.GetString(_value.AsSpan());
         }
     }
 }

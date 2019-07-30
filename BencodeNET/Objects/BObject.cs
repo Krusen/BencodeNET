@@ -1,3 +1,4 @@
+﻿using System;
 using System.IO;
 using System.Text;
 using BencodeNET.IO;
@@ -49,12 +50,16 @@ namespace BencodeNET.Objects
         /// Encodes the object and returns the raw bytes.
         /// </summary>
         /// <returns>The raw bytes of the bencoded object.</returns>
-        public virtual byte[] EncodeAsBytes()
+        public virtual ReadOnlySpan<byte> EncodeAsBytes()
         {
             var size = GetSizeInBytes();
             using (var stream = new MemoryStream(size))
             {
                 EncodeTo(stream);
+                if (stream.TryGetBuffer(out var buffer) && stream.Length <= int.MaxValue)
+                {
+                    return buffer;
+                }
                 return stream.ToArray();
             }
         }
