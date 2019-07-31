@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using BencodeNET.IO;
 using BencodeNET.Objects;
 
@@ -35,7 +36,11 @@ namespace BencodeNET.Parsing
         /// </summary>
         /// <param name="stream">The bencoded stream to parse.</param>
         /// <returns>The parsed object.</returns>
+        [Obsolete("Use Parse(Stream) or Parse(BencodeReader) instead.")]
         IBObject Parse(BencodeStream stream);
+
+        IBObject Parse(BencodeReader reader);
+
     }
 
     /// <summary>
@@ -69,6 +74,9 @@ namespace BencodeNET.Parsing
         /// </summary>
         /// <param name="stream">The bencoded stream to parse.</param>
         /// <returns>The parsed object.</returns>
+        [Obsolete("Use Parse(Stream) or Parse(BencodeReader) instead.")]
         new T Parse(BencodeStream stream);
+
+        new T Parse(BencodeReader reader);
     }
 }

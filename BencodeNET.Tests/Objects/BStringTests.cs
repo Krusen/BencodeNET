@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using BencodeNET.Objects;
 using FluentAssertions;
@@ -10,11 +9,17 @@ namespace BencodeNET.Tests.Objects
     public class BStringTests
     {
         [Fact]
-        public void ConstructorWithNullValue_ThrowsArgumentNullException()
+        public void ConstructorEmpty_ResultsInEmptyValue()
         {
-            Action action = () => new BString((string) null);
+            var bstring = new BString();
+            bstring.Value.Should().BeEmpty();
+        }
 
-            action.Should().Throw<ArgumentNullException>();
+        [Fact]
+        public void ConstructorWithNullValue_ResultsInEmptyValue()
+        {
+            var bstring = new BString((string)null);
+            bstring.Value.Should().BeEmpty();
         }
 
         [Theory]
@@ -155,6 +160,14 @@ namespace BencodeNET.Tests.Objects
             var bstring = new BString(str);
             var bencode = bstring.EncodeAsString();
             bencode.Should().Be($"{length}:{str}");
+        }
+
+        [Fact]
+        public void CanEncode_NullString()
+        {
+            var bstring = new BString();
+            var bencode = bstring.EncodeAsString();
+            bencode.Should().Be("0:");
         }
 
         [Fact]

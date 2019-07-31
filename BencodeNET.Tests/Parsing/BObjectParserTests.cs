@@ -18,7 +18,7 @@ namespace BencodeNET.Tests.Parsing
 
             parser.ParseString("bencoded string");
 
-            parserMock.Received().Parse(Arg.Any<BencodeStream>());
+            parserMock.Received().Parse(Arg.Any<BencodeReader>());
         }
 
         [Theory]
@@ -33,7 +33,7 @@ namespace BencodeNET.Tests.Parsing
                 parser.Parse(stream);
             }
 
-            parserMock.Received().Parse(Arg.Any<BencodeStream>());
+            parserMock.Received().Parse(Arg.Any<BencodeReader>());
         }
 
         [Theory]
@@ -44,7 +44,7 @@ namespace BencodeNET.Tests.Parsing
 
             parser.ParseString("bencoded string");
 
-            parserMock.Received().Parse(Arg.Any<BencodeStream>());
+            parserMock.Received().Parse(Arg.Any<BencodeReader>());
         }
 
         [Theory]
@@ -59,7 +59,7 @@ namespace BencodeNET.Tests.Parsing
                 parser.Parse(stream);
             }
 
-            parserMock.Received().Parse(Arg.Any<BencodeStream>());
+            parserMock.Received().Parse(Arg.Any<BencodeReader>());
         }
 
         class MockBObjectParser : BObjectParser<IBObject>
@@ -73,7 +73,7 @@ namespace BencodeNET.Tests.Parsing
 
             protected override Encoding Encoding => Encoding.UTF8;
 
-            public override IBObject Parse(BencodeStream stream)
+            public override IBObject Parse(BencodeReader stream)
             {
                 return Substitute.Parse(stream);
             }

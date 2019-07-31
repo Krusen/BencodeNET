@@ -40,24 +40,24 @@ namespace BencodeNET.Parsing
         protected override Encoding Encoding { get; }
 
         /// <summary>
-        /// Parses the next <see cref="BString"/> from the stream.
+        /// Parses the next <see cref="BString"/> from the reader.
         /// </summary>
-        /// <param name="stream">The stream to parse from.</param>
+        /// <param name="reader">The reader to parse from.</param>
         /// <returns>The parsed <see cref="BString"/>.</returns>
-        /// <exception cref="InvalidBencodeException{BString}">Invalid bencode</exception>
-        /// <exception cref="UnsupportedBencodeException{BString}">The bencode is unsupported by this library</exception>
-        public override BString Parse(BencodeStream stream)
+        /// <exception cref="InvalidBencodeException{BString}">Invalid bencode.</exception>
+        /// <exception cref="UnsupportedBencodeException{BString}">The bencode is unsupported by this library.</exception>
+        public override BString Parse(BencodeReader reader)
         {
-            if (stream == null) throw new ArgumentNullException(nameof(stream));
+            if (reader == null) throw new ArgumentNullException(nameof(reader));
 
             // Minimum valid bencode string is '0:' meaning an empty string
-            if (stream.Length < MinimumLength)
-                throw InvalidBencodeException<BString>.BelowMinimumLength(MinimumLength, stream.Length, stream.Position);
+            if (reader.Length < MinimumLength)
+                throw InvalidBencodeException<BString>.BelowMinimumLength(MinimumLength, reader.Length.Value, reader.Position);
 
-            var startPosition = stream.Position;
+            var startPosition = reader.Position;
 
             LengthString.Clear();
-            for (var c = stream.ReadChar(); c != ':' && c != default(char); c = stream.ReadChar())
+            for (var c = reader.ReadChar(); c != ':' && c != null; c = reader.ReadChar())
             {
                 // Because of memory limitations (~1-2 GB) we know for certain we cannot handle more than 10 digits (10GB)
                 if (LengthString.Length >= BString.LengthMaxDigits)
@@ -70,6 +70,9 @@ namespace BencodeNET.Parsing
                 LengthString.Append(c);
             }
 
+            if (reader.ReadPreviousChar() != ':')
+                throw InvalidBencodeException<BString>.UnexpectedChar(':', reader.ReadPreviousChar(), reader.Position);
+
             if (!ParseUtil.TryParseLongFast(LengthString.ToString(), out var stringLength))
                 throw InvalidException($"Invalid length '{LengthString}' of string.", startPosition);
 
@@ -81,10 +84,11 @@ namespace BencodeNET.Parsing
                     startPosition);
             }
 
-            var bytes = stream.Read((int)stringLength);
+            var bytes = new byte[stringLength];
+            var bytesRead = reader.Read(bytes);
 
             // If the two don't match we've reached the end of the stream before reading the expected number of chars
-            if (bytes.Length != stringLength)
+            if (bytesRead != stringLength)
             {
                 throw InvalidException(
                     $"Expected string to be {stringLength:N0} bytes long but could only read {bytes.Length:N0} bytes.",

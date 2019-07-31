@@ -125,7 +125,10 @@ namespace BencodeNET.Parsing
         /// <returns>The parsed object.</returns>
         public IBObject Parse(Stream stream)
         {
-            return Parse(new BencodeStream(stream));
+            using (var reader = new BencodeReader(stream, leaveOpen: true))
+            {
+                return Parse(reader);
+            }
         }
 
         /// <summary>
@@ -133,11 +136,18 @@ namespace BencodeNET.Parsing
         /// </summary>
         /// <param name="stream">The stream to parse.</param>
         /// <returns>The parsed object.</returns>
-        public IBObject Parse(BencodeStream stream)
-        {
-            if (stream == null) throw new ArgumentNullException(nameof(stream));
+        [Obsolete("Use Parse(Stream) or Parse(BencodeReader) instead.")]
+        public IBObject Parse(BencodeStream stream) => Parse(stream.InnerStream);
 
-            switch (stream.PeekChar())
+        /// <summary>
+        ///  Parses an <see cref="IBObject"/> from the reader.
+        /// </summary>
+        /// <param name="reader"></param>
+        public IBObject Parse(BencodeReader reader)
+        {
+            if (reader == null) throw new ArgumentNullException(nameof(reader));
+
+            switch (reader.PeekChar())
             {
                 case '0':
                 case '1':
@@ -148,13 +158,14 @@ namespace BencodeNET.Parsing
                 case '6':
                 case '7':
                 case '8':
-                case '9': return Parse<BString>(stream);
-                case 'i': return Parse<BNumber>(stream);
-                case 'l': return Parse<BList>(stream);
-                case 'd': return Parse<BDictionary>(stream);
+                case '9': return Parse<BString>(reader);
+                case 'i': return Parse<BNumber>(reader);
+                case 'l': return Parse<BList>(reader);
+                case 'd': return Parse<BDictionary>(reader);
+                case null: return null;
             }
 
-            throw InvalidBencodeException<IBObject>.InvalidBeginningChar(stream.PeekChar(), stream.Position);
+            throw InvalidBencodeException<IBObject>.InvalidBeginningChar(reader.PeekChar(), reader.Position);
         }
 
         /// <summary>
@@ -206,7 +217,10 @@ namespace BencodeNET.Parsing
         /// <returns>The parsed object.</returns>
         public T Parse<T>(Stream stream) where T : class, IBObject
         {
-            return Parse<T>(new BencodeStream(stream));
+            using (var reader = new BencodeReader(stream, leaveOpen: true))
+            {
+                return Parse<T>(reader);
+            }
         }
 
         /// <summary>
@@ -215,14 +229,22 @@ namespace BencodeNET.Parsing
         /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
         /// <param name="stream">The bencoded string to parse.</param>
         /// <returns>The parsed object.</returns>
-        public T Parse<T>(BencodeStream stream) where T : class, IBObject
+        [Obsolete("Use Parse(Stream) or Parse(BencodeReader) instead.")]
+        public T Parse<T>(BencodeStream stream) where T : class, IBObject => Parse<T>(stream.InnerStream);
+
+        /// <summary>
+        /// Parse an <see cref="IBObject"/> of type <typeparamref name="T"/> from the reader.
+        /// </summary>
+        /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
+        /// <param name="reader"></param>
+        public T Parse<T>(BencodeReader reader) where T : class, IBObject
         {
             var parser = Parsers.Get<T>();
 
             if (parser == null)
-                throw new BencodeException($"Missing parser for the type '{typeof(T).FullName}'. Stream position: {stream.Position}");
+                throw new BencodeException($"Missing parser for the type '{typeof(T).FullName}'. Stream position: {reader.Position}");
 
-            return parser.Parse(stream);
+            return parser.Parse(reader);
         }
 
         /// <summary>

@@ -3,8 +3,6 @@ using System.Text;
 using BencodeNET.IO;
 using Xunit;
 
-// ReSharper disable ConsiderUsingConfigureAwait
-
 namespace BencodeNET.Tests.IO
 {
     public class BencodeStreamTests

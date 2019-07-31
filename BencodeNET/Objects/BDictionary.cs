@@ -131,11 +131,10 @@ namespace BencodeNET.Objects
             }
         }
 
-        // TODO: Tests, and maybe store change to CalculateSizeInBytes or cache value or something
         /// <inheritdoc/>
         public override int GetSizeInBytes() => this.Sum(x => x.Key.GetSizeInBytes() + x.Value.GetSizeInBytes()) + 2;
 
-#pragma warning disable 1591
+        /// <inheritdoc/>
         protected override void EncodeObject(Stream stream)
         {
             stream.Write('d');
@@ -148,6 +147,7 @@ namespace BencodeNET.Objects
         }
 
         #region IDictionary<BString, IBObject> Members
+#pragma warning disable 1591
 
         public ICollection<BString> Keys => Value.Keys;
 
@@ -196,8 +196,8 @@ namespace BencodeNET.Objects
 
         public bool TryGetValue(BString key, out IBObject value) => Value.TryGetValue(key, out value);
 
-        #endregion
 #pragma warning restore 1591
+        #endregion
     }
 
     /// <summary>

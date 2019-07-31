@@ -1,12 +1,14 @@
 ﻿using System;
-using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 
+#if NETSTANDARD
+using System.Buffers;
+#endif
+
 #if NETSTANDARD1_3
-using System;
 using System.Reflection;
 #endif
 

@@ -9,6 +9,7 @@ namespace BencodeNET.IO
     /// with bencode and to read/write one byte at a time. Also has methods for peeking
     /// at the next byte (caching the read) and for reading the previous byte in stream.
     /// </summary>
+    [Obsolete("Use BencodeReader instead")]
     public class BencodeStream : IDisposable
     {
         private static readonly byte[] EmptyByteArray = new byte[0];
@@ -133,7 +134,7 @@ namespace BencodeNET.IO
         public char PeekChar()
         {
             if (Peek() == -1)
-                return default(char);
+                return default;
             return (char) Peek();
         }
 
@@ -146,7 +147,12 @@ namespace BencodeNET.IO
         public int Read()
         {
             if (!_hasPeeked)
-                return InnerStream.ReadByte();
+            {
+                var read = InnerStream.Read(_singleByteBuffer, 0, 1);
+                if (read == 0)
+                    return -1;
+                return _singleByteBuffer[0];
+            }
 
             if (_peekedByte == -1)
                 return _peekedByte;
@@ -166,7 +172,7 @@ namespace BencodeNET.IO
         {
             var value = Read();
             if (value == -1)
-                return default(char);
+                return default;
             return (char) value;
         }
 

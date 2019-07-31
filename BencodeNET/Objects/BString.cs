@@ -46,6 +46,14 @@ namespace BencodeNET.Objects
         private Encoding _encoding;
 
         /// <summary>
+        /// Creates an empty <see cref="BString"/> ('0:').
+        /// </summary>
+        public BString()
+            : this((string)null)
+        {
+        }
+
+        /// <summary>
         /// Creates a <see cref="BString"/> from bytes with the specified encoding.
         /// </summary>
         /// <param name="bytes">The bytes representing the data.</param>
@@ -66,10 +74,10 @@ namespace BencodeNET.Objects
         /// <exception cref="ArgumentNullException"></exception>
         public BString(string str, Encoding encoding = null)
         {
-            if (str == null) throw new ArgumentNullException(nameof(str));
-
             _encoding = encoding ?? DefaultEncoding;
-            _value = _encoding.GetBytes(str);
+            _value = string.IsNullOrEmpty(str)
+                ? Array.Empty<byte>()
+                : _encoding.GetBytes(str);
         }
 
         /// <inheritdoc/>

@@ -36,33 +36,33 @@ namespace BencodeNET.Parsing
         protected override Encoding Encoding => BencodeParser.Encoding;
 
         /// <summary>
-        /// Parses the next <see cref="BDictionary"/> from the stream and its contained keys and values.
+        /// Parses the next <see cref="BDictionary"/> and its contained keys and values from the reader.
         /// </summary>
-        /// <param name="stream">The stream to parse from.</param>
+        /// <param name="reader">The reader to parse from.</param>
         /// <returns>The parsed <see cref="BDictionary"/>.</returns>
-        /// <exception cref="InvalidBencodeException{BDictionary}">Invalid bencode</exception>
-        public override BDictionary Parse(BencodeStream stream)
+        /// <exception cref="InvalidBencodeException{BDictionary}">Invalid bencode.</exception>
+        public override BDictionary Parse(BencodeReader reader)
         {
-            if (stream == null) throw new ArgumentNullException(nameof(stream));
+            if (reader == null) throw new ArgumentNullException(nameof(reader));
 
-            var startPosition = stream.Position;
+            var startPosition = reader.Position;
 
-            if (stream.Length < MinimumLength)
-                throw InvalidBencodeException<BDictionary>.BelowMinimumLength(MinimumLength, stream.Length, startPosition);
+            if (reader.Length < MinimumLength)
+                throw InvalidBencodeException<BDictionary>.BelowMinimumLength(MinimumLength, reader.Length.Value, startPosition);
 
             // Dictionaries must start with 'd'
-            if (stream.ReadChar() != 'd')
-                throw InvalidBencodeException<BDictionary>.UnexpectedChar('d', stream.ReadPreviousChar(), startPosition);
+            if (reader.ReadChar() != 'd')
+                throw InvalidBencodeException<BDictionary>.UnexpectedChar('d', reader.ReadPreviousChar(), startPosition);
 
             var dictionary = new BDictionary();
             // Loop until next character is the end character 'e' or end of stream
-            while (stream.Peek() != 'e' && stream.Peek() != -1)
+            while (reader.PeekChar() != 'e' && reader.PeekChar() != null)
             {
                 BString key;
                 try
                 {
                     // Decode next string in stream as the key
-                    key = BencodeParser.Parse<BString>(stream);
+                    key = BencodeParser.Parse<BString>(reader);
                 }
                 catch (BencodeException<BString> ex)
                 {
@@ -73,7 +73,7 @@ namespace BencodeNET.Parsing
                 try
                 {
                     // Decode next object in stream as the value
-                    value = BencodeParser.Parse(stream);
+                    value = BencodeParser.Parse(reader);
                 }
                 catch (BencodeException ex)
                 {
@@ -91,11 +91,8 @@ namespace BencodeNET.Parsing
                 dictionary.Add(key, value);
             }
 
-            if (stream.ReadChar() != 'e')
-            {
-                if (stream.EndOfStream) throw InvalidBencodeException<BDictionary>.MissingEndChar();
-                throw InvalidBencodeException<BDictionary>.InvalidEndChar(stream.ReadPreviousChar(), stream.Position);
-            }
+            if (reader.ReadChar() != 'e')
+                if (reader.EndOfStream) throw InvalidBencodeException<BDictionary>.MissingEndChar();
 
             return dictionary;
         }

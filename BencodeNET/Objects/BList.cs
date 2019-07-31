@@ -242,11 +242,7 @@ namespace BencodeNET.Objects
                 if (obj == null) throw new InvalidCastException($"The object at index {index} is not of type {typeof (T).FullName}");
                 return obj;
             }
-            set
-            {
-                if (value == null) throw new ArgumentNullException(nameof(value));
-                Value[index] = value;
-            }
+            set => Value[index] = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         public void Add(T item)
@@ -262,13 +258,16 @@ namespace BencodeNET.Objects
         public new IEnumerator<T> GetEnumerator()
         {
             var i = 0;
-            var enumerator = Value.GetEnumerator();
-            while (enumerator.MoveNext())
+            using (var enumerator = Value.GetEnumerator())
             {
-                var obj = enumerator.Current as T;
-                if (obj == null) throw new InvalidCastException($"The object at index {i} is not of type {typeof(T).FullName}");
-                yield return (T) enumerator.Current;
-                i++;
+                while (enumerator.MoveNext())
+                {
+                    var obj = enumerator.Current as T;
+                    if (obj == null)
+                        throw new InvalidCastException($"The object at index {i} is not of type {typeof(T).FullName}");
+                    yield return (T) enumerator.Current;
+                    i++;
+                }
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using BencodeNET.IO;
 using BencodeNET.Objects;
@@ -41,7 +42,14 @@ namespace BencodeNET.Parsing
         /// </summary>
         /// <param name="stream">The stream to parse.</param>
         /// <returns>The parsed object.</returns>
+        [Obsolete("Use Parse(Stream) or Parse(BencodeReader) instead.")]
         IBObject Parse(BencodeStream stream);
+
+        /// <summary>
+        ///  Parses an <see cref="IBObject"/> from the reader.
+        /// </summary>
+        /// <param name="reader"></param>
+        IBObject Parse(BencodeReader reader);
 
         /// <summary>
         /// Parses a bencoded file into an <see cref="IBObject"/>.
@@ -80,7 +88,15 @@ namespace BencodeNET.Parsing
         /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
         /// <param name="stream">The bencoded string to parse.</param>
         /// <returns>The parsed object.</returns>
+        [Obsolete("Use Parse(Stream) or Parse(BencodeReader) instead.")]
         T Parse<T>(BencodeStream stream) where T : class, IBObject;
+
+        /// <summary>
+        /// Parse an <see cref="IBObject"/> of type <typeparamref name="T"/> from the reader.
+        /// </summary>
+        /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
+        /// <param name="reader"></param>
+        T Parse<T>(BencodeReader reader) where T : class, IBObject;
 
         /// <summary>
         /// Parses a bencoded file into an <see cref="IBObject"/> of type <typeparamref name="T"/>.

@@ -19,7 +19,9 @@ namespace BencodeNET.Tests.Parsing
         {
             // Arrange
             var bstring = new BString("test");
-            SetupBencodeParser(bparser, bencode, bstring, hasEndChar: true);
+            bparser.Parse(Arg.Any<BencodeReader>())
+                .Returns(bstring)
+                .AndSkipsAhead(bencode.Length - 2);
 
             // Act
             var parser = new BListParser(bparser);
@@ -29,7 +31,7 @@ namespace BencodeNET.Tests.Parsing
             blist.Count.Should().Be(1);
             blist[0].Should().BeOfType<BString>();
             blist[0].Should().BeSameAs(bstring);
-            bparser.Received(1).Parse(Arg.Any<BencodeStream>());
+            bparser.Received(1).Parse(Arg.Any<BencodeReader>());
         }
 
         [Theory]
@@ -40,7 +42,7 @@ namespace BencodeNET.Tests.Parsing
             var blist = parser.ParseString(bencode);
 
             blist.Count.Should().Be(0);
-            bparser.Received(0).Parse(Arg.Any<BencodeStream>());
+            bparser.DidNotReceive().Parse(Arg.Any<BencodeReader>());
         }
 
         [Theory]
@@ -73,11 +75,12 @@ namespace BencodeNET.Tests.Parsing
         [InlineAutoMockedData("l4:spam")]
         [InlineAutoMockedData("l ")]
         [InlineAutoMockedData("l:")]
-        public void MissingEndChar_ThrowsInvalidBencodeException(string bencode, IBencodeParser bparser)
+        public void MissingEndChar_ThrowsInvalidBencodeException(string bencode, IBencodeParser bparser, IBObject something)
         {
             // Arrange
-            var bstring = new BString("test");
-            SetupBencodeParser(bparser, bencode, bstring, hasEndChar:false);
+            bparser.Parse(Arg.Any<BencodeReader>())
+                .Returns(something)
+                .AndSkipsAhead(bencode.Length - 1);
 
             // Act
             var parser = new BListParser(bparser);
@@ -85,20 +88,6 @@ namespace BencodeNET.Tests.Parsing
 
             // Assert
             action.Should().Throw<InvalidBencodeException<BList>>();
-        }
-
-        private static void SetupBencodeParser(IBencodeParser bparser, string bencode, IBObject obj, bool hasEndChar)
-        {
-            bparser.Parse(Arg.Any<BencodeStream>())
-                .Returns(obj)
-                .AndDoes(x =>
-                {
-                    // Set stream position to end of list, skipping all "parsed" content
-                    var stream = x.Arg<BencodeStream>();
-                    stream.Position += Math.Max(1, bencode.Length - 1);
-
-                    if (hasEndChar) stream.Position--;
-                });
         }
     }
 }

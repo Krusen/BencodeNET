@@ -25,38 +25,37 @@ namespace BencodeNET.Parsing
         protected override Encoding Encoding => Encoding.UTF8;
 
         /// <summary>
-        /// Parses the next <see cref="BNumber"/> from the stream.
+        /// Parses the next <see cref="BNumber"/> from the reader.
         /// </summary>
-        /// <param name="stream">The stream to parse from.</param>
+        /// <param name="reader">The reader to parse from.</param>
         /// <returns>The parsed <see cref="BNumber"/>.</returns>
-        /// <exception cref="InvalidBencodeException{BNumber}">Invalid bencode</exception>
-        /// <exception cref="UnsupportedBencodeException{BNumber}">The bencode is unsupported by this library</exception>
-        public override BNumber Parse(BencodeStream stream)
+        /// <exception cref="InvalidBencodeException{BNumber}">Invalid bencode.</exception>
+        /// <exception cref="UnsupportedBencodeException{BNumber}">The bencode is unsupported by this library.</exception>
+        public override BNumber Parse(BencodeReader reader)
         {
-            if (stream == null) throw new ArgumentNullException(nameof(stream));
+            if (reader == null) throw new ArgumentNullException(nameof(reader));
 
-            if (stream.Length < MinimumLength)
-                throw InvalidBencodeException<BNumber>.BelowMinimumLength(MinimumLength, stream.Length, stream.Position);
+            if (reader.Length < MinimumLength)
+                throw InvalidBencodeException<BNumber>.BelowMinimumLength(MinimumLength, reader.Length.Value, reader.Position);
 
-            var startPosition = stream.Position;
+            var startPosition = reader.Position;
 
             // Numbers must start with 'i'
-            if (stream.ReadChar() != 'i')
-                throw InvalidBencodeException<BNumber>.UnexpectedChar('i', stream.ReadPreviousChar(), stream.Position);
+            if (reader.ReadChar() != 'i')
+                throw InvalidBencodeException<BNumber>.UnexpectedChar('i', reader.ReadPreviousChar(), reader.Position);
 
             Digits.Clear();
-            char c;
-            for (c = stream.ReadChar(); c != 'e' && c != default(char); c = stream.ReadChar())
+            for (var c = reader.ReadChar(); c != 'e' && c != null; c = reader.ReadChar())
             {
                 Digits.Append(c);
             }
 
             // Last read character should be 'e'
-            if (c != 'e')
-            {
-                if (stream.EndOfStream) throw InvalidBencodeException<BNumber>.MissingEndChar();
-                throw InvalidBencodeException<BNumber>.InvalidEndChar(c, stream.Position);
-            }
+            if (reader.ReadPreviousChar() != 'e')
+                throw InvalidBencodeException<BNumber>.MissingEndChar();
+
+            if (Digits.Length == 0)
+                throw InvalidException("'ie' is not a valid number.", startPosition);
 
             var isNegative = Digits[0] == '-';
             var numberOfDigits = isNegative ? Digits.Length - 1 : Digits.Length;

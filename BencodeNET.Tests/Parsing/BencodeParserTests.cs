@@ -10,7 +10,6 @@ using Xunit;
 namespace BencodeNET.Tests.Parsing
 {
     // TODO: "Integration" tests? Full decode tests
-    // TODO: stream/bencodestream methods
     public class BencodeParserTests
     {
         [Theory]
@@ -30,7 +29,7 @@ namespace BencodeNET.Tests.Parsing
             bparser.Parsers.AddOrReplace(stringParser);
             bparser.ParseString(bencode);
 
-            stringParser.Received(1).Parse(Arg.Any<BencodeStream>());
+            stringParser.Received(1).Parse(Arg.Any<BencodeReader>());
         }
 
         [Theory]
@@ -41,7 +40,7 @@ namespace BencodeNET.Tests.Parsing
             bparser.Parsers.AddOrReplace(numberParser);
             bparser.ParseString(bencode);
 
-            numberParser.Received(1).Parse(Arg.Any<BencodeStream>());
+            numberParser.Received(1).Parse(Arg.Any<BencodeReader>());
         }
 
         [Theory]
@@ -52,7 +51,7 @@ namespace BencodeNET.Tests.Parsing
             bparser.Parsers.AddOrReplace(listParser);
             bparser.ParseString(bencode);
 
-            listParser.Received(1).Parse(Arg.Any<BencodeStream>());
+            listParser.Received(1).Parse(Arg.Any<BencodeReader>());
         }
 
         [Theory]
@@ -63,7 +62,7 @@ namespace BencodeNET.Tests.Parsing
             bparser.Parsers.AddOrReplace(dictionaryParser);
             bparser.ParseString(bencode);
 
-            dictionaryParser.Received(1).Parse(Arg.Any<BencodeStream>());
+            dictionaryParser.Received(1).Parse(Arg.Any<BencodeReader>());
         }
 
         [Theory]
@@ -124,6 +123,14 @@ namespace BencodeNET.Tests.Parsing
             Action action = () => bparser.ParseString(bencode);
 
             action.Should().Throw<InvalidBencodeException<IBObject>>();
+        }
+
+        [Fact]
+        public void EmptyString_ReturnsNull()
+        {
+            var bparser = new BencodeParser();
+            var result = bparser.ParseString("");
+            result.Should().BeNull();
         }
 
         [Fact]

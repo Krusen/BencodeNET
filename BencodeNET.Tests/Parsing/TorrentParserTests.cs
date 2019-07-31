@@ -25,7 +25,7 @@ namespace BencodeNET.Tests.Parsing
         public TorrentParserTests()
         {
             BencodeParser = Substitute.For<IBencodeParser>();
-            BencodeParser.Parse<BDictionary>((BencodeStream) null).ReturnsForAnyArgs(x => ParsedData);
+            BencodeParser.Parse<BDictionary>((BencodeReader) null).ReturnsForAnyArgs(x => ParsedData);
 
             ValidSingleFileTorrentData = new BDictionary
             {
@@ -60,7 +60,7 @@ namespace BencodeNET.Tests.Parsing
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            var torrent = parser.Parse((BencodeStream) null);
+            var torrent = parser.Parse((BencodeReader) null);
 
             // Assert
             torrent.Comment.Should().Be(comment);
@@ -76,7 +76,7 @@ namespace BencodeNET.Tests.Parsing
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            var torrent = parser.Parse((BencodeStream) null);
+            var torrent = parser.Parse((BencodeReader) null);
 
             // Assert
             torrent.CreatedBy.Should().Be(createdBy);
@@ -91,7 +91,7 @@ namespace BencodeNET.Tests.Parsing
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            var torrent = parser.Parse((BencodeStream) null);
+            var torrent = parser.Parse((BencodeReader) null);
 
             // Assert
             torrent.CreationDate.Should().Be(new DateTime(2016, 1, 1));
@@ -106,7 +106,7 @@ namespace BencodeNET.Tests.Parsing
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            var torrent = parser.Parse((BencodeStream) null);
+            var torrent = parser.Parse((BencodeReader) null);
 
             // Assert
             torrent.CreationDate.Should().Be(new DateTime(2016, 1, 1));
@@ -121,7 +121,7 @@ namespace BencodeNET.Tests.Parsing
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            var torrent = parser.Parse((BencodeStream) null);
+            var torrent = parser.Parse((BencodeReader) null);
 
             // Assert
             torrent.CreationDate.Should().Be(new DateTime(1970, 1, 1));
@@ -140,7 +140,7 @@ namespace BencodeNET.Tests.Parsing
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            var torrent = parser.Parse((BencodeStream) null);
+            var torrent = parser.Parse((BencodeReader) null);
 
             // Assert
             torrent.Encoding.Should().Be(Encoding.UTF8);
@@ -157,7 +157,7 @@ namespace BencodeNET.Tests.Parsing
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            var torrent = parser.Parse((BencodeStream) null);
+            var torrent = parser.Parse((BencodeReader) null);
 
             // Assert
             torrent.Encoding.Should().Be(Encoding.ASCII);
@@ -176,7 +176,7 @@ namespace BencodeNET.Tests.Parsing
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            var torrent = parser.Parse((BencodeStream) null);
+            var torrent = parser.Parse((BencodeReader) null);
 
             // Assert
             torrent.Encoding.Should().Be(null);
@@ -193,7 +193,7 @@ namespace BencodeNET.Tests.Parsing
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            var torrent = parser.Parse((BencodeStream)null);
+            var torrent = parser.Parse((BencodeReader)null);
 
             // Assert
             torrent.PieceSize.Should().Be(pieceSize);
@@ -210,7 +210,7 @@ namespace BencodeNET.Tests.Parsing
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            var torrent = parser.Parse((BencodeStream)null);
+            var torrent = parser.Parse((BencodeReader)null);
 
             // Assert
             torrent.Pieces.Should().Equal(pieces);
@@ -231,7 +231,7 @@ namespace BencodeNET.Tests.Parsing
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            var torrent = parser.Parse((BencodeStream)null);
+            var torrent = parser.Parse((BencodeReader)null);
 
             // Assert
             torrent.IsPrivate.Should().Be(expectedResult);
@@ -248,7 +248,7 @@ namespace BencodeNET.Tests.Parsing
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            var torrent = parser.Parse((BencodeStream)null);
+            var torrent = parser.Parse((BencodeReader)null);
 
             // Assert
             torrent.ExtraFields.Should().Contain(extraKey, (BString) extraValue);
@@ -265,7 +265,7 @@ namespace BencodeNET.Tests.Parsing
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            var torrent = parser.Parse((BencodeStream)null);
+            var torrent = parser.Parse((BencodeReader)null);
 
             // Assert
             torrent.Trackers.Should().HaveCount(1);
@@ -286,7 +286,7 @@ namespace BencodeNET.Tests.Parsing
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            var torrent = parser.Parse((BencodeStream)null);
+            var torrent = parser.Parse((BencodeReader)null);
 
             // Assert
             torrent.Trackers.Should().HaveCount(1);
@@ -308,7 +308,7 @@ namespace BencodeNET.Tests.Parsing
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            var torrent = parser.Parse((BencodeStream)null);
+            var torrent = parser.Parse((BencodeReader)null);
 
             // Assert
             torrent.Trackers.Should().HaveCount(2);
@@ -333,7 +333,7 @@ namespace BencodeNET.Tests.Parsing
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            var torrent = parser.Parse((BencodeStream)null);
+            var torrent = parser.Parse((BencodeReader)null);
 
 
             // Assert
@@ -360,7 +360,7 @@ namespace BencodeNET.Tests.Parsing
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            var torrent = parser.Parse((BencodeStream)null);
+            var torrent = parser.Parse((BencodeReader)null);
 
             // Assert
             torrent.Trackers.Should().HaveCount(1);
@@ -381,7 +381,7 @@ namespace BencodeNET.Tests.Parsing
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            var torrent = parser.Parse((BencodeStream)null);
+            var torrent = parser.Parse((BencodeReader)null);
 
             // Assert
             torrent.Files.Should().BeNull();
@@ -419,7 +419,7 @@ namespace BencodeNET.Tests.Parsing
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            var torrent = parser.Parse((BencodeStream)null);
+            var torrent = parser.Parse((BencodeReader)null);
 
             // Assert
             torrent.File.Should().BeNull();
@@ -444,7 +444,7 @@ namespace BencodeNET.Tests.Parsing
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            Action action = () => parser.Parse((BencodeStream)null);
+            Action action = () => parser.Parse((BencodeReader)null);
 
             // Assert
             action.Should().Throw<InvalidTorrentException>()
@@ -462,7 +462,7 @@ namespace BencodeNET.Tests.Parsing
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            Action action = () => parser.Parse((BencodeStream)null);
+            Action action = () => parser.Parse((BencodeReader)null);
 
             // Assert
             action.Should().Throw<InvalidTorrentException>()
@@ -480,7 +480,7 @@ namespace BencodeNET.Tests.Parsing
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            Action action = () => parser.Parse((BencodeStream)null);
+            Action action = () => parser.Parse((BencodeReader)null);
 
             // Assert
             action.Should().Throw<InvalidTorrentException>()
@@ -497,7 +497,7 @@ namespace BencodeNET.Tests.Parsing
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            Action action = () => parser.Parse((BencodeStream)null);
+            Action action = () => parser.Parse((BencodeReader)null);
 
             // Assert
             action.Should().Throw<InvalidTorrentException>()
@@ -514,7 +514,7 @@ namespace BencodeNET.Tests.Parsing
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            Action action = () => parser.Parse((BencodeStream)null);
+            Action action = () => parser.Parse((BencodeReader)null);
 
             // Assert
             action.Should().Throw<InvalidTorrentException>()
@@ -531,7 +531,7 @@ namespace BencodeNET.Tests.Parsing
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            Action action = () => parser.Parse((BencodeStream)null);
+            Action action = () => parser.Parse((BencodeReader)null);
 
             // Assert
             action.Should().Throw<InvalidTorrentException>()
@@ -554,7 +554,7 @@ namespace BencodeNET.Tests.Parsing
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            Action action = () => parser.Parse((BencodeStream)null);
+            Action action = () => parser.Parse((BencodeReader)null);
 
             // Assert
             action.Should().Throw<InvalidTorrentException>()
@@ -577,7 +577,7 @@ namespace BencodeNET.Tests.Parsing
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            Action action = () => parser.Parse((BencodeStream)null);
+            Action action = () => parser.Parse((BencodeReader)null);
 
             // Assert
             action.Should().Throw<InvalidTorrentException>()
@@ -593,7 +593,7 @@ namespace BencodeNET.Tests.Parsing
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            var torrent = parser.Parse((BencodeStream) null);
+            var torrent = parser.Parse((BencodeReader) null);
 
             // Assert
             torrent.OriginalInfoHash.Should().Be(expectedInfoHash);
@@ -608,7 +608,7 @@ namespace BencodeNET.Tests.Parsing
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            var torrent = parser.Parse((BencodeStream) null);
+            var torrent = parser.Parse((BencodeReader) null);
 
             // Assert
             torrent.OriginalInfoHashBytes.Should().Equal(expectedInfoHashBytes);

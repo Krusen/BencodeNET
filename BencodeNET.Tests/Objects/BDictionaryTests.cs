@@ -10,15 +10,14 @@ namespace BencodeNET.Tests.Objects
     public class BDictionaryTests
     {
         [Fact]
-        public void Add_NullValue_ThrowsArgumentNullException()
+        public void Add_NullStringValue_ResultsInEmptyBString()
         {
-            var dict = new BDictionary();
-            Action action = () => dict.Add("key", null);
-            action.Should().Throw<ArgumentNullException>();
+            var dict = new BDictionary {{"key", (string) null}};
+            dict.Get<BString>("key").Value.Should().BeEmpty();
         }
 
         [Fact]
-        public void Add_NullIBobjectValue_ThrowsArgumentNullException()
+        public void Add_NullIBObjectValue_ThrowsArgumentNullException()
         {
             var dict = new BDictionary();
             Action action = () => dict.Add("key", (IBObject)null);

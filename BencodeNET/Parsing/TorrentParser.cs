@@ -38,9 +38,7 @@ namespace BencodeNET.Parsing
         /// <param name="torrentParserMode">The parsing mode to use.</param>
         public TorrentParser(IBencodeParser bencodeParser, TorrentParserMode torrentParserMode)
         {
-            if (bencodeParser == null) throw new ArgumentNullException(nameof(bencodeParser));
-
-            BencodeParser = bencodeParser;
+            BencodeParser = bencodeParser ?? throw new ArgumentNullException(nameof(bencodeParser));
             ParseMode = torrentParserMode;
         }
 
@@ -55,18 +53,18 @@ namespace BencodeNET.Parsing
         protected override Encoding Encoding => BencodeParser.Encoding;
 
         /// <summary>
-        /// Parses the next <see cref="BDictionary"/> from the stream as a <see cref="Torrent"/>.
+        /// Parses the next <see cref="BDictionary"/> from the reader as a <see cref="Torrent"/>.
         /// </summary>
-        /// <param name="stream">The stream to parse from.</param>
+        /// <param name="reader">The reader to parse from.</param>
         /// <returns>The parsed <see cref="Torrent"/>.</returns>
-        public override Torrent Parse(BencodeStream stream)
+        public override Torrent Parse(BencodeReader reader)
         {
-            var data = BencodeParser.Parse<BDictionary>(stream);
+            var data = BencodeParser.Parse<BDictionary>(reader);
             return CreateTorrent(data);
         }
 
         /// <summary>
-        /// Creates a torrrent by reading the relevant data from the <see cref="BDictionary"/>.
+        /// Creates a torrent by reading the relevant data from the <see cref="BDictionary"/>.
         /// </summary>
         /// <param name="data">The torrent bencode data.</param>
         /// <returns>A <see cref="Torrent"/> matching the input.</returns>

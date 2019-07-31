@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Text;
 using BencodeNET.IO;
@@ -21,40 +22,31 @@ namespace BencodeNET.Parsing
         /// </summary>
         /// <param name="bencodedString">The bencoded string to parse.</param>
         /// <returns>The parsed object.</returns>
-        IBObject IBObjectParser.ParseString(string bencodedString)
-        {
-            return ParseString(bencodedString);
-        }
+        IBObject IBObjectParser.ParseString(string bencodedString) => ParseString(bencodedString);
 
         /// <summary>
         /// Parses a byte array into an <see cref="IBObject"/>.
         /// </summary>
         /// <param name="bytes">The bytes to parse.</param>
         /// <returns>The parsed object.</returns>
-        IBObject IBObjectParser.Parse(byte[] bytes)
-        {
-            return Parse(bytes);
-        }
+        IBObject IBObjectParser.Parse(byte[] bytes) => Parse(bytes);
 
         /// <summary>
         /// Parses a stream into an <see cref="IBObject"/>.
         /// </summary>
         /// <param name="stream">The stream to parse.</param>
         /// <returns>The parsed object.</returns>
-        IBObject IBObjectParser.Parse(Stream stream)
-        {
-            return Parse(stream);
-        }
+        IBObject IBObjectParser.Parse(Stream stream) => Parse(stream);
 
         /// <summary>
         /// Parses a bencoded stream into an <see cref="IBObject"/>.
         /// </summary>
         /// <param name="stream">The bencoded stream to parse.</param>
         /// <returns>The parsed object.</returns>
-        IBObject IBObjectParser.Parse(BencodeStream stream)
-        {
-            return Parse(stream);
-        }
+        [Obsolete("Use Parse(Stream) or Parse(BencodeReader) instead.")]
+        IBObject IBObjectParser.Parse(BencodeStream stream) => Parse(stream.InnerStream);
+
+        IBObject IBObjectParser.Parse(BencodeReader reader) => Parse(reader);
 
         /// <summary>
         /// Parses a bencoded string into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
@@ -89,7 +81,7 @@ namespace BencodeNET.Parsing
         /// <returns>The parsed object.</returns>
         public virtual T Parse(Stream stream)
         {
-            return Parse(new BencodeStream(stream));
+            return Parse(new BencodeReader(stream));
         }
 
         /// <summary>
@@ -97,6 +89,10 @@ namespace BencodeNET.Parsing
         /// </summary>
         /// <param name="stream">The bencoded stream to parse.</param>
         /// <returns>The parsed object.</returns>
-        public abstract T Parse(BencodeStream stream);
+        [Obsolete("Use Parse(Stream) or Parse(BencodeReader) instead.")]
+        public virtual T Parse(BencodeStream stream) => Parse(stream.InnerStream);
+
+        // TODO: Make protected?
+        public abstract T Parse(BencodeReader reader);
     }
 }
