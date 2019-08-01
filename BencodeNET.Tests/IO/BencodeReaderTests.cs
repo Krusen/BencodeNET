@@ -138,78 +138,47 @@ namespace BencodeNET.Tests.IO
         }
 
         [Fact]
-        public void ReadPreviousChar()
+        public void PreviousChar()
         {
             var str = "Hello World!";
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(str)))
             using (var bs = new BencodeReader(ms))
             {
-                bs.ReadPreviousChar().Should().BeNull();
+                bs.PreviousChar.Should().BeNull();
 
                 Assert.Equal('H', bs.ReadChar());
-                Assert.Equal('H', bs.ReadPreviousChar());
+                Assert.Equal('H', bs.PreviousChar);
                 Assert.Equal('e', bs.ReadChar());
-                Assert.Equal('e', bs.ReadPreviousChar());
+                Assert.Equal('e', bs.PreviousChar);
 
                 bs.Read(new byte[20]);
 
-                Assert.Equal('!', bs.ReadPreviousChar());
+                Assert.Equal('!', bs.PreviousChar);
             }
         }
 
         [Fact]
-        public void ReadPreviousCharAtStartOfStream()
+        public void PreviousCharAtStartOfStream()
         {
             var str = "Hello World!";
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(str)))
             using (var bs = new BencodeReader(ms))
             {
-                bs.ReadPreviousChar().Should().BeNull();
+                bs.PreviousChar.Should().BeNull();
             }
         }
 
         [Fact]
-        public void ReadPreviousUnaffectedByPeekChar()
+        public void PreviousCharUnaffectedByPeekChar()
         {
             var str = "Hello World!";
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(str)))
             using (var bs = new BencodeReader(ms))
             {
                 bs.SkipBytes(1);
-                Assert.Equal('H', bs.ReadPreviousChar());
+                Assert.Equal('H', bs.PreviousChar);
                 Assert.Equal('e', bs.PeekChar());
-                Assert.Equal('H', bs.ReadPreviousChar());
-            }
-        }
-
-        [Fact]
-        public void PeekUnaffectedByReadPreviousChar()
-        {
-            var str = "abcdefghijkl";
-            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(str)))
-            using (var bs = new BencodeReader(ms))
-            {
-                bs.PeekChar().Should().Be('a');
-                bs.ReadPreviousChar();
-                bs.PeekChar().Should().Be('a');
-
-                bs.SkipBytes(1);
-                bs.PeekChar().Should().Be('b');
-                bs.ReadPreviousChar();
-                bs.PeekChar().Should().Be('b');
-            }
-        }
-
-        [Fact]
-        public void ReadUnaffectedByReadPreviousChar()
-        {
-            var str = "abcdefghijkl";
-            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(str)))
-            using (var bs = new BencodeReader(ms))
-            {
-                bs.ReadChar().Should().Be('a');
-                bs.ReadPreviousChar();
-                bs.ReadChar().Should().Be('b');
+                Assert.Equal('H', bs.PreviousChar);
             }
         }
 

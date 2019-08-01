@@ -18,7 +18,7 @@ namespace BencodeNET.IO
         private bool _hasPeeked;
         private char? _peekedChar;
 
-        private char? _previousChar;
+        public char? PreviousChar { get; private set; }
 
         public int Position { get; private set; }
 
@@ -85,16 +85,13 @@ namespace BencodeNET.IO
 
             var read = _stream.Read(_tinyBuffer, 0, 1);
 
-            _previousChar = read == 0 ? null : (char?)_tinyBuffer[0];
-
             Position += read;
+            PreviousChar = read == 0
+                ? null
+                : (char?) _tinyBuffer[0];
 
-            return _previousChar;
+            return PreviousChar;
         }
-
-        // TODO: Change to property?
-        [Obsolete("Change this to a property")]
-        public char? ReadPreviousChar() => _previousChar;
 
         // TODO: Create version using Span<byte>?
         public int Read(byte[] buffer)
@@ -138,7 +135,7 @@ namespace BencodeNET.IO
                 if (totalRead > 0)
                 {
                     Position += totalRead;
-                    _previousChar = (char)buffer[totalRead - 1];
+                    PreviousChar = (char)buffer[totalRead - 1];
                 }
 
                 return totalRead;

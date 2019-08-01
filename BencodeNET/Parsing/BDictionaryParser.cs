@@ -52,7 +52,7 @@ namespace BencodeNET.Parsing
 
             // Dictionaries must start with 'd'
             if (reader.ReadChar() != 'd')
-                throw InvalidBencodeException<BDictionary>.UnexpectedChar('d', reader.ReadPreviousChar(), startPosition);
+                throw InvalidBencodeException<BDictionary>.UnexpectedChar('d', reader.PreviousChar, startPosition);
 
             var dictionary = new BDictionary();
             // Loop until next character is the end character 'e' or end of stream

@@ -42,7 +42,7 @@ namespace BencodeNET.Parsing
 
             // Numbers must start with 'i'
             if (reader.ReadChar() != 'i')
-                throw InvalidBencodeException<BNumber>.UnexpectedChar('i', reader.ReadPreviousChar(), startPosition);
+                throw InvalidBencodeException<BNumber>.UnexpectedChar('i', reader.PreviousChar, startPosition);
 
             Digits.Clear();
             for (var c = reader.ReadChar(); c != 'e' && c != null; c = reader.ReadChar())
@@ -54,7 +54,7 @@ namespace BencodeNET.Parsing
                 throw NoDigitsException(startPosition);
 
             // Last read character should be 'e'
-            if (reader.ReadPreviousChar() != 'e')
+            if (reader.PreviousChar != 'e')
                 throw InvalidBencodeException<BNumber>.MissingEndChar(startPosition);
 
             var isNegative = Digits[0] == '-';

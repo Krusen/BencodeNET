@@ -52,7 +52,7 @@ namespace BencodeNET.Parsing
 
             // Lists must start with 'l'
             if (reader.ReadChar() != 'l')
-                throw InvalidBencodeException<BList>.UnexpectedChar('l', reader.ReadPreviousChar(), startPosition);
+                throw InvalidBencodeException<BList>.UnexpectedChar('l', reader.PreviousChar, startPosition);
 
             var list = new BList();
             // Loop until next character is the end character 'e' or end of stream

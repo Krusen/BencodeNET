@@ -70,8 +70,8 @@ namespace BencodeNET.Parsing
                 LengthString.Append(c);
             }
 
-            if (reader.ReadPreviousChar() != ':')
-                throw InvalidBencodeException<BString>.UnexpectedChar(':', reader.ReadPreviousChar(), reader.Position - 1);
+            if (reader.PreviousChar != ':')
+                throw InvalidBencodeException<BString>.UnexpectedChar(':', reader.PreviousChar, reader.Position - 1);
 
             if (!ParseUtil.TryParseLongFast(LengthString.ToString(), out var stringLength))
                 throw InvalidException($"Invalid length '{LengthString}' of string.", startPosition);
