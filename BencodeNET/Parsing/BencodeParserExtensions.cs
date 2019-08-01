@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using BencodeNET.IO;
 using BencodeNET.Objects;
@@ -112,5 +112,46 @@ namespace BencodeNET.Parsing
                 return parser.Parse<T>(stream);
             }
         }
+
+#if !NETSTANDARD1_3
+        /// <summary>
+        /// Parses a stream through a <see cref="BufferedStream"/> into an <see cref="IBObject"/>.
+        /// The input <paramref name="stream"/> is disposed when parsing is completed.
+        /// </summary>
+        /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
+        /// <param name="parser"></param>
+        /// <param name="stream">The stream to parse.</param>
+        /// <param name="bufferSize">The buffer size to use. Uses default size of <see cref="BufferedStream"/> if null.</param>
+        /// <returns>The parsed object.</returns>
+        public static IBObject ParseBuffered(this IBencodeParser parser, Stream stream, int? bufferSize = null)
+        {
+;
+            using (var bufferedStream = bufferSize == null
+                ? new BufferedStream(stream)
+                : new BufferedStream(stream, bufferSize.Value))
+            {
+                return parser.Parse(bufferedStream);
+            }
+        }
+
+        /// <summary>
+        /// Parses a stream through a <see cref="BufferedStream"/> into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
+        /// The input <paramref name="stream"/> is disposed when parsing is completed.
+        /// </summary>
+        /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
+        /// <param name="parser"></param>
+        /// <param name="stream">The stream to parse.</param>
+        /// <param name="bufferSize">The buffer size to use. Uses default size of <see cref="BufferedStream"/> if null.</param>
+        /// <returns>The parsed object.</returns>
+        public static T ParseBuffered<T>(this IBencodeParser parser, Stream stream, int? bufferSize = null) where T : class, IBObject
+        {
+            using (var bufferedStream = bufferSize == null
+                ? new BufferedStream(stream)
+                : new BufferedStream(stream, bufferSize.Value))
+            {
+                return parser.Parse<T>(bufferedStream);
+            }
+        }
+#endif
     }
 }

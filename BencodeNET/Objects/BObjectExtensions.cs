@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 
@@ -70,5 +70,23 @@ namespace BencodeNET.Objects
                 bobject.EncodeTo(stream);
             }
         }
+
+#if !NETSTANDARD1_3
+        /// <summary>
+        /// Writes the object as bencode to the specified stream.
+        /// </summary>
+        /// <param name="bobject"></param>
+        /// <param name="stream">The stream to write to.</param>
+        /// <param name="bufferSize">The buffer size to use. Uses default size of <see cref="BufferedStream"/> if null.</param>
+        /// <returns>The used stream.</returns>
+        public static BufferedStream EncodeToBuffered(this IBObject bobject, Stream stream, int? bufferSize = null)
+        {
+            var bufferedStream = bufferSize == null
+                ? new BufferedStream(stream)
+                : new BufferedStream(stream, bufferSize.Value);
+            bobject.EncodeTo(bufferedStream);
+            return bufferedStream;
+        }
+#endif
     }
 }
