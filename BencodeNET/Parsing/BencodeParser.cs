@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using BencodeNET.Exceptions;
@@ -13,91 +12,46 @@ namespace BencodeNET.Parsing
     /// </summary>
     public class BencodeParser : IBencodeParser
     {
-        /// <summary>
-        /// Creates an instance using <see cref="System.Text.Encoding.UTF8"/> and the default parsers.
-        /// </summary>
-        public BencodeParser()
-            : this(Encoding.UTF8)
-        { }
-
-        /// <summary>
-        /// Creates an instance using the specified encoding and the default parsers.
-        /// </summary>
-        /// <param name="encoding">The encoding to use when parsing.</param>
-        public BencodeParser(Encoding encoding)
-        {
-            Encoding = encoding;
-
-            Parsers = new BObjectParserList
-            {
-                new BStringParser(encoding),
-                new BNumberParser(),
-                new BListParser(this),
-                new BDictionaryParser(this),
-                new TorrentParser(this)
-            };
-        }
-
-        /// <summary>
-        /// Creates an instance using <see cref="System.Text.Encoding.UTF8"/> and the default parsers plus the specified parsers.
-        /// Existing default parsers for the same type will be replaced by the new parsers.
-        /// </summary>
-        /// <param name="parsers">The new parsers to add or replace.</param>
-        public BencodeParser(IEnumerable<KeyValuePair<Type, IBObjectParser>> parsers)
-            : this(parsers, Encoding.UTF8)
-        { }
-
-        /// <summary>
-        /// Creates an instance using <see cref="System.Text.Encoding.UTF8"/> and the default parsers plus the specified parsers.
-        /// Existing default parsers for the same type will be replaced by the new parsers.
-        /// </summary>
-        /// <param name="parsers">The new parsers to add or replace.</param>
-        public BencodeParser(IDictionary<Type, IBObjectParser> parsers)
-            : this(parsers, Encoding.UTF8)
-        { }
-
-        /// <summary>
-        /// Creates an instance using the specified encoding and the default parsers plus the specified parsers.
-        /// Existing default parsers for the same type will be replaced by the new parsers.
-        /// </summary>
-        /// <param name="parsers">The new parsers to add or replace.</param>
-        /// <param name="encoding">The encoding to use when parsing.</param>
-        public BencodeParser(IEnumerable<KeyValuePair<Type, IBObjectParser>> parsers, Encoding encoding)
-        {
-            Encoding = encoding;
-
-            foreach (var entry in parsers)
-            {
-                Parsers.AddOrReplace(entry.Key, entry.Value);
-            }
-        }
-
-        /// <summary>
-        /// Creates an instance using the specified encoding and the default parsers plus the specified parsers.
-        /// Existing default parsers for the same type will be replaced by the new parsers.
-        /// </summary>
-        /// <param name="parsers">The new parsers to add or replace.</param>
-        /// <param name="encoding">The encoding to use when parsing.</param>
-        public BencodeParser(IDictionary<Type, IBObjectParser> parsers, Encoding encoding)
-            : this((IEnumerable<KeyValuePair<Type, IBObjectParser>>)parsers, encoding)
-        { }
+        protected BObjectParserList Parsers { get; }
 
         /// <summary>
         /// The encoding use for parsing.
         /// </summary>
-        public Encoding Encoding { get; protected set; }
+        public Encoding Encoding
+        {
+            get => _encoding;
+            set
+            {
+                _encoding = value ?? throw new ArgumentNullException(nameof(value));
+                Parsers.AddOrReplace(new BStringParser(value));
+            }
+        }
+        private Encoding _encoding;
 
         /// <summary>
-        /// The parsers used by this instance when parsing bencoded.
+        /// Creates an instance using the specified encoding and the default parsers.
+        /// Encoding defaults to <see cref="System.Text.Encoding.UTF8"/> if not specified.
         /// </summary>
-        public BObjectParserList Parsers { get; }
+        /// <param name="encoding">The encoding to use when parsing.</param>
+        public BencodeParser(Encoding encoding = null)
+        {
+            _encoding = encoding ?? Encoding.UTF8;
+
+            Parsers = new BObjectParserList
+            {
+                new BNumberParser(),
+                new BStringParser(_encoding),
+                new BListParser(this),
+                new BDictionaryParser(this)
+            };
+        }
 
         /// <summary>
         /// Parses a stream into an <see cref="IBObject"/>.
         /// </summary>
         /// <param name="stream">The stream to parse.</param>
         /// <returns>The parsed object.</returns>
-        public IBObject Parse(Stream stream)
+        public virtual IBObject Parse(Stream stream)
         {
             using (var reader = new BencodeReader(stream, leaveOpen: true))
             {
@@ -111,7 +65,7 @@ namespace BencodeNET.Parsing
         /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
         /// <param name="stream">The stream to parse.</param>
         /// <returns>The parsed object.</returns>
-        public T Parse<T>(Stream stream) where T : class, IBObject
+        public virtual T Parse<T>(Stream stream) where T : class, IBObject
         {
             using (var reader = new BencodeReader(stream, leaveOpen: true))
             {
@@ -123,7 +77,7 @@ namespace BencodeNET.Parsing
         ///  Parses an <see cref="IBObject"/> from the reader.
         /// </summary>
         /// <param name="reader"></param>
-        public IBObject Parse(BencodeReader reader)
+        public virtual IBObject Parse(BencodeReader reader)
         {
             if (reader == null) throw new ArgumentNullException(nameof(reader));
 
@@ -153,7 +107,7 @@ namespace BencodeNET.Parsing
         /// </summary>
         /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
         /// <param name="reader"></param>
-        public T Parse<T>(BencodeReader reader) where T : class, IBObject
+        public virtual T Parse<T>(BencodeReader reader) where T : class, IBObject
         {
             var parser = Parsers.Get<T>();
 

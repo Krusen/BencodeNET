@@ -13,59 +13,6 @@ namespace BencodeNET.Tests.Parsing
     public class BencodeParserTests
     {
         [Theory]
-        [InlineAutoMockedData("0")]
-        [InlineAutoMockedData("1")]
-        [InlineAutoMockedData("2")]
-        [InlineAutoMockedData("3")]
-        [InlineAutoMockedData("4")]
-        [InlineAutoMockedData("5")]
-        [InlineAutoMockedData("6")]
-        [InlineAutoMockedData("7")]
-        [InlineAutoMockedData("8")]
-        [InlineAutoMockedData("9")]
-        public void FirstCharDigit_CallsStringParser(string bencode, IBObjectParser<BString> stringParser)
-        {
-            var bparser = new BencodeParser();
-            bparser.Parsers.AddOrReplace(stringParser);
-            bparser.ParseString(bencode);
-
-            stringParser.Received(1).Parse(Arg.Any<BencodeReader>());
-        }
-
-        [Theory]
-        [InlineAutoMockedData("i")]
-        public void FirstChar_I_CallsNumberParser(string bencode, IBObjectParser<BNumber> numberParser)
-        {
-            var bparser = new BencodeParser();
-            bparser.Parsers.AddOrReplace(numberParser);
-            bparser.ParseString(bencode);
-
-            numberParser.Received(1).Parse(Arg.Any<BencodeReader>());
-        }
-
-        [Theory]
-        [InlineAutoMockedData("l")]
-        public void FirstChar_L_CallsNumberParser(string bencode, IBObjectParser<BList> listParser)
-        {
-            var bparser = new BencodeParser();
-            bparser.Parsers.AddOrReplace(listParser);
-            bparser.ParseString(bencode);
-
-            listParser.Received(1).Parse(Arg.Any<BencodeReader>());
-        }
-
-        [Theory]
-        [InlineAutoMockedData("d")]
-        public void FirstChar_D_CallsNumberParser(string bencode, IBObjectParser<BDictionary> dictionaryParser)
-        {
-            var bparser = new BencodeParser();
-            bparser.Parsers.AddOrReplace(dictionaryParser);
-            bparser.ParseString(bencode);
-
-            dictionaryParser.Received(1).Parse(Arg.Any<BencodeReader>());
-        }
-
-        [Theory]
         #region Alphabet...
         [InlineAutoMockedData("a")]
         [InlineAutoMockedData("b")]
