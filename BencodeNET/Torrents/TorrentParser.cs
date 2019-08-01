@@ -5,9 +5,9 @@ using System.Text;
 using BencodeNET.Exceptions;
 using BencodeNET.IO;
 using BencodeNET.Objects;
-using BencodeNET.Torrents;
+using BencodeNET.Parsing;
 
-namespace BencodeNET.Parsing
+namespace BencodeNET.Torrents
 {
     /// <summary>
     /// A parser for torrent files.
@@ -19,6 +19,24 @@ namespace BencodeNET.Parsing
         /// You can use <see cref="TorrentParserMode.Tolerant"/> if your torrent files are not always following the torrent specification.
         /// </summary>
         public TorrentParserMode ParseMode { get; set; }
+
+
+        /// <summary>
+        /// Creates an instance using a default <see cref="IBencodeParser"/>.
+        /// </summary>
+        public TorrentParser()
+            : this(new BencodeParser())
+        {
+        }
+
+        /// <summary>
+        /// Creates an instance with the specified <see cref="TorrentParserMode"/> using a default <see cref="IBencodeParser"/>.
+        /// </summary>
+        /// <param name="torrentParserMode">The parser used for parsing the torrent <see cref="BDictionary"/>.</param>
+        public TorrentParser(TorrentParserMode torrentParserMode)
+            : this(new BencodeParser(), torrentParserMode)
+        {
+        }
 
         /// <summary>
         /// Creates an instance using the specified <see cref="IBencodeParser"/> for parsing

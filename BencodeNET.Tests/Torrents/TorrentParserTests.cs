@@ -10,7 +10,7 @@ using FluentAssertions;
 using NSubstitute;
 using Xunit;
 
-namespace BencodeNET.Tests.Parsing
+namespace BencodeNET.Tests.Torrents
 {
     public class TorrentParserTests
     {

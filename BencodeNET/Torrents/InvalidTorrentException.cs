@@ -1,7 +1,8 @@
 ﻿using System;
+using BencodeNET.Exceptions;
 
 #pragma warning disable 1591
-namespace BencodeNET.Exceptions
+namespace BencodeNET.Torrents
 {
     /// <summary>
     /// Represents parse errors when parsing torrents.

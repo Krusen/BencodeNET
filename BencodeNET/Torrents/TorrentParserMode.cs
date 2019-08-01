@@ -1,4 +1,4 @@
-﻿namespace BencodeNET.Parsing
+﻿namespace BencodeNET.Torrents
 {
     /// <summary>
     /// Determines how strict to be when parsing torrent files.
