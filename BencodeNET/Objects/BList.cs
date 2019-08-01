@@ -209,7 +209,7 @@ namespace BencodeNET.Objects
     /// <summary>
     /// Represents a bencoded list of type <typeparamref name="T"/> which implements <see cref="IBObject"/> .
     /// </summary>
-    public class BList<T> : BList, IList<T> where T : class, IBObject
+    public sealed class BList<T> : BList, IList<T> where T : class, IBObject
     {
         /// <summary>
         /// The underlying list.

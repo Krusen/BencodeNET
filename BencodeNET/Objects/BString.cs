@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using BencodeNET.IO;
 
 namespace BencodeNET.Objects
 {
@@ -14,7 +13,7 @@ namespace BencodeNET.Objects
     /// <remarks>
     /// The underlying value is a <see cref="byte"/> array.
     /// </remarks>
-    public class BString : BObject<IReadOnlyList<byte>>, IComparable<BString>
+    public sealed class BString : BObject<IReadOnlyList<byte>>, IComparable<BString>
     {
         /// <summary>
         /// The maximum number of digits that can be handled as the length part of a bencoded string.
