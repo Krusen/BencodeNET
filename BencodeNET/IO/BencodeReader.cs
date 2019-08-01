@@ -20,7 +20,7 @@ namespace BencodeNET.IO
 
         public char? PreviousChar { get; private set; }
 
-        public int Position { get; private set; }
+        public long Position => _hasPeeked ? _stream.Position - 1 : _stream.Position;
 
         public long? Length => _supportsLength ? _stream.Length : (long?) null;
 
@@ -78,14 +78,12 @@ namespace BencodeNET.IO
         {
             if (_hasPeeked)
             {
-                if (_peekedChar != null) Position++;
                 _hasPeeked = _peekedChar == null; // If null then EOS so don't reset peek as peeking again will just be EOS again
                 return _peekedChar;
             }
 
             var read = _stream.Read(_tinyBuffer, 0, 1);
 
-            Position += read;
             PreviousChar = read == 0
                 ? null
                 : (char?) _tinyBuffer[0];
@@ -108,7 +106,6 @@ namespace BencodeNET.IO
                 // Just return right away if only reading this 1 byte
                 if (buffer.Length == 1)
                 {
-                    Position++;
                     return 1;
                 }
             }
@@ -134,7 +131,6 @@ namespace BencodeNET.IO
 
                 if (totalRead > 0)
                 {
-                    Position += totalRead;
                     PreviousChar = (char)buffer[totalRead - 1];
                 }
 
