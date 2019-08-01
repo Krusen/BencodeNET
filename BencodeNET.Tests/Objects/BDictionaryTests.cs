@@ -40,6 +40,8 @@ namespace BencodeNET.Tests.Objects
             action.Should().Throw<ArgumentNullException>();
         }
 
+        #region MergeWith
+
         [Fact]
         public void MergeWith_StringReplacesExistingKey()
         {
@@ -225,6 +227,10 @@ namespace BencodeNET.Tests.Objects
             dict1.Get<BDictionary>("main2").Should().HaveCount(1).And.ContainKeys("key2");
         }
 
+        #endregion
+
+        #region SequenceEqual
+
         [Fact]
         public void SequenceEqual_WithKeysAddedInSameOrder_AreEqual()
         {
@@ -297,6 +303,10 @@ namespace BencodeNET.Tests.Objects
             bdict1.SequenceEqual(bdict2).Should().BeFalse();
         }
 
+        #endregion
+
+        #region Encode
+
         [Fact]
         public void CanEncode_Simple()
         {
@@ -365,6 +375,8 @@ namespace BencodeNET.Tests.Objects
             bencode.Should()
                 .Be("d6:A Listl3:foo3:bari123ed9:more spam9:more eggsee6:foobard7:numbersli1ei2ei3eee4:spam3:egge");
         }
+
+        #endregion
 
         [Fact]
         public void GetSizeInBytes()

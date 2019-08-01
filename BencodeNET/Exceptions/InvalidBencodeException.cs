@@ -29,13 +29,13 @@ namespace BencodeNET.Exceptions
         public InvalidBencodeException(string message, Exception inner, long streamPosition)
             : base($"Failed to parse {typeof(T).Name}. {message}", inner)
         {
-            StreamPosition = streamPosition;
+            StreamPosition = Math.Max(0, streamPosition);
         }
 
         public InvalidBencodeException(string message, long streamPosition)
             : base($"Failed to parse {typeof(T).Name}. {message}")
         {
-            StreamPosition = streamPosition;
+            StreamPosition = Math.Max(0, streamPosition);
         }
 
         internal static InvalidBencodeException<T> InvalidBeginningChar(char? invalidChar, long streamPosition)
@@ -45,10 +45,10 @@ namespace BencodeNET.Exceptions
             return new InvalidBencodeException<T>(message, streamPosition);
         }
 
-        internal static InvalidBencodeException<T> MissingEndChar()
+        internal static InvalidBencodeException<T> MissingEndChar(long streamPosition)
         {
             var message = "Missing end character of object. Expected 'e' but reached the end of the stream.";
-            return new InvalidBencodeException<T>(message);
+            return new InvalidBencodeException<T>(message, streamPosition);
         }
 
         internal static InvalidBencodeException<T> BelowMinimumLength(int minimumLength, long actualLength, long streamPosition)
@@ -60,7 +60,9 @@ namespace BencodeNET.Exceptions
 
         internal static InvalidBencodeException<T> UnexpectedChar(char expected, char? unexpected, long streamPosition)
         {
-            var message = $"Unexpected character. Expected '{expected}' but found '{unexpected}' at position {streamPosition}.";
+            var message = unexpected == null
+                ? $"Unexpected character. Expected '{expected}' but reached end of stream."
+                : $"Unexpected character. Expected '{expected}' but found '{unexpected}' at position {streamPosition}.";
             return new InvalidBencodeException<T>(message, streamPosition);
         }
     }

@@ -5,6 +5,7 @@ using BencodeNET.Objects;
 using BencodeNET.Parsing;
 using FluentAssertions;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using Xunit;
 
 namespace BencodeNET.Tests.Parsing
@@ -47,11 +48,25 @@ namespace BencodeNET.Tests.Parsing
         }
 
         [Theory]
+        [InlineAutoMockedData("")]
         [InlineAutoMockedData("d")]
         public void BelowMinimumLength2_ThrowsInvalidBencodeException(string bencode, IBencodeParser bparser)
         {
             var parser = new BDictionaryParser(bparser);
             Action action = () => parser.ParseString(bencode);
+
+            action.Should().Throw<InvalidBencodeException<BDictionary>>().WithMessage("*Invalid length*");
+        }
+
+        [Theory]
+        [InlineAutoMockedData("")]
+        [InlineAutoMockedData("d")]
+        public void BelowMinimumLength2_WhenStreamLengthNotSupported_ThrowsInvalidBencodeException(string bencode, IBencodeParser bparser)
+        {
+            var stream = new LengthNotSupportedStream(bencode);
+
+            var parser = new BDictionaryParser(bparser);
+            Action action = () => parser.Parse(stream);
 
             action.Should().Throw<InvalidBencodeException<BDictionary>>();
         }
@@ -66,7 +81,7 @@ namespace BencodeNET.Tests.Parsing
             var parser = new BDictionaryParser(bparser);
             Action action = () => parser.ParseString(bencode);
 
-            action.Should().Throw<InvalidBencodeException<BDictionary>>();
+            action.Should().Throw<InvalidBencodeException<BDictionary>>().WithMessage("*Unexpected character*");
         }
 
         [Theory]
@@ -88,7 +103,48 @@ namespace BencodeNET.Tests.Parsing
             Action action = () => parser.ParseString(bencode);
 
             // Assert
-            action.Should().Throw<InvalidBencodeException<BDictionary>>();
+            action.Should().Throw<InvalidBencodeException<BDictionary>>().WithMessage("*Missing end character of object*");
+        }
+
+        [Theory]
+        [InlineAutoMockedData]
+        public void InvalidKey_ThrowsInvalidBencodeException(IBencodeParser bparser)
+        {
+            bparser.Parse<BString>(Arg.Any<BencodeReader>()).Throws<BencodeException>();
+
+            var parser = new BDictionaryParser(bparser);
+
+            Action action = () => parser.ParseString("di42ee");
+
+            action.Should().Throw<InvalidBencodeException<BDictionary>>().WithMessage("*Could not parse dictionary key*");
+        }
+
+        [Theory]
+        [InlineAutoMockedData]
+        public void InvalidValue_ThrowsInvalidBencodeException(IBencodeParser bparser, BString someKey)
+        {
+            bparser.Parse<BString>(Arg.Any<BencodeReader>()).Returns(someKey);
+            bparser.Parse(Arg.Any<BencodeReader>()).Throws<BencodeException>();
+
+            var parser = new BDictionaryParser(bparser);
+
+            Action action = () => parser.ParseString("di42ee");
+
+            action.Should().Throw<InvalidBencodeException<BDictionary>>().WithMessage("*Could not parse dictionary value*");
+        }
+
+        [Theory]
+        [InlineAutoMockedData]
+        public void DuplicateKey_ThrowsInvalidBencodeException(IBencodeParser bparser, BString someKey, BString someValue)
+        {
+            bparser.Parse<BString>(Arg.Any<BencodeReader>()).Returns(someKey, someKey);
+            bparser.Parse(Arg.Any<BencodeReader>()).Returns(someValue);
+
+            var parser = new BDictionaryParser(bparser);
+
+            Action action = () => parser.ParseString("di42ee");
+
+            action.Should().Throw<InvalidBencodeException<BDictionary>>().WithMessage("*The dictionary already contains the key*");
         }
     }
 }

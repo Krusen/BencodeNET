@@ -22,6 +22,8 @@ namespace BencodeNET.Tests.Objects
             bstring.Value.Should().BeEmpty();
         }
 
+        #region Equals
+
         [Theory]
         [InlineAutoMockedData("hello world", "hello world")]
         [InlineAutoMockedData("a", "a")]
@@ -144,12 +146,16 @@ namespace BencodeNET.Tests.Objects
             bstring.GetHashCode().Should().NotBe(otherBString.GetHashCode());
         }
 
+        #endregion
+
         [Fact]
         public void Encoding_DefaultIsUTF8()
         {
             var bstring = new BString("foo");
             bstring.Encoding.Should().Be(Encoding.UTF8);
         }
+
+        #region Encode
 
         [Theory]
         [InlineAutoMockedData("some string", 11)]
@@ -218,6 +224,33 @@ namespace BencodeNET.Tests.Objects
         }
 
         [Fact]
+        public void CanEncodeToStream()
+        {
+            var bstring = new BString("hello world");
+
+            using (var stream = new MemoryStream())
+            {
+                bstring.EncodeTo(stream);
+
+                stream.Length.Should().Be(14);
+                stream.AsString().Should().Be("11:hello world");
+            }
+        }
+
+        [Fact]
+        public void CanEncodeAsBytes()
+        {
+            var bstring = new BString("hello world");
+            var expected = Encoding.ASCII.GetBytes("11:hello world");
+
+            var bytes = bstring.EncodeAsBytes();
+
+            bytes.ToArray().Should().BeEquivalentTo(expected);
+        }
+
+        #endregion
+
+        [Fact]
         public void ToString_WithoutEncoding_EncodesUsingUTF8()
         {
             var bstring = new BString("æøå äö èéê ñ", Encoding.UTF8);
@@ -232,20 +265,6 @@ namespace BencodeNET.Tests.Objects
             var bstring = new BString("æøå äö èéê ñ", encoding);
             var value = bstring.ToString(encoding);
             value.Should().Be("æøå äö èéê ñ");
-        }
-
-        [Fact]
-        public void CanEncodeToStream()
-        {
-            var bstring = new BString("hello world");
-
-            using (var stream = new MemoryStream())
-            {
-                bstring.EncodeTo(stream);
-
-                stream.Length.Should().Be(14);
-                stream.AsString().Should().Be("11:hello world");
-            }
         }
 
         [Fact]

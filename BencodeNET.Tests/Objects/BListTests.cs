@@ -73,6 +73,8 @@ namespace BencodeNET.Tests.Objects
             blist1.SequenceEqual(blist2).Should().BeFalse();
         }
 
+        #region Encode
+
         [Fact]
         public void CanEncode_Simple()
         {
@@ -138,6 +140,10 @@ namespace BencodeNET.Tests.Objects
             bencode.Should().Be("l4:spami666el3:foo3:bari123ed9:more spam9:more eggsee6:foobard7:numbersli1ei2ei3eeee");
         }
 
+        #endregion
+
+        #region AsType/AsStrings/AsNumbers
+
         [Fact]
         public void AsType_ConvertsToListOfType()
         {
@@ -193,6 +199,8 @@ namespace BencodeNET.Tests.Objects
             Action action = () => blist.AsNumbers();
             action.Should().Throw<InvalidCastException>();
         }
+
+        #endregion
 
         [Fact]
         public void GetSizeInBytes()

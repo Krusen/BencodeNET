@@ -66,43 +66,53 @@ namespace BencodeNET.Tests.Parsing
         public void LeadingZeros_ThrowsInvalidBencodeException(string bencode)
         {
             Action action = () => Parser.ParseString(bencode);
-            action.Should().Throw<InvalidBencodeException<BNumber>>();
+            action.Should().Throw<InvalidBencodeException<BNumber>>()
+                .WithMessage("*Leading '0's are not valid.*")
+                .Which.StreamPosition.Should().Be(0);
         }
 
         [Fact]
         public void MinusZero_ThrowsInvalidBencodeException()
         {
             Action action = () => Parser.ParseString("i-0e");
-            action.Should().Throw<InvalidBencodeException<BNumber>>();
+            action.Should().Throw<InvalidBencodeException<BNumber>>()
+                .WithMessage("*'-0' is not a valid number.*")
+                .Which.StreamPosition.Should().Be(0);
         }
 
         [Theory]
-        [InlineData("i")]
-        [InlineData("i1")]
-        [InlineData("i2")]
+        [InlineData("i12")]
         [InlineData("i123")]
         public void MissingEndChar_ThrowsInvalidBencodeException(string bencode)
         {
             Action action = () => Parser.ParseString(bencode);
-            action.Should().Throw<InvalidBencodeException<BNumber>>();
+            action.Should().Throw<InvalidBencodeException<BNumber>>()
+                .WithMessage("*Missing end character of object.*")
+                .Which.StreamPosition.Should().Be(0);
         }
 
         [Theory]
-        [InlineData("1e")]
         [InlineData("42e")]
+        [InlineData("a42e")]
+        [InlineData("d42e")]
+        [InlineData("l42e")]
         [InlineData("100e")]
         [InlineData("1234567890e")]
         public void InvalidFirstChar_ThrowsInvalidBencodeException(string bencode)
         {
             Action action = () => Parser.ParseString(bencode);
-            action.Should().Throw<InvalidBencodeException<BNumber>>();
+            action.Should().Throw<InvalidBencodeException<BNumber>>()
+                .WithMessage("*Unexpected character. Expected 'i'*")
+                .Which.StreamPosition.Should().Be(0);
         }
 
         [Fact]
         public void JustNegativeSign_ThrowsInvalidBencodeException()
         {
             Action action = () => Parser.ParseString("i-e");
-            action.Should().Throw<InvalidBencodeException<BNumber>>();
+            action.Should().Throw<InvalidBencodeException<BNumber>>()
+                .WithMessage("*It contains no digits.*")
+                .Which.StreamPosition.Should().Be(0);
         }
 
         [Theory]
@@ -113,11 +123,12 @@ namespace BencodeNET.Tests.Parsing
         public void MoreThanOneNegativeSign_ThrowsInvalidBencodeException(string bencode)
         {
             Action action = () => Parser.ParseString(bencode);
-            action.Should().Throw<InvalidBencodeException<BNumber>>();
+            action.Should().Throw<InvalidBencodeException<BNumber>>()
+                .WithMessage("*The value '*' is not a valid number.*")
+                .Which.StreamPosition.Should().Be(0);
         }
 
         [Theory]
-        [InlineData("i-e")]
         [InlineData("iasdfe")]
         [InlineData("i!#¤%&e")]
         [InlineData("i.e")]
@@ -126,14 +137,34 @@ namespace BencodeNET.Tests.Parsing
         public void NonDigit_ThrowsInvalidBencodeException(string bencode)
         {
             Action action = () => Parser.ParseString(bencode);
-            action.Should().Throw<InvalidBencodeException<BNumber>>();
+            action.Should().Throw<InvalidBencodeException<BNumber>>()
+                .WithMessage("*The value '*' is not a valid number.*")
+                .Which.StreamPosition.Should().Be(0);
         }
 
-        [Fact]
-        public void BelowMinimumLength_ThrowsInvalidBencodeException()
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("i")]
+        [InlineData("ie")]
+        public void BelowMinimumLength_ThrowsInvalidBencodeException(string bencode)
         {
-            Action action = () => Parser.ParseString("ie");
-            action.Should().Throw<InvalidBencodeException<BNumber>>();
+            Action action = () => Parser.ParseString(bencode);
+            action.Should().Throw<InvalidBencodeException<BNumber>>()
+                .WithMessage("*Invalid length.*")
+                .Which.StreamPosition.Should().Be(0);
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("i")]
+        [InlineData("ie")]
+        public void BelowMinimumLength_WhenStreamWithoutLengthSupport_ThrowsInvalidException(string bencode)
+        {
+            var stream = new LengthNotSupportedStream(bencode);
+            Action action = () => Parser.Parse(stream);
+            action.Should().Throw<InvalidBencodeException<BNumber>>()
+                .Which.StreamPosition.Should().Be(0);
         }
 
         [Theory]
@@ -142,7 +173,9 @@ namespace BencodeNET.Tests.Parsing
         public void LargerThanInt64_ThrowsUnsupportedException(string bencode)
         {
             Action action = () => Parser.ParseString(bencode);
-            action.Should().Throw<UnsupportedBencodeException<BNumber>>();
+            action.Should().Throw<UnsupportedBencodeException<BNumber>>()
+                .WithMessage("*The value '*' is not a valid long (Int64)*")
+                .Which.StreamPosition.Should().Be(0);
         }
 
         [Theory]
@@ -152,7 +185,9 @@ namespace BencodeNET.Tests.Parsing
         public void LongerThanMaxDigits19_ThrowsUnsupportedException(string bencode)
         {
             Action action = () => Parser.ParseString(bencode);
-            action.Should().Throw<UnsupportedBencodeException<BNumber>>();
+            action.Should().Throw<UnsupportedBencodeException<BNumber>>()
+                .WithMessage("*The number '*' has more than 19 digits and cannot be stored as a long*")
+                .Which.StreamPosition.Should().Be(0);
         }
     }
 }

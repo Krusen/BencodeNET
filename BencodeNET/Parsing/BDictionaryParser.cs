@@ -45,10 +45,10 @@ namespace BencodeNET.Parsing
         {
             if (reader == null) throw new ArgumentNullException(nameof(reader));
 
-            var startPosition = reader.Position;
-
             if (reader.Length < MinimumLength)
-                throw InvalidBencodeException<BDictionary>.BelowMinimumLength(MinimumLength, reader.Length.Value, startPosition);
+                throw InvalidBencodeException<BDictionary>.BelowMinimumLength(MinimumLength, reader.Length.Value, reader.Position);
+
+            var startPosition = reader.Position;
 
             // Dictionaries must start with 'd'
             if (reader.ReadChar() != 'd')
@@ -64,7 +64,7 @@ namespace BencodeNET.Parsing
                     // Decode next string in stream as the key
                     key = BencodeParser.Parse<BString>(reader);
                 }
-                catch (BencodeException<BString> ex)
+                catch (BencodeException ex)
                 {
                     throw InvalidException("Could not parse dictionary key. Keys must be strings.", ex, startPosition);
                 }
@@ -92,7 +92,7 @@ namespace BencodeNET.Parsing
             }
 
             if (reader.ReadChar() != 'e')
-                if (reader.EndOfStream) throw InvalidBencodeException<BDictionary>.MissingEndChar();
+                throw InvalidBencodeException<BDictionary>.MissingEndChar(startPosition);
 
             return dictionary;
         }

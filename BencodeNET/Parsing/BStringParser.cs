@@ -57,7 +57,7 @@ namespace BencodeNET.Parsing
             var startPosition = reader.Position;
 
             LengthString.Clear();
-            for (var c = reader.ReadChar(); c != ':' && c != null; c = reader.ReadChar())
+            for (var c = reader.ReadChar(); c.HasValue && c.Value.IsDigit(); c = reader.ReadChar())
             {
                 // Because of memory limitations (~1-2 GB) we know for certain we cannot handle more than 10 digits (10GB)
                 if (LengthString.Length >= BString.LengthMaxDigits)
@@ -71,7 +71,7 @@ namespace BencodeNET.Parsing
             }
 
             if (reader.ReadPreviousChar() != ':')
-                throw InvalidBencodeException<BString>.UnexpectedChar(':', reader.ReadPreviousChar(), reader.Position);
+                throw InvalidBencodeException<BString>.UnexpectedChar(':', reader.ReadPreviousChar(), reader.Position - 1);
 
             if (!ParseUtil.TryParseLongFast(LengthString.ToString(), out var stringLength))
                 throw InvalidException($"Invalid length '{LengthString}' of string.", startPosition);

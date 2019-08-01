@@ -46,13 +46,14 @@ namespace BencodeNET.Tests.Parsing
         }
 
         [Theory]
+        [InlineAutoMockedData("")]
         [InlineAutoMockedData("l")]
         public void BelowMinimumLength2_ThrowsInvalidBencodeException(string bencode, IBencodeParser bparser)
         {
             var parser = new BListParser(bparser);
             Action action = () => parser.ParseString(bencode);
 
-            action.Should().Throw<InvalidBencodeException<BList>>();
+            action.Should().Throw<InvalidBencodeException<BList>>().WithMessage("*Invalid length*");
         }
 
         [Theory]
@@ -62,16 +63,32 @@ namespace BencodeNET.Tests.Parsing
         [InlineAutoMockedData("-")]
         [InlineAutoMockedData(".")]
         [InlineAutoMockedData("e")]
+        public void BelowMinimumLength2_WhenStreamLengthNotSupported_ThrowsInvalidBencodeException(string bencode, IBencodeParser bparser)
+        {
+            var stream = new LengthNotSupportedStream(bencode);
+
+            var parser = new BListParser(bparser);
+            Action action = () => parser.Parse(stream);
+
+            action.Should().Throw<InvalidBencodeException<BList>>().WithMessage("*Unexpected character*");
+        }
+
+        [Theory]
+        [InlineAutoMockedData("4e")]
+        [InlineAutoMockedData("ae")]
+        [InlineAutoMockedData(":e")]
+        [InlineAutoMockedData("-e")]
+        [InlineAutoMockedData(".e")]
+        [InlineAutoMockedData("ee")]
         public void InvalidFirstChar_ThrowsInvalidBencodeException(string bencode, IBencodeParser bparser)
         {
             var parser = new BListParser(bparser);
             Action action = () => parser.ParseString(bencode);
 
-            action.Should().Throw<InvalidBencodeException<BList>>();
+            action.Should().Throw<InvalidBencodeException<BList>>().WithMessage("*Unexpected character*");
         }
 
         [Theory]
-        [InlineAutoMockedData("l")]
         [InlineAutoMockedData("l4:spam")]
         [InlineAutoMockedData("l ")]
         [InlineAutoMockedData("l:")]
@@ -87,7 +104,7 @@ namespace BencodeNET.Tests.Parsing
             Action action = () => parser.ParseString(bencode);
 
             // Assert
-            action.Should().Throw<InvalidBencodeException<BList>>();
+            action.Should().Throw<InvalidBencodeException<BList>>().WithMessage("*Missing end character of object*");
         }
     }
 }

@@ -51,21 +51,25 @@ namespace BencodeNET.Tests.Parsing
         public void LessCharsThanSpecified_ThrowsInvalidBencodeException(string bencode)
         {
             Action action = () => Parser.ParseString(bencode);
-            action.Should().Throw<InvalidBencodeException<BString>>();
+            action.Should().Throw<InvalidBencodeException<BString>>()
+                .WithMessage("*but could only read * bytes*")
+                .Which.StreamPosition.Should().Be(0);
         }
 
         [Theory]
-        [InlineData("4spam")]
-        [InlineData("10spam")]
-        [InlineData("4-spam")]
-        [InlineData("4.spam")]
-        [InlineData("4;spam")]
-        [InlineData("4,spam")]
-        [InlineData("4|spam")]
-        public void MissingDelimiter_ThrowsInvalidBencodeException(string bencode)
+        [InlineData("4spam", 1)]
+        [InlineData("10spam", 2)]
+        [InlineData("4-spam", 1)]
+        [InlineData("4.spam", 1)]
+        [InlineData("4;spam", 1)]
+        [InlineData("4,spam", 1)]
+        [InlineData("4|spam", 1)]
+        public void MissingDelimiter_ThrowsInvalidBencodeException(string bencode, int errorIndex)
         {
             Action action = () => Parser.ParseString(bencode);
-            action.Should().Throw<InvalidBencodeException<BString>>();
+            action.Should().Throw<InvalidBencodeException<BString>>()
+                .WithMessage("*Unexpected character. Expected ':'*")
+                .Which.StreamPosition.Should().Be(errorIndex);
         }
 
         [Theory]
@@ -80,7 +84,9 @@ namespace BencodeNET.Tests.Parsing
         public void NonDigitFirstChar_ThrowsInvalidBencodeException(string bencode)
         {
             Action action = () => Parser.ParseString(bencode);
-            action.Should().Throw<InvalidBencodeException<BString>>();
+            action.Should().Throw<InvalidBencodeException<BString>>()
+                .WithMessage($"*Unexpected character. Expected ':' but found '{bencode[0]}'*")
+                .Which.StreamPosition.Should().Be(0);
         }
 
         [Theory]
@@ -89,7 +95,9 @@ namespace BencodeNET.Tests.Parsing
         public void LessThanMinimumLength2_ThrowsInvalidBencodeException(string bencode)
         {
             Action action = () => Parser.ParseString(bencode);
-            action.Should().Throw<InvalidBencodeException<BString>>();
+            action.Should().Throw<InvalidBencodeException<BString>>()
+                .WithMessage("*Invalid length*")
+                .Which.StreamPosition.Should().Be(0);
         }
 
         [Theory]
@@ -100,7 +108,9 @@ namespace BencodeNET.Tests.Parsing
         public void LengthAboveMaxDigits10_ThrowsUnsupportedException(string bencode)
         {
             Action action = () => Parser.ParseString(bencode);
-            action.Should().Throw<UnsupportedBencodeException<BString>>();
+            action.Should().Throw<UnsupportedBencodeException<BString>>()
+                .WithMessage("*Length of string is more than * digits*")
+                .Which.StreamPosition.Should().Be(0);
         }
 
         [Theory]
@@ -125,7 +135,9 @@ namespace BencodeNET.Tests.Parsing
         {
             var bencode = "2147483648:spam";
             Action action = () => Parser.ParseString(bencode);
-            action.Should().Throw<UnsupportedBencodeException<BString>>();
+            action.Should().Throw<UnsupportedBencodeException<BString>>()
+                .WithMessage("*Length of string is * but maximum supported length is *")
+                .Which.StreamPosition.Should().Be(0);
         }
 
         [Fact]
@@ -148,6 +160,31 @@ namespace BencodeNET.Tests.Parsing
             var bstring = parser.Parse(bytes);
 
             bstring.Should().Be(expected);
+        }
+
+        [Theory]
+        [InlineData("1-:a", 1)]
+        [InlineData("1abc:a", 1)]
+        [InlineData("123?:asdf", 3)]
+        [InlineData("3abc:abc", 1)]
+        public void InvalidLengthString_ThrowsInvalidException(string bencode, int errorIndex)
+        {
+            Action action = () => Parser.ParseString(bencode);
+            action.Should().Throw<InvalidBencodeException<BString>>()
+                .WithMessage("*Unexpected character. Expected ':'*")
+                .Which.StreamPosition.Should().Be(errorIndex);
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("0")]
+        public void BelowMinimumLength_WhenStreamWithoutLengthSupport_ThrowsInvalidException(string bencode)
+        {
+            var stream = new LengthNotSupportedStream(bencode);
+            Action action = () => Parser.Parse(stream);
+            action.Should().Throw<InvalidBencodeException<BString>>()
+                .WithMessage("*Unexpected character. Expected ':' but reached end of stream*")
+                .Which.StreamPosition.Should().Be(0);
         }
     }
 }

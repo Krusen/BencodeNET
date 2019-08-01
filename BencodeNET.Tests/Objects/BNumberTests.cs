@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using BencodeNET.Objects;
 using FluentAssertions;
 using Xunit;
@@ -73,6 +74,8 @@ namespace BencodeNET.Tests.Objects
             hash1.Should().Be(hash2);
         }
 
+        #region Encode
+
         [Theory]
         [InlineAutoMockedData(1)]
         [InlineAutoMockedData(10)]
@@ -124,7 +127,7 @@ namespace BencodeNET.Tests.Objects
         }
 
         [Fact]
-        public void CanEnodeToStream()
+        public void CanEncodeToStream()
         {
             var bnumber = new BNumber(42);
 
@@ -136,6 +139,19 @@ namespace BencodeNET.Tests.Objects
                 stream.AsString().Should().Be("i42e");
             }
         }
+
+        [Fact]
+        public void CanEncodeAsBytes()
+        {
+            var bnumber = new BNumber(42);
+            var expected = Encoding.ASCII.GetBytes("i42e");
+
+            var bytes = bnumber.EncodeAsBytes();
+
+            bytes.ToArray().Should().BeEquivalentTo(expected);
+        }
+
+        #endregion
 
         [Fact]
         public void ToString_SameAsLong()
@@ -158,6 +174,8 @@ namespace BencodeNET.Tests.Objects
 
             str1.Should().Be(str2);
         }
+
+        #region Casts
 
         [Fact]
         public void CanCastFromInt()
@@ -313,6 +331,8 @@ namespace BencodeNET.Tests.Objects
             Action action = () => { var b = (bool) bnumber; };
             action.Should().Throw<InvalidCastException>();
         }
+
+        #endregion
 
         [Fact]
         public void GetSizeInBytes()

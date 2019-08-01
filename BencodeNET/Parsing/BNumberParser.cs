@@ -42,7 +42,7 @@ namespace BencodeNET.Parsing
 
             // Numbers must start with 'i'
             if (reader.ReadChar() != 'i')
-                throw InvalidBencodeException<BNumber>.UnexpectedChar('i', reader.ReadPreviousChar(), reader.Position);
+                throw InvalidBencodeException<BNumber>.UnexpectedChar('i', reader.ReadPreviousChar(), startPosition);
 
             Digits.Clear();
             for (var c = reader.ReadChar(); c != 'e' && c != null; c = reader.ReadChar())
@@ -50,12 +50,12 @@ namespace BencodeNET.Parsing
                 Digits.Append(c);
             }
 
+            if (Digits.Length == 0)
+                throw NoDigitsException(startPosition);
+
             // Last read character should be 'e'
             if (reader.ReadPreviousChar() != 'e')
-                throw InvalidBencodeException<BNumber>.MissingEndChar();
-
-            if (Digits.Length == 0)
-                throw InvalidException("'ie' is not a valid number.", startPosition);
+                throw InvalidBencodeException<BNumber>.MissingEndChar(startPosition);
 
             var isNegative = Digits[0] == '-';
             var numberOfDigits = isNegative ? Digits.Length - 1 : Digits.Length;
@@ -70,7 +70,7 @@ namespace BencodeNET.Parsing
 
             // We need at least one digit
             if (numberOfDigits < 1)
-                throw InvalidException("It contains no digits.", startPosition);
+                throw NoDigitsException(startPosition);
 
             var firstDigit = isNegative ? Digits[1] : Digits[0];
 
@@ -94,6 +94,13 @@ namespace BencodeNET.Parsing
             }
 
             return new BNumber(number);
+        }
+
+        private static InvalidBencodeException<BNumber> NoDigitsException(long startPosition)
+        {
+            return new InvalidBencodeException<BNumber>(
+                $"It contains no digits. The number starts at position {startPosition}.",
+                startPosition);
         }
 
         private static InvalidBencodeException<BNumber> InvalidException(string message, long startPosition)
