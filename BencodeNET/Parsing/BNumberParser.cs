@@ -22,7 +22,7 @@ namespace BencodeNET.Parsing
         /// <summary>
         /// The encoding used for parsing.
         /// </summary>
-        protected override Encoding Encoding => Encoding.UTF8;
+        public override Encoding Encoding => Encoding.UTF8;
 
         /// <summary>
         /// Parses the next <see cref="BNumber"/> from the reader.

@@ -50,7 +50,7 @@ namespace BencodeNET.Parsing
         /// <summary>
         /// The encoding used for parsing.
         /// </summary>
-        protected override Encoding Encoding => BencodeParser.Encoding;
+        public override Encoding Encoding => BencodeParser.Encoding;
 
         /// <summary>
         /// Parses the next <see cref="BDictionary"/> from the reader as a <see cref="Torrent"/>.

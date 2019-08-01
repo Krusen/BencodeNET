@@ -1,9 +1,4 @@
-﻿using System;
-using System.Buffers.Text;
-using System.IO;
-using System.Linq;
-using System.Text;
-using BencodeNET.IO;
+﻿using System.IO;
 
 namespace BencodeNET.Objects
 {
@@ -21,54 +16,6 @@ namespace BencodeNET.Objects
         public abstract int GetSizeInBytes();
 
         /// <summary>
-        /// Encodes the object and returns the result as a string using <see cref="Encoding.UTF8"/>.
-        /// </summary>
-        /// <returns>
-        /// The object bencoded and converted to a string using <see cref="Encoding.UTF8"/>.
-        /// </returns>
-        public virtual string EncodeAsString() => EncodeAsString(Encoding.UTF8);
-
-        /// <summary>
-        /// Encodes the object and returns the result as a string using the specified encoding.
-        /// </summary>
-        /// <param name="encoding">The encoding used to convert the encoded bytes to a string.</param>
-        /// <returns>
-        /// The object bencoded and converted to a string using the specified encoding.
-        /// </returns>
-        public virtual string EncodeAsString(Encoding encoding)
-        {
-            var size = GetSizeInBytes();
-            using (var stream = EncodeTo(new MemoryStream(size)))
-            {
-#if NETCOREAPP2_1
-                if (stream.TryGetBuffer(out var buffer) && stream.Length <=  int.MaxValue)
-                {
-                    return encoding.GetString(buffer);
-                }
-#endif
-                return encoding.GetString(stream.ToArray());
-            }
-        }
-
-        /// <summary>
-        /// Encodes the object and returns the raw bytes.
-        /// </summary>
-        /// <returns>The raw bytes of the bencoded object.</returns>
-        public virtual ReadOnlySpan<byte> EncodeAsBytes()
-        {
-            var size = GetSizeInBytes();
-            using (var stream = new MemoryStream(size))
-            {
-                EncodeTo(stream);
-                if (stream.TryGetBuffer(out var buffer) && stream.Length <= int.MaxValue)
-                {
-                    return buffer;
-                }
-                return stream.ToArray();
-            }
-        }
-
-        /// <summary>
         /// Writes the object as bencode to the specified stream.
         /// </summary>
         /// <typeparam name="TStream">The type of stream.</typeparam>
@@ -80,18 +27,6 @@ namespace BencodeNET.Objects
             stream.TrySetLength(size);
             EncodeObject(stream);
             return stream;
-        }
-
-        /// <summary>
-        /// Writes the object as bencode to the specified file path.
-        /// </summary>
-        /// <param name="filePath">The file path to write the encoded object to.</param>
-        public virtual void EncodeTo(string filePath)
-        {
-            using (var stream = File.OpenWrite(filePath))
-            {
-                EncodeTo(stream);
-            }
         }
 
         /// <summary>

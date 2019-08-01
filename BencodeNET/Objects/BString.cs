@@ -83,15 +83,6 @@ namespace BencodeNET.Objects
         /// <inheritdoc/>
         public override int GetSizeInBytes() => _value.Length + 1 + _value.Length.DigitCount();
 
-        /// <summary>
-        /// Encodes this byte-string as bencode and returns the encoded string.
-        /// Uses the current value of the <see cref="Encoding"/> property.
-        /// </summary>
-        /// <returns>
-        /// This byte-string as a bencoded string.
-        /// </returns>
-        public override string EncodeAsString() => EncodeAsString(_encoding);
-
         /// <inheritdoc/>
         protected override void EncodeObject(Stream stream)
         {

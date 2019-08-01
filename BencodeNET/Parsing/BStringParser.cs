@@ -37,7 +37,7 @@ namespace BencodeNET.Parsing
         /// <summary>
         /// The encoding used when creating the <see cref="BString"/> when parsing.
         /// </summary>
-        protected override Encoding Encoding { get; }
+        public override Encoding Encoding { get; }
 
         /// <summary>
         /// Parses the next <see cref="BString"/> from the reader.

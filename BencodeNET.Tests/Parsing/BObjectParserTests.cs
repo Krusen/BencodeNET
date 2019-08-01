@@ -12,32 +12,6 @@ namespace BencodeNET.Tests.Parsing
     {
         [Theory]
         [InlineAutoMockedData]
-        public void IBObjectParser_Parse_String_CallsOverriddenParse(IBObjectParser<IBObject> parserMock)
-        {
-            var parser = new MockBObjectParser(parserMock) as IBObjectParser;
-
-            parser.ParseString("bencoded string");
-
-            parserMock.Received().Parse(Arg.Any<BencodeReader>());
-        }
-
-        [Theory]
-        [InlineAutoMockedData]
-        public void IBObjectParser_Parse_Stream_CallsOverriddenParse(IBObjectParser<IBObject> parserMock)
-        {
-            var parser = new MockBObjectParser(parserMock) as IBObjectParser;
-            var bytes = Encoding.UTF8.GetBytes("bencoded string");
-
-            using (var stream = new MemoryStream(bytes))
-            {
-                parser.Parse(stream);
-            }
-
-            parserMock.Received().Parse(Arg.Any<BencodeReader>());
-        }
-
-        [Theory]
-        [InlineAutoMockedData]
         public void Parse_String_CallsOverriddenParse(IBObjectParser<IBObject> parserMock)
         {
             var parser = new MockBObjectParser(parserMock);
@@ -71,7 +45,7 @@ namespace BencodeNET.Tests.Parsing
 
             public IBObjectParser<IBObject> Substitute { get; set; }
 
-            protected override Encoding Encoding => Encoding.UTF8;
+            public override Encoding Encoding => Encoding.UTF8;
 
             public override IBObject Parse(BencodeReader stream)
             {
