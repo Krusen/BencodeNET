@@ -165,9 +165,9 @@ namespace BencodeNET.Objects
         protected override void EncodeObject(Stream stream)
         {
             stream.Write('l');
-            foreach (var item in this)
+            for (var i = 0; i < this.Count; i++)
             {
-                item.EncodeTo(stream);
+                this[i].EncodeTo(stream);
             }
             stream.Write('e');
         }
