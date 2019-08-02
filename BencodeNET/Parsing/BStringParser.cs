@@ -67,7 +67,7 @@ namespace BencodeNET.Parsing
                         startPosition);
                 }
 
-                LengthString.Append(c);
+                LengthString.Append(c.Value);
             }
 
             if (reader.PreviousChar != ':')
