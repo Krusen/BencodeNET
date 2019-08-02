@@ -38,7 +38,7 @@ namespace BencodeNET.Exceptions
             StreamPosition = Math.Max(0, streamPosition);
         }
 
-        internal static InvalidBencodeException<T> InvalidBeginningChar(char? invalidChar, long streamPosition)
+        internal static InvalidBencodeException<T> InvalidBeginningChar(char invalidChar, long streamPosition)
         {
             var message =
                 $"Invalid beginning character of object. Found '{invalidChar}' at position {streamPosition}. Valid characters are: 0-9, 'i', 'l' and 'd'";
@@ -58,9 +58,9 @@ namespace BencodeNET.Exceptions
             return new InvalidBencodeException<T>(message, streamPosition);
         }
 
-        internal static InvalidBencodeException<T> UnexpectedChar(char expected, char? unexpected, long streamPosition)
+        internal static InvalidBencodeException<T> UnexpectedChar(char expected, char unexpected, long streamPosition)
         {
-            var message = unexpected == null
+            var message = unexpected == default
                 ? $"Unexpected character. Expected '{expected}' but reached end of stream."
                 : $"Unexpected character. Expected '{expected}' but found '{unexpected}' at position {streamPosition}.";
             return new InvalidBencodeException<T>(message, streamPosition);

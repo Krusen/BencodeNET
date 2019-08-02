@@ -56,7 +56,7 @@ namespace BencodeNET.Parsing
 
             var list = new BList();
             // Loop until next character is the end character 'e' or end of stream
-            while (reader.PeekChar() != 'e' && reader.PeekChar() != null)
+            while (reader.PeekChar() != 'e' && reader.PeekChar() != default)
             {
                 // Decode next object in stream
                 var bObject = BencodeParser.Parse(reader);

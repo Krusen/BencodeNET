@@ -96,7 +96,7 @@ namespace BencodeNET.Parsing
                 case 'i': return Parse<BNumber>(reader);
                 case 'l': return Parse<BList>(reader);
                 case 'd': return Parse<BDictionary>(reader);
-                case null: return null;
+                case default(char): return null;
             }
 
             throw InvalidBencodeException<IBObject>.InvalidBeginningChar(reader.PeekChar(), reader.Position);

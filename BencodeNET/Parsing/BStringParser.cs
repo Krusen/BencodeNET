@@ -57,7 +57,7 @@ namespace BencodeNET.Parsing
             var startPosition = reader.Position;
 
             LengthString.Clear();
-            for (var c = reader.ReadChar(); c.HasValue && c.Value.IsDigit(); c = reader.ReadChar())
+            for (var c = reader.ReadChar(); c != default && c.IsDigit(); c = reader.ReadChar())
             {
                 // Because of memory limitations (~1-2 GB) we know for certain we cannot handle more than 10 digits (10GB)
                 if (LengthString.Length >= BString.LengthMaxDigits)
@@ -67,7 +67,7 @@ namespace BencodeNET.Parsing
                         startPosition);
                 }
 
-                LengthString.Append(c.Value);
+                LengthString.Append(c);
             }
 
             if (reader.PreviousChar != ':')

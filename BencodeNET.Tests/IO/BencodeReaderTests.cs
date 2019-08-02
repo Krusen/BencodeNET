@@ -133,7 +133,7 @@ namespace BencodeNET.Tests.IO
                 bs.ReadChar().Should().Be('l');
                 bs.ReadChar().Should().Be('d');
                 bs.ReadChar().Should().Be('!');
-                bs.ReadChar().Should().BeNull();
+                bs.ReadChar().Should().Be(default);
             }
         }
 
@@ -144,7 +144,7 @@ namespace BencodeNET.Tests.IO
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(str)))
             using (var bs = new BencodeReader(ms))
             {
-                bs.PreviousChar.Should().BeNull();
+                bs.PreviousChar.Should().Be(default);
 
                 Assert.Equal('H', bs.ReadChar());
                 Assert.Equal('H', bs.PreviousChar);
@@ -164,7 +164,7 @@ namespace BencodeNET.Tests.IO
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(str)))
             using (var bs = new BencodeReader(ms))
             {
-                bs.PreviousChar.Should().BeNull();
+                bs.PreviousChar.Should().Be(default);
             }
         }
 
@@ -301,8 +301,8 @@ namespace BencodeNET.Tests.IO
             using (var bs = new BencodeReader(ms))
             {
                 bs.SkipBytes(12);
-                bs.PeekChar().Should().BeNull();
-                bs.ReadChar().Should().BeNull();
+                bs.PeekChar().Should().Be(default);
+                bs.ReadChar().Should().Be(default);
             }
         }
 
@@ -314,7 +314,7 @@ namespace BencodeNET.Tests.IO
             using (var bs = new BencodeReader(ms))
             {
                 bs.SkipBytes(12);
-                bs.PeekChar().Should().BeNull();
+                bs.PeekChar().Should().Be(default);
                 bs.Read(new byte[4]).Should().Be(0);
             }
         }
@@ -328,7 +328,7 @@ namespace BencodeNET.Tests.IO
             {
                 bs.SkipBytes(12);
                 bs.EndOfStream.Should().BeTrue();
-                bs.ReadChar().Should().BeNull();
+                bs.ReadChar().Should().Be(default);
             }
         }
     }

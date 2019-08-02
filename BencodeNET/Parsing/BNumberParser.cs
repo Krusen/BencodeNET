@@ -45,9 +45,9 @@ namespace BencodeNET.Parsing
                 throw InvalidBencodeException<BNumber>.UnexpectedChar('i', reader.PreviousChar, startPosition);
 
             Digits.Clear();
-            for (var c = reader.ReadChar(); c.HasValue && c.Value != 'e'; c = reader.ReadChar())
+            for (var c = reader.ReadChar(); c != default && c != 'e'; c = reader.ReadChar())
             {
-                Digits.Append(c.Value);
+                Digits.Append(c);
             }
 
             if (Digits.Length == 0)
