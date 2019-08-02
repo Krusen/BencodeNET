@@ -152,7 +152,15 @@ namespace BencodeNET.Objects
         }
 
         /// <inheritdoc/>
-        public override int GetSizeInBytes() => this.Sum(x => x.GetSizeInBytes()) + 2;
+        public override int GetSizeInBytes()
+        {
+            var size = 2;
+            for (var i = 0; i < this.Count; i++)
+            {
+                size += this[i].GetSizeInBytes();
+            }
+            return size;
+        }
 
         /// <inheritdoc/>
         protected override void EncodeObject(Stream stream)
