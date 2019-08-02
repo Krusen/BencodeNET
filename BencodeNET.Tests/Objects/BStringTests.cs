@@ -245,7 +245,7 @@ namespace BencodeNET.Tests.Objects
 
             var bytes = bstring.EncodeAsBytes();
 
-            bytes.ToArray().Should().BeEquivalentTo(expected);
+            bytes.Should().BeEquivalentTo(expected);
         }
 
         #endregion
