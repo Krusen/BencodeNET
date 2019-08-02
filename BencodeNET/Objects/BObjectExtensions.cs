@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if NETCOREAPP2_1
+using System;
+#endif
 using System.Buffers;
 using System.IO;
 using System.Text;

@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-#if NETSTANDARD
+#if !NETCOREAPP2_1
 using System.Buffers;
 #endif
 

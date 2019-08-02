@@ -1,10 +1,8 @@
 ﻿using System;
 using BencodeNET.Exceptions;
-using BencodeNET.IO;
 using BencodeNET.Objects;
 using BencodeNET.Parsing;
 using FluentAssertions;
-using NSubstitute;
 using Xunit;
 
 namespace BencodeNET.Tests.Parsing

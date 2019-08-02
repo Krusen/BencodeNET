@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using BencodeNET.Exceptions;
 using BencodeNET.IO;
 using BencodeNET.Objects;
 using BencodeNET.Parsing;
