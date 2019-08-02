@@ -1,4 +1,5 @@
-using System;
+﻿using System;
+using System.Buffers;
 using System.IO;
 using System.Text;
 
@@ -28,16 +29,20 @@ namespace BencodeNET.Objects
         public static string EncodeAsString(this IBObject bobject, Encoding encoding)
         {
             var size = bobject.GetSizeInBytes();
-            using (var stream = bobject.EncodeTo(new MemoryStream(size)))
+            var buffer = ArrayPool<byte>.Shared.Rent(size);
+            try
             {
-#if NETCOREAPP2_1
-                if (stream.TryGetBuffer(out var buffer) && stream.Length <=  int.MaxValue)
+                using (var stream = new MemoryStream(buffer))
                 {
-                    return encoding.GetString(buffer);
-                }
+                    bobject.EncodeTo(stream);
+#if NETCOREAPP2_1
+                    return encoding.GetString(buffer.AsSpan().Slice(0, size));
+#else
+                    return encoding.GetString(buffer, 0, size);
 #endif
-                return encoding.GetString(stream.ToArray());
+                }
             }
+            finally { ArrayPool<byte>.Shared.Return(buffer); }
         }
 
         /// <summary>
