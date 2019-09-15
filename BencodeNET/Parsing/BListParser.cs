@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using BencodeNET.Exceptions;
 using BencodeNET.IO;
 using BencodeNET.Objects;
@@ -65,6 +67,32 @@ namespace BencodeNET.Parsing
 
             if (reader.ReadChar() != 'e')
                  throw InvalidBencodeException<BList>.MissingEndChar(startPosition);
+
+            return list;
+        }
+
+        public override async ValueTask<BList> ParseAsync(PipeBencodeReader reader, CancellationToken cancellationToken = default)
+        {
+            if (reader == null) throw new ArgumentNullException(nameof(reader));
+
+            var startPosition = reader.Position;
+
+            // Lists must start with 'l'
+            if (await reader.ReadCharAsync(cancellationToken).ConfigureAwait(false) != 'l')
+                throw InvalidBencodeException<BList>.UnexpectedChar('l', reader.PreviousChar, startPosition);
+
+            var list = new BList();
+            // Loop until next character is the end character 'e' or end of stream
+            while (await reader.PeekCharAsync(cancellationToken).ConfigureAwait(false) != 'e' &&
+                   await reader.PeekCharAsync(cancellationToken).ConfigureAwait(false) != default)
+            {
+                // Decode next object in stream
+                var bObject = await BencodeParser.ParseAsync(reader, cancellationToken).ConfigureAwait(false);
+                list.Add(bObject);
+            }
+
+            if (await reader.ReadCharAsync(cancellationToken).ConfigureAwait(false) != 'e')
+                throw InvalidBencodeException<BList>.MissingEndChar(startPosition);
 
             return list;
         }

@@ -47,7 +47,7 @@ namespace BencodeNET.Exceptions
 
         internal static InvalidBencodeException<T> MissingEndChar(long streamPosition)
         {
-            var message = "Missing end character of object. Expected 'e' but reached the end of the stream.";
+            var message = "Missing end character of object. Expected 'e' but reached end of stream.";
             return new InvalidBencodeException<T>(message, streamPosition);
         }
 

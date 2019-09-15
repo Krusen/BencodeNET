@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using BencodeNET.IO;
 using BencodeNET.Objects;
 using BencodeNET.Parsing;
@@ -77,6 +79,12 @@ namespace BencodeNET.Torrents
         public override Torrent Parse(BencodeReader reader)
         {
             var data = BencodeParser.Parse<BDictionary>(reader);
+            return CreateTorrent(data);
+        }
+
+        public override async ValueTask<Torrent> ParseAsync(PipeBencodeReader pipeReader, CancellationToken cancellationToken = default)
+        {
+            var data = await BencodeParser.ParseAsync<BDictionary>(pipeReader, cancellationToken);
             return CreateTorrent(data);
         }
 

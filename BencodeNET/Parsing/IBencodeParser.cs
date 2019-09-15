@@ -1,5 +1,8 @@
 ﻿using System.IO;
+using System.IO.Pipelines;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using BencodeNET.IO;
 using BencodeNET.Objects;
 
@@ -42,5 +45,14 @@ namespace BencodeNET.Parsing
         /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
         /// <param name="reader"></param>
         T Parse<T>(BencodeReader reader) where T : class, IBObject;
+
+        ValueTask<IBObject> ParseAsync(PipeReader pipeReader, CancellationToken cancellationToken = default);
+
+        ValueTask<IBObject> ParseAsync(PipeBencodeReader pipeReader, CancellationToken cancellationToken = default);
+
+        // TODO: XmlDoc
+        ValueTask<T> ParseAsync<T>(PipeReader pipeReader, CancellationToken cancellationToken = default) where T : class, IBObject;
+
+        ValueTask<T> ParseAsync<T>(PipeBencodeReader pipeReader, CancellationToken cancellationToken = default) where T : class, IBObject;
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace BencodeNET.Parsing
+﻿using System;
+
+namespace BencodeNET.Parsing
 {
     /// <summary>
     /// A collection of helper methods for parsing bencode.
@@ -11,7 +13,7 @@
         /// A faster implementation than <see cref="long.TryParse(string, out long)"/>
         /// because we skip some checks that are not needed.
         /// </summary>
-        public static bool TryParseLongFast(string value, out long result)
+        public static bool TryParseLongFast(ReadOnlySpan<char> value, out long result)
         {
             result = 0;
 

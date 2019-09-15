@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Pipelines;
 using System.Linq;
 using System.Text;
 
@@ -155,5 +156,11 @@ namespace BencodeNET
             return type.GetTypeInfo().IsAssignableFrom(otherType.GetTypeInfo());
         }
 #endif
+
+        public static void Deconstruct(this Pipe pipe, out PipeReader reader, out PipeWriter writer)
+        {
+            reader = pipe.Reader;
+            writer = pipe.Writer;
+        }
     }
 }

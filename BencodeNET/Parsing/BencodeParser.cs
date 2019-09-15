@@ -1,6 +1,9 @@
 ﻿using System;
 using System.IO;
+using System.IO.Pipelines;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using BencodeNET.Exceptions;
 using BencodeNET.IO;
 using BencodeNET.Objects;
@@ -115,6 +118,55 @@ namespace BencodeNET.Parsing
                 throw new BencodeException($"Missing parser for the type '{typeof(T).FullName}'. Stream position: {reader.Position}");
 
             return parser.Parse(reader);
+        }
+
+        public virtual ValueTask<IBObject> ParseAsync(PipeReader pipeReader, CancellationToken cancellationToken = default)
+        {
+            var reader = new PipeBencodeReader(pipeReader);
+            return ParseAsync(reader, cancellationToken);
+        }
+
+        public virtual ValueTask<T> ParseAsync<T>(PipeReader pipeReader, CancellationToken cancellationToken = default) where T : class, IBObject
+        {
+            var reader = new PipeBencodeReader(pipeReader);
+            return ParseAsync<T>(reader, cancellationToken);
+        }
+
+        public virtual async ValueTask<IBObject> ParseAsync(PipeBencodeReader pipeReader, CancellationToken cancellationToken = default)
+        {
+            if (pipeReader == null) throw new ArgumentNullException(nameof(pipeReader));
+
+            switch (await pipeReader.PeekCharAsync(cancellationToken).ConfigureAwait(false))
+            {
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9': return await ParseAsync<BString>(pipeReader, cancellationToken).ConfigureAwait(false);
+                case 'i': return await ParseAsync<BNumber>(pipeReader, cancellationToken).ConfigureAwait(false);
+                case 'l': return await ParseAsync<BList>(pipeReader, cancellationToken).ConfigureAwait(false);
+                case 'd': return await ParseAsync<BDictionary>(pipeReader, cancellationToken).ConfigureAwait(false);
+                case default(char): return null;
+            }
+
+            throw InvalidBencodeException<IBObject>.InvalidBeginningChar(
+                await pipeReader.PeekCharAsync(cancellationToken).ConfigureAwait(false),
+                pipeReader.Position);
+        }
+
+        public virtual async ValueTask<T> ParseAsync<T>(PipeBencodeReader pipeReader, CancellationToken cancellationToken = default) where T : class, IBObject
+        {
+            var parser = Parsers.Get<T>();
+
+            if (parser == null)
+                throw new BencodeException($"Missing parser for the type '{typeof(T).FullName}'. Stream position: {pipeReader.Position}");
+
+            return await parser.ParseAsync(pipeReader, cancellationToken).ConfigureAwait(false);
         }
     }
 }

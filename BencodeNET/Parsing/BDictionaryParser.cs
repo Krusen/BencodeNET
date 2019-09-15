@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using BencodeNET.Exceptions;
 using BencodeNET.IO;
 using BencodeNET.Objects;
@@ -92,6 +94,60 @@ namespace BencodeNET.Parsing
             }
 
             if (reader.ReadChar() != 'e')
+                throw InvalidBencodeException<BDictionary>.MissingEndChar(startPosition);
+
+            return dictionary;
+        }
+
+        public override async ValueTask<BDictionary> ParseAsync(PipeBencodeReader reader, CancellationToken cancellationToken = default)
+        {
+            if (reader == null) throw new ArgumentNullException(nameof(reader));
+
+            var startPosition = reader.Position;
+
+            // Dictionaries must start with 'd'
+            if (await reader.ReadCharAsync(cancellationToken).ConfigureAwait(false) != 'd')
+                throw InvalidBencodeException<BDictionary>.UnexpectedChar('d', reader.PreviousChar, startPosition);
+
+            var dictionary = new BDictionary();
+            // Loop until next character is the end character 'e' or end of stream
+            while (await reader.PeekCharAsync(cancellationToken).ConfigureAwait(false) != 'e' &&
+                   await reader.PeekCharAsync(cancellationToken).ConfigureAwait(false) != default)
+            {
+                BString key;
+                try
+                {
+                    // Decode next string in stream as the key
+                    key = await BencodeParser.ParseAsync<BString>(reader, cancellationToken).ConfigureAwait(false);
+                }
+                catch (BencodeException ex)
+                {
+                    throw InvalidException("Could not parse dictionary key. Keys must be strings.", ex, startPosition);
+                }
+
+                IBObject value;
+                try
+                {
+                    // Decode next object in stream as the value
+                    value = await BencodeParser.ParseAsync(reader, cancellationToken).ConfigureAwait(false);
+                }
+                catch (BencodeException ex)
+                {
+                    throw InvalidException(
+                        $"Could not parse dictionary value for the key '{key}'. There needs to be a value for each key.",
+                        ex, startPosition);
+                }
+
+                if (dictionary.ContainsKey(key))
+                {
+                    throw InvalidException(
+                        $"The dictionary already contains the key '{key}'. Duplicate keys are not supported.", startPosition);
+                }
+
+                dictionary.Add(key, value);
+            }
+
+            if (await reader.ReadCharAsync(cancellationToken).ConfigureAwait(false) != 'e')
                 throw InvalidBencodeException<BDictionary>.MissingEndChar(startPosition);
 
             return dictionary;

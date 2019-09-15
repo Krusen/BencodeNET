@@ -1,5 +1,7 @@
 ﻿using System.IO;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using BencodeNET.IO;
 using BencodeNET.Objects;
 using BencodeNET.Parsing;
@@ -50,6 +52,11 @@ namespace BencodeNET.Tests.Parsing
             public override IBObject Parse(BencodeReader stream)
             {
                 return Substitute.Parse(stream);
+            }
+
+            public override ValueTask<IBObject> ParseAsync(PipeBencodeReader pipeReader, CancellationToken cancellationToken = default)
+            {
+                throw new System.NotImplementedException();
             }
         }
     }

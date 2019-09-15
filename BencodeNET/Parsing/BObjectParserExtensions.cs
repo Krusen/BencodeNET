@@ -1,4 +1,7 @@
 ﻿using System.IO;
+using System.IO.Pipelines;
+using System.Threading.Tasks;
+using BencodeNET.IO;
 using BencodeNET.Objects;
 
 namespace BencodeNET.Parsing

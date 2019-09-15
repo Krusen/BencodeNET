@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Buffers;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using BencodeNET.Exceptions;
 using BencodeNET.IO;
 using BencodeNET.Objects;
@@ -12,8 +15,6 @@ namespace BencodeNET.Parsing
     /// </summary>
     public class BNumberParser : BObjectParser<BNumber>
     {
-        private StringBuilder Digits { get; } = new StringBuilder(BNumber.MaxDigits);
-
         /// <summary>
         /// The minimum stream length in bytes for a valid number ('i0e').
         /// </summary>
@@ -44,27 +45,68 @@ namespace BencodeNET.Parsing
             if (reader.ReadChar() != 'i')
                 throw InvalidBencodeException<BNumber>.UnexpectedChar('i', reader.PreviousChar, startPosition);
 
-            Digits.Clear();
-            for (var c = reader.ReadChar(); c != default && c != 'e'; c = reader.ReadChar())
+            using (var digits = MemoryPool<char>.Shared.Rent(BNumber.MaxDigits))
             {
-                Digits.Append(c);
+                var digitCount = 0;
+                for (var c = reader.ReadChar(); c != default && c != 'e'; c = reader.ReadChar())
+                {
+                    digits.Memory.Span[digitCount++] = c;
+                }
+
+                if (digitCount == 0)
+                    throw NoDigitsException(startPosition);
+
+                // Last read character should be 'e'
+                if (reader.PreviousChar != 'e')
+                    throw InvalidBencodeException<BNumber>.MissingEndChar(startPosition);
+
+                return ParseNumber(digits.Memory.Span.Slice(0, digitCount), startPosition);
             }
+        }
 
-            if (Digits.Length == 0)
-                throw NoDigitsException(startPosition);
+        // TODO: ConfigureAwait(false) on all async calls
+        public override async ValueTask<BNumber> ParseAsync(PipeBencodeReader reader, CancellationToken cancellationToken = default)
+        {
+            if (reader == null) throw new ArgumentNullException(nameof(reader));
 
-            // Last read character should be 'e'
-            if (reader.PreviousChar != 'e')
-                throw InvalidBencodeException<BNumber>.MissingEndChar(startPosition);
+            var startPosition = reader.Position;
 
-            var isNegative = Digits[0] == '-';
-            var numberOfDigits = isNegative ? Digits.Length - 1 : Digits.Length;
+            // Numbers must start with 'i'
+            if (await reader.ReadCharAsync(cancellationToken).ConfigureAwait(false) != 'i')
+                throw InvalidBencodeException<BNumber>.UnexpectedChar('i', reader.PreviousChar, startPosition);
+
+            using (var memoryOwner = MemoryPool<char>.Shared.Rent(BNumber.MaxDigits))
+            {
+                var digits = memoryOwner.Memory;
+                var digitCount = 0;
+                for (var c = await reader.ReadCharAsync(cancellationToken).ConfigureAwait(false);
+                    c != default && c != 'e';
+                    c = await reader.ReadCharAsync(cancellationToken).ConfigureAwait(false))
+                {
+                    digits.Span[digitCount++] = c;
+                }
+
+                if (digitCount == 0)
+                    throw NoDigitsException(startPosition);
+
+                // Last read character should be 'e'
+                if (reader.PreviousChar != 'e')
+                    throw InvalidBencodeException<BNumber>.MissingEndChar(startPosition);
+
+                return ParseNumber(digits.Span.Slice(0, digitCount), startPosition);
+            }
+        }
+
+        private BNumber ParseNumber(ReadOnlySpan<char> digits, long startPosition)
+        {
+            var isNegative = digits[0] == '-';
+            var numberOfDigits = isNegative ? digits.Length - 1 : digits.Length;
 
             // We do not support numbers that cannot be stored as a long (Int64)
             if (numberOfDigits > BNumber.MaxDigits)
             {
                 throw UnsupportedException(
-                    $"The number '{Digits}' has more than 19 digits and cannot be stored as a long (Int64) and therefore is not supported.",
+                    $"The number '{new string(digits)}' has more than 19 digits and cannot be stored as a long (Int64) and therefore is not supported.",
                     startPosition);
             }
 
@@ -72,24 +114,24 @@ namespace BencodeNET.Parsing
             if (numberOfDigits < 1)
                 throw NoDigitsException(startPosition);
 
-            var firstDigit = isNegative ? Digits[1] : Digits[0];
+            var firstDigit = isNegative ? digits[1] : digits[0];
 
             // Leading zeros are not valid
             if (firstDigit == '0' && numberOfDigits > 1)
-                throw InvalidException($"Leading '0's are not valid. Found value '{Digits}'.", startPosition);
+                throw InvalidException($"Leading '0's are not valid. Found value '{new string(digits)}'.", startPosition);
 
             // '-0' is not valid either
             if (firstDigit == '0' && numberOfDigits == 1 && isNegative)
                 throw InvalidException("'-0' is not a valid number.", startPosition);
 
-            if (!ParseUtil.TryParseLongFast(Digits.ToString(), out var number))
+            if (!ParseUtil.TryParseLongFast(digits, out var number))
             {
-                var nonSignChars = isNegative ? Digits.ToString(1, Digits.Length - 1) : Digits.ToString();
+                var nonSignChars = new string(isNegative ? digits.Slice(1) : digits);
                 if (nonSignChars.Any(x => !x.IsDigit()))
-                    throw InvalidException($"The value '{Digits}' is not a valid number.", startPosition);
+                    throw InvalidException($"The value '{new string(digits)}' is not a valid number.", startPosition);
 
                 throw UnsupportedException(
-                    $"The value '{Digits}' is not a valid long (Int64). Supported values range from '{long.MinValue:N0}' to '{long.MaxValue:N0}'.",
+                    $"The value '{new string(digits)}' is not a valid long (Int64). Supported values range from '{long.MinValue:N0}' to '{long.MaxValue:N0}'.",
                     startPosition);
             }
 

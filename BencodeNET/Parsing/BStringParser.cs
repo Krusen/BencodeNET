@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Buffers;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using BencodeNET.Exceptions;
 using BencodeNET.IO;
 using BencodeNET.Objects;
@@ -11,8 +14,6 @@ namespace BencodeNET.Parsing
     /// </summary>
     public class BStringParser : BObjectParser<BString>
     {
-        private StringBuilder LengthString { get; } = new StringBuilder(BString.LengthMaxDigits);
-
         /// <summary>
         /// The minimum stream length in bytes for a valid string ('0:').
         /// </summary>
@@ -56,46 +57,107 @@ namespace BencodeNET.Parsing
 
             var startPosition = reader.Position;
 
-            LengthString.Clear();
-            for (var c = reader.ReadChar(); c != default && c.IsDigit(); c = reader.ReadChar())
+            using (var memoryOwner = MemoryPool<char>.Shared.Rent(BString.LengthMaxDigits))
             {
-                // Because of memory limitations (~1-2 GB) we know for certain we cannot handle more than 10 digits (10GB)
-                if (LengthString.Length >= BString.LengthMaxDigits)
+                var lengthString = memoryOwner.Memory;
+                var lengthStringCount = 0;
+                for (var c = reader.ReadChar(); c != default && c.IsDigit(); c = reader.ReadChar())
+                {
+                    // Because of memory limitations (~1-2 GB) we know for certain we cannot handle more than 10 digits (10GB)
+                    if (lengthStringCount >= BString.LengthMaxDigits)
+                    {
+                        throw UnsupportedException(
+                            $"Length of string is more than {BString.LengthMaxDigits} digits (>10GB) and is not supported (max is ~1-2GB).",
+                            startPosition);
+                    }
+
+                    lengthString.Span[lengthStringCount++] = c;
+                }
+
+                if (reader.PreviousChar != ':')
+                    throw InvalidBencodeException<BString>.UnexpectedChar(':', reader.PreviousChar, reader.Position - 1);
+
+                if (!ParseUtil.TryParseLongFast(lengthString.Span.Slice(0, lengthStringCount), out var stringLength))
+                    throw InvalidException($"Invalid length '{new string(lengthString.Span)}' of string.", startPosition);
+
+                // Int32.MaxValue is ~2GB and is the absolute maximum that can be handled in memory
+                if (stringLength > int.MaxValue)
                 {
                     throw UnsupportedException(
-                        $"Length of string is more than {BString.LengthMaxDigits} digits (>10GB) and is not supported (max is ~1-2GB).",
+                        $"Length of string is {stringLength:N0} but maximum supported length is {int.MaxValue:N0}.",
                         startPosition);
                 }
 
-                LengthString.Append(c);
+                var bytes = new byte[stringLength];
+                var bytesRead = reader.Read(bytes);
+
+                // If the two don't match we've reached the end of the stream before reading the expected number of chars
+                if (bytesRead != stringLength)
+                {
+                    throw InvalidException(
+                        $"Expected string to be {stringLength:N0} bytes long but could only read {bytes.Length:N0} bytes.",
+                        startPosition);
+                }
+
+                return new BString(bytes, Encoding);
             }
+        }
 
-            if (reader.PreviousChar != ':')
-                throw InvalidBencodeException<BString>.UnexpectedChar(':', reader.PreviousChar, reader.Position - 1);
+        // TODO: XmlDoc
+        public override async ValueTask<BString> ParseAsync(PipeBencodeReader reader, CancellationToken cancellationToken = default)
+        {
+            if (reader == null) throw new ArgumentNullException(nameof(reader));
 
-            if (!ParseUtil.TryParseLongFast(LengthString.ToString(), out var stringLength))
-                throw InvalidException($"Invalid length '{LengthString}' of string.", startPosition);
+            var startPosition = reader.Position;
 
-            // Int32.MaxValue is ~2GB and is the absolute maximum that can be handled in memory
-            if (stringLength > int.MaxValue)
+            using (var memoryOwner = MemoryPool<char>.Shared.Rent(BString.LengthMaxDigits))
             {
-                throw UnsupportedException(
-                    $"Length of string is {stringLength:N0} but maximum supported length is {int.MaxValue:N0}.",
-                    startPosition);
+                var lengthString = memoryOwner.Memory;
+                var lengthStringCount = 0;
+                for (var c = await reader.ReadCharAsync(cancellationToken).ConfigureAwait(false);
+                    c != default && c.IsDigit();
+                    c = await reader.ReadCharAsync(cancellationToken).ConfigureAwait(false))
+                {
+                    // Because of memory limitations (~1-2 GB) we know for certain we cannot handle more than 10 digits (10GB)
+                    if (lengthStringCount >= BString.LengthMaxDigits)
+                    {
+                        throw UnsupportedException(
+                            $"Length of string is more than {BString.LengthMaxDigits} digits (>10GB) and is not supported (max is ~1-2GB).",
+                            startPosition);
+                    }
+
+                    lengthString.Span[lengthStringCount++] = c;
+                }
+
+                if (reader.PreviousChar != ':')
+                    throw InvalidBencodeException<BString>.UnexpectedChar(':', reader.PreviousChar, reader.Position - 1);
+
+                lengthString = lengthString.Slice(0, lengthStringCount);
+
+                if (!ParseUtil.TryParseLongFast(lengthString.Span, out var stringLength))
+                    throw InvalidException($"Invalid length '{new string(lengthString.Span)}' of string.", startPosition);
+
+                // Int32.MaxValue is ~2GB and is the absolute maximum that can be handled in memory
+                if (stringLength > int.MaxValue)
+                {
+                    throw UnsupportedException(
+                        $"Length of string is {stringLength:N0} but maximum supported length is {int.MaxValue:N0}.",
+                        startPosition);
+                }
+
+                var bytes = new byte[stringLength];
+                var bytesRead = await reader.ReadAsync(bytes, cancellationToken).ConfigureAwait(false);
+
+                // If the two don't match we've reached the end of the stream before reading the expected number of chars
+                if (bytesRead != stringLength)
+                {
+                    throw InvalidException(
+                        $"Expected string to be {stringLength:N0} bytes long but could only read {bytes.Length:N0} bytes.",
+                        startPosition);
+                }
+
+                return new BString(bytes, Encoding);
             }
-
-            var bytes = new byte[stringLength];
-            var bytesRead = reader.Read(bytes);
-
-            // If the two don't match we've reached the end of the stream before reading the expected number of chars
-            if (bytesRead != stringLength)
-            {
-                throw InvalidException(
-                    $"Expected string to be {stringLength:N0} bytes long but could only read {bytes.Length:N0} bytes.",
-                    startPosition);
-            }
-
-            return new BString(bytes, Encoding);
         }
 
         private static InvalidBencodeException<BString> InvalidException(string message, long startPosition)
