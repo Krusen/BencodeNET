@@ -20,7 +20,7 @@
     <Description>A library for encoding and decoding bencode (e.g. torrent files)</Description>
     <PackageLicenseExpression>Unlicense</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/Krusen/BencodeNET</PackageProjectUrl>
-    <PackageIconUrl>https://raw.githubusercontent.com/Krusen/BencodeNET/master/Assets/icon.png</PackageIconUrl>
+    <PackageIcon>icon.png</PackageIcon>
     <RepositoryUrl>https://github.com/Krusen/BencodeNET</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageReleaseNotes></PackageReleaseNotes>
@@ -29,6 +29,10 @@
     <IncludeSource>True</IncludeSource>
     <IncludeSymbols>True</IncludeSymbols>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../Assets/icon.png" Pack="true" PackagePath="/" />
+  </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
     <PackageReference Include="System.Reflection" Version="4.3.0" />
