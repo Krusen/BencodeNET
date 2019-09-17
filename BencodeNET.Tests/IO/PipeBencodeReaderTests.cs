@@ -258,7 +258,7 @@ namespace BencodeNET.Tests.IO
         }
 
         [Fact]
-        public async Task PreviousCharAtStartOfStream()
+        public void PreviousCharAtStartOfStream()
         {
             Write("Hello World!");
 
