@@ -71,7 +71,7 @@ namespace BencodeNET.IO
             return PeekCharConsume(result.Buffer);
         }
 
-        private char PeekCharConsume(ReadOnlySequence<byte> buffer)
+        private char PeekCharConsume(in ReadOnlySequence<byte> buffer)
         {
             if (buffer.IsEmpty)
             {
@@ -113,7 +113,7 @@ namespace BencodeNET.IO
         /// Reads the next char in the pipe and consumes it (advances the reader),
         /// unless <paramref name="peek"/> is <c>true</c>.
         /// </summary>
-        private char ReadCharConsume(ReadOnlySequence<byte> buffer)
+        private char ReadCharConsume(int ReadOnlySequence<byte> buffer)
         {
             if (buffer.IsEmpty)
             {
