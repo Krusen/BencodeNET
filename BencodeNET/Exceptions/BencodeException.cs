@@ -13,7 +13,6 @@ namespace BencodeNET.Exceptions
 
         public BencodeException(string message)
             : base(message)
-
         { }
 
         public BencodeException(string message, Exception inner)
