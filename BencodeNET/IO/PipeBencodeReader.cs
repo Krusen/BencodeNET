@@ -120,6 +120,8 @@ namespace BencodeNET.IO
 
         private bool TryReadConsume(ReadResult result, Span<byte> bytes, out long bytesRead)
         {
+            if (result.IsCanceled) throw new InvalidOperationException("Read operation cancelled.");
+
             var buffer = result.Buffer;
 
             // Check if enough bytes have been read

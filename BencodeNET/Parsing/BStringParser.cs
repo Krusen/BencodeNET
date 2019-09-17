@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Buffers;
 using System.Text;
 using System.Threading;
@@ -78,7 +78,7 @@ namespace BencodeNET.Parsing
                     throw InvalidBencodeException<BString>.UnexpectedChar(':', reader.PreviousChar, reader.Position - 1);
 
                 if (!ParseUtil.TryParseLongFast(lengthString.Span.Slice(0, lengthStringCount), out var stringLength))
-                    throw InvalidException($"Invalid length '{new string(lengthString.Span)}' of string.", startPosition);
+                    throw InvalidException($"Invalid length '{lengthString.AsString()}' of string.", startPosition);
 
                 // Int32.MaxValue is ~2GB and is the absolute maximum that can be handled in memory
                 if (stringLength > int.MaxValue)
@@ -135,7 +135,7 @@ namespace BencodeNET.Parsing
                 lengthString = lengthString.Slice(0, lengthStringCount);
 
                 if (!ParseUtil.TryParseLongFast(lengthString.Span, out var stringLength))
-                    throw InvalidException($"Invalid length '{new string(lengthString.Span)}' of string.", startPosition);
+                    throw InvalidException($"Invalid length '{lengthString.AsString()}' of string.", startPosition);
 
                 // Int32.MaxValue is ~2GB and is the absolute maximum that can be handled in memory
                 if (stringLength > int.MaxValue)

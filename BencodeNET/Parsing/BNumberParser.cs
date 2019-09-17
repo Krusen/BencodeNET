@@ -64,7 +64,6 @@ namespace BencodeNET.Parsing
             }
         }
 
-        // TODO: ConfigureAwait(false) on all async calls
         public override async ValueTask<BNumber> ParseAsync(PipeBencodeReader reader, CancellationToken cancellationToken = default)
         {
             if (reader == null) throw new ArgumentNullException(nameof(reader));
@@ -106,7 +105,7 @@ namespace BencodeNET.Parsing
             if (numberOfDigits > BNumber.MaxDigits)
             {
                 throw UnsupportedException(
-                    $"The number '{new string(digits)}' has more than 19 digits and cannot be stored as a long (Int64) and therefore is not supported.",
+                    $"The number '{digits.AsString()}' has more than 19 digits and cannot be stored as a long (Int64) and therefore is not supported.",
                     startPosition);
             }
 
@@ -118,7 +117,7 @@ namespace BencodeNET.Parsing
 
             // Leading zeros are not valid
             if (firstDigit == '0' && numberOfDigits > 1)
-                throw InvalidException($"Leading '0's are not valid. Found value '{new string(digits)}'.", startPosition);
+                throw InvalidException($"Leading '0's are not valid. Found value '{digits.AsString()}'.", startPosition);
 
             // '-0' is not valid either
             if (firstDigit == '0' && numberOfDigits == 1 && isNegative)
@@ -126,12 +125,12 @@ namespace BencodeNET.Parsing
 
             if (!ParseUtil.TryParseLongFast(digits, out var number))
             {
-                var nonSignChars = new string(isNegative ? digits.Slice(1) : digits);
-                if (nonSignChars.Any(x => !x.IsDigit()))
-                    throw InvalidException($"The value '{new string(digits)}' is not a valid number.", startPosition);
+                var nonSignChars = isNegative ? digits.Slice(1) : digits;
+                if (nonSignChars.AsString().Any(x => !x.IsDigit()))
+                    throw InvalidException($"The value '{digits.AsString()}' is not a valid number.", startPosition);
 
                 throw UnsupportedException(
-                    $"The value '{new string(digits)}' is not a valid long (Int64). Supported values range from '{long.MinValue:N0}' to '{long.MaxValue:N0}'.",
+                    $"The value '{digits.AsString()}' is not a valid long (Int64). Supported values range from '{long.MinValue:N0}' to '{long.MaxValue:N0}'.",
                     startPosition);
             }
 

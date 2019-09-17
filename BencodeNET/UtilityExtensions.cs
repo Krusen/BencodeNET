@@ -157,6 +157,28 @@ namespace BencodeNET
         }
 #endif
 
+#if NETCOREAPP2_1
+        public static string AsString(this ReadOnlySpan<char> chars)
+        {
+            return new string(chars);
+        }
+
+        public static string AsString(this Memory<char> chars)
+        {
+            return new string(chars.Span);
+        }
+#else
+        public static string AsString(this ReadOnlySpan<char> chars)
+        {
+            return new string(chars.ToArray());
+        }
+
+        public static string AsString(this Memory<char> chars)
+        {
+            return new string(chars.ToArray());
+        }
+#endif
+
         public static void Deconstruct(this Pipe pipe, out PipeReader reader, out PipeWriter writer)
         {
             reader = pipe.Reader;

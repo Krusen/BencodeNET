@@ -34,6 +34,10 @@
     <None Include="../Assets/icon.png" Pack="true" PackagePath="/" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="System.IO.Pipelines" Version="4.5.3" />
+  </ItemGroup>
+
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
     <PackageReference Include="System.Reflection" Version="4.3.0" />
     <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.0" />
