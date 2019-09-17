@@ -13,8 +13,6 @@ namespace BencodeNET.IO
     {
         private readonly PipeReader _reader;
 
-        private bool _hasPeeked;
-        private char _peekedChar;
         private bool _endOfStream;
 
         /// <summary>
@@ -37,94 +35,54 @@ namespace BencodeNET.IO
         }
 
         /// <summary>
-        /// Consumes the peeked char by incrementing <see cref="Position"/>,
-        /// setting <see cref="PreviousChar"/>  and resetting <see cref="_peekedChar"/>.
-        /// </summary>
-        protected char ConsumePeekedChar()
-        {
-            _hasPeeked = false;
-            Position++;
-            PreviousChar = _peekedChar;
-            return _peekedChar;
-        }
-
-        /// <summary>
         /// Peek at the next char in the pipe, without advancing the reader.
         /// </summary>
         public ValueTask<char> PeekCharAsync(CancellationToken cancellationToken = default)
-        {
-            if (_endOfStream)
-                return new ValueTask<char>(default(char));
+            => ReadCharAsync(peek: true, cancellationToken);
 
-            if (_hasPeeked)
-                return new ValueTask<char>(_peekedChar);
-
-            if (_reader.TryRead(out var result))
-                return new ValueTask<char>(PeekCharConsume(result.Buffer));
-
-            return PeekCharAsyncAwaited(cancellationToken);
-        }
-
-        private async ValueTask<char> PeekCharAsyncAwaited(CancellationToken cancellationToken)
-        {
-            var result = await _reader.ReadAsync(cancellationToken).ConfigureAwait(false);
-            return PeekCharConsume(result.Buffer);
-        }
-
-        private char PeekCharConsume(in ReadOnlySequence<byte> buffer)
-        {
-            if (buffer.IsEmpty)
-            {
-                _endOfStream = true;
-                _reader.AdvanceTo(buffer.Start);
-                return default;
-            }
-
-            _hasPeeked = true;
-            _peekedChar = (char) buffer.First.Span[0];
-            _reader.AdvanceTo(buffer.GetPosition(1));
-            return _peekedChar;
-        }
+        public ValueTask<char> ReadCharAsync(CancellationToken cancellationToken = default)
+            => ReadCharAsync(peek: false, cancellationToken);
 
         /// <summary>
         /// Read the next char in the pipe and advance the reader.
         /// </summary>
-        public ValueTask<char> ReadCharAsync(CancellationToken cancellationToken = default)
+        private ValueTask<char> ReadCharAsync(bool peek = false, CancellationToken cancellationToken = default)
         {
             if (_endOfStream)
                 return new ValueTask<char>(default(char));
 
-            if (_hasPeeked)
-                return new ValueTask<char>(ConsumePeekedChar());
-
             if (_reader.TryRead(out var result))
-                return new ValueTask<char>(ReadCharConsume(result.Buffer));
+                return new ValueTask<char>(ReadCharConsume(result.Buffer, peek));
 
-            return ReadCharAsyncAwaited(cancellationToken);
+            return ReadCharAsyncAwaited(peek, cancellationToken);
         }
 
-        private async ValueTask<char> ReadCharAsyncAwaited(CancellationToken cancellationToken)
+        private async ValueTask<char> ReadCharAsyncAwaited(bool peek, CancellationToken cancellationToken)
         {
             var result = await _reader.ReadAsync(cancellationToken).ConfigureAwait(false);
-            return ReadCharConsume(result.Buffer);
+            return ReadCharConsume(result.Buffer, peek);
         }
 
-        /// <summary>
-        /// Reads the next char in the pipe and consumes it (advances the reader),
-        /// unless <paramref name="peek"/> is <c>true</c>.
-        /// </summary>
-        private char ReadCharConsume(int ReadOnlySequence<byte> buffer)
+        private char ReadCharConsume(in ReadOnlySequence<byte> buffer, bool peek)
         {
             if (buffer.IsEmpty)
             {
                 _endOfStream = true;
-                _reader.AdvanceTo(buffer.Start);
                 return default;
+            }
+
+            var c = (char) buffer.First.Span[0];
+
+            if (peek)
+            {
+                // Advance reader to start (i.e. don't advance)
+                _reader.AdvanceTo(buffer.Start);
+                return c;
             }
 
             // Consume char by advancing reader
             Position++;
-            PreviousChar = (char) buffer.First.Span[0];
+            PreviousChar = c;
             _reader.AdvanceTo(buffer.GetPosition(1));
             return c;
         }
@@ -140,41 +98,27 @@ namespace BencodeNET.IO
             if (bytes.Length == 0 || _endOfStream)
                 return new ValueTask<long>(0);
 
-            var consumed = 0;
-            if (_hasPeeked)
-            {
-                bytes.Span[0] = (byte) ConsumePeekedChar();
-
-                if (bytes.Length == 1)
-                    return new ValueTask<long>(1);
-
-                consumed = 1;
-            }
-
-            if (consumed != 0)
-                bytes = bytes.Slice(consumed);
-
-            if (_reader.TryRead(out var result) && TryReadConsume(result, bytes.Span, consumed, out var bytesRead))
+            if (_reader.TryRead(out var result) && TryReadConsume(result, bytes.Span, out var bytesRead))
             {
                 return new ValueTask<long>(bytesRead);
             }
 
-            return ReadAsyncAwaited(bytes, consumed, cancellationToken);
+            return ReadAsyncAwaited(bytes, cancellationToken);
         }
 
-        private async ValueTask<long> ReadAsyncAwaited(Memory<byte> bytes, long consumed, CancellationToken cancellationToken)
+        private async ValueTask<long> ReadAsyncAwaited(Memory<byte> bytes, CancellationToken cancellationToken)
         {
             while (true)
             {
                 var result = await _reader.ReadAsync(cancellationToken).ConfigureAwait(false);
-                if (TryReadConsume(result, bytes.Span, consumed, out var bytesRead))
+                if (TryReadConsume(result, bytes.Span, out var bytesRead))
                 {
                     return bytesRead;
                 }
             }
         }
 
-        private bool TryReadConsume(ReadResult result, Span<byte> bytes, long consumed, out long bytesRead)
+        private bool TryReadConsume(ReadResult result, Span<byte> bytes, out long bytesRead)
         {
             var buffer = result.Buffer;
 
@@ -185,7 +129,7 @@ namespace BencodeNET.IO
                 buffer.Slice(0, bytes.Length).CopyTo(bytes);
                 Position += bytes.Length;
                 PreviousChar = (char) bytes[bytes.Length - 1];
-                bytesRead = bytes.Length + consumed;
+                bytesRead = bytes.Length;
                 _reader.AdvanceTo(buffer.GetPosition(bytes.Length));
                 return true;
             }
@@ -205,7 +149,7 @@ namespace BencodeNET.IO
                 buffer.CopyTo(bytes);
                 Position += buffer.Length;
                 PreviousChar = (char) buffer.Slice(buffer.Length - 1).First.Span[0];
-                bytesRead = buffer.Length + consumed;
+                bytesRead = buffer.Length;
                 _reader.AdvanceTo(buffer.End);
                 return true;
             }
