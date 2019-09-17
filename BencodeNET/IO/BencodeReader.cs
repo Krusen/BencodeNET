@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Buffers;
 using System.IO;
 
 namespace BencodeNET.IO
@@ -9,12 +8,9 @@ namespace BencodeNET.IO
     /// </summary>
     public class BencodeReader : IDisposable
     {
-        private const int DefaultBufferSize = 40960;
-
         private readonly byte[] _tinyBuffer = new byte[1];
 
         private readonly Stream _stream;
-        private readonly int _chunkBufferSize;
         private readonly bool _leaveOpen;
         private readonly bool _supportsLength;
 
@@ -43,25 +39,12 @@ namespace BencodeNET.IO
         public bool EndOfStream => Position > Length || PeekChar() == default;
 
         /// <summary>
-        /// Creates a new <see cref="BencodeReader"/> for the specified <see cref="Stream"/>
-        /// using the default buffer size of 40,960 bytes.
+        /// Creates a new <see cref="BencodeReader"/> for the specified <see cref="Stream"/>.
         /// </summary>
         /// <param name="stream">The stream to read from.</param>
         public BencodeReader(Stream stream)
-            : this(stream, DefaultBufferSize)
+            : this(stream, leaveOpen: false)
         {
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="BencodeReader"/> for the specified <see cref="Stream"/>
-        /// using the specified <paramref name="bufferSize"/>.
-        /// </summary>
-        /// <param name="stream">The stream to read from.</param>
-        /// <param name="bufferSize">The buffer size used when reading more than a single character from the stream. </param>
-        public BencodeReader(Stream stream, int bufferSize)
-            : this(stream, bufferSize, leaveOpen: false)
-        {
-
         }
 
         /// <summary>
@@ -71,22 +54,8 @@ namespace BencodeNET.IO
         /// <param name="stream">The stream to read from.</param>
         /// <param name="leaveOpen">Indicates if the stream should be left open when this <see cref="BencodeReader"/> is disposed.</param>
         public BencodeReader(Stream stream, bool leaveOpen)
-            : this(stream, DefaultBufferSize, leaveOpen)
-        {
-
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="BencodeReader"/> for the specified <see cref="Stream"/>
-        /// using the specified <paramref name="bufferSize"/> and the option of leaving the stream open after disposing of this instance.
-        /// </summary>
-        /// <param name="stream">The stream to read from.</param>
-        /// <param name="bufferSize">The buffer size used when reading more than a single character from the stream. </param>
-        /// <param name="leaveOpen">Indicates if the stream should be left open when this <see cref="BencodeReader"/> is disposed.</param>
-        public BencodeReader(Stream stream, int bufferSize, bool leaveOpen)
         {
             _stream = stream ?? throw new ArgumentNullException(nameof(stream));
-            _chunkBufferSize = bufferSize;
             _leaveOpen = leaveOpen;
             try
             {
@@ -147,12 +116,12 @@ namespace BencodeNET.IO
         /// <returns>The number of bytes actually read from the stream and filled into the buffer.</returns>
         public int Read(byte[] buffer)
         {
-            var index = 0;
+            var read = 0;
             var length = buffer.Length;
             if (_hasPeeked && _peekedChar != default)
             {
                 buffer[0] = (byte) _peekedChar;
-                index = 1;
+                read = 1;
                 length--;
                 _hasPeeked = false;
 
@@ -163,32 +132,12 @@ namespace BencodeNET.IO
                 }
             }
 
-            using (var ms = new MemoryStream(buffer, index, length))
-            {
-                var totalRead = index;
-                var chunkBuffer = ArrayPool<byte>.Shared.Rent(_chunkBufferSize);
-                try
-                {
+            read += _stream.Read(buffer, read, length);
 
-                    int count;
-                    while ((count = _stream.Read(chunkBuffer, 0, Math.Min(chunkBuffer.Length, buffer.Length - totalRead))) != 0)
-                    {
-                        totalRead += count;
-                        ms.Write(chunkBuffer, 0, count);
-                    }
-                }
-                finally
-                {
-                    ArrayPool<byte>.Shared.Return(chunkBuffer);
-                }
+            if (read > 0)
+                PreviousChar = (char) buffer[read - 1];
 
-                if (totalRead > 0)
-                {
-                    PreviousChar = (char)buffer[totalRead - 1];
-                }
-
-                return totalRead;
-            }
+            return read;
         }
 
         /// <inheritdoc/>
