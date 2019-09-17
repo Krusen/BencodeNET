@@ -107,7 +107,6 @@ namespace BencodeNET.IO
             return PreviousChar;
         }
 
-        // TODO: Create version using Span<byte>?
         /// <summary>
         /// Reads into the <paramref name="buffer"/> by reading from the stream.
         /// Returns the number of bytes actually read from the stream.
@@ -117,12 +116,10 @@ namespace BencodeNET.IO
         public int Read(byte[] buffer)
         {
             var read = 0;
-            var length = buffer.Length;
             if (_hasPeeked && _peekedChar != default)
             {
                 buffer[0] = (byte) _peekedChar;
                 read = 1;
-                length--;
                 _hasPeeked = false;
 
                 // Just return right away if only reading this 1 byte
@@ -132,7 +129,7 @@ namespace BencodeNET.IO
                 }
             }
 
-            read += _stream.Read(buffer, read, length);
+            read += _stream.Read(buffer, read, buffer.Length - read);
 
             if (read > 0)
                 PreviousChar = (char) buffer[read - 1];
