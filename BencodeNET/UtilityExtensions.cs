@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Pipelines;
 using System.Linq;
 using System.Text;
 
@@ -39,7 +38,6 @@ namespace BencodeNET
 
         public static int DigitCount(this int value) => DigitCount((long) value);
 
-        // TODO: Unit tests
         public static int DigitCount(this long value)
         {
             var sign = value < 0 ? 1 : 0;
@@ -178,11 +176,5 @@ namespace BencodeNET
             return new string(chars.ToArray());
         }
 #endif
-
-        public static void Deconstruct(this Pipe pipe, out PipeReader reader, out PipeWriter writer)
-        {
-            reader = pipe.Reader;
-            writer = pipe.Writer;
-        }
     }
 }
