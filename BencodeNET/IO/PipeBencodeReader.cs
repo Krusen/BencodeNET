@@ -71,6 +71,7 @@ namespace BencodeNET.IO
         {
             if (buffer.IsEmpty)
             {
+                // TODO: Add IsCompleted check?
                 _endOfStream = true;
                 return default;
             }
