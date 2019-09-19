@@ -46,11 +46,28 @@ namespace BencodeNET.Parsing
         /// <returns>The parsed object.</returns>
         public virtual T Parse(Stream stream) => Parse(new BencodeReader(stream, leaveOpen: true));
 
+        /// <summary>
+        /// Parses an <see cref="IBObject"/> of type <typeparamref name="T"/> from a <see cref="BencodeReader"/>.
+        /// </summary>
+        /// <param name="reader">The reader to read from.</param>
+        /// <returns>The parsed object.</returns>
         public abstract T Parse(BencodeReader reader);
 
+        /// <summary>
+        /// Parses an <see cref="IBObject"/> of type <typeparamref name="T"/> from a <see cref="PipeReader"/>.
+        /// </summary>
+        /// <param name="pipeReader">The pipe reader to read from.</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>The parsed object.</returns>
         public ValueTask<T> ParseAsync(PipeReader pipeReader, CancellationToken cancellationToken = default)
             => ParseAsync(new PipeBencodeReader(pipeReader), cancellationToken);
 
+        /// <summary>
+        /// Parses an <see cref="IBObject"/> of type <typeparamref name="T"/> from a <see cref="PipeBencodeReader"/>.
+        /// </summary>
+        /// <param name="pipeReader">The pipe reader to read from.</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>The parsed object.</returns>
         public abstract ValueTask<T> ParseAsync(PipeBencodeReader pipeReader, CancellationToken cancellationToken = default);
     }
 }

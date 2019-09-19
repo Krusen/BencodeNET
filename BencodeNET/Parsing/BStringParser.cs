@@ -103,7 +103,14 @@ namespace BencodeNET.Parsing
             }
         }
 
-        // TODO: XmlDoc
+        /// <summary>
+        /// Parses the next <see cref="BString"/> from the reader.
+        /// </summary>
+        /// <param name="reader">The reader to parse from.</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>The parsed <see cref="BString"/>.</returns>
+        /// <exception cref="InvalidBencodeException{BString}">Invalid bencode.</exception>
+        /// <exception cref="UnsupportedBencodeException{BString}">The bencode is unsupported by this library.</exception>
         public override async ValueTask<BString> ParseAsync(PipeBencodeReader reader, CancellationToken cancellationToken = default)
         {
             if (reader == null) throw new ArgumentNullException(nameof(reader));

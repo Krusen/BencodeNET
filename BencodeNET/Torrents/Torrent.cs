@@ -336,7 +336,6 @@ namespace BencodeNET.Torrents
         /// Encodes the torrent and writes it to the stream.
         /// </summary>
         /// <param name="stream"></param>
-        /// <returns></returns>
         protected override void EncodeObject(Stream stream)
         {
             var torrent = ToBDictionary();

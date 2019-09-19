@@ -82,6 +82,12 @@ namespace BencodeNET.Torrents
             return CreateTorrent(data);
         }
 
+        /// <summary>
+        /// Parses the next <see cref="BDictionary"/> from the reader as a <see cref="Torrent"/>.
+        /// </summary>
+        /// <param name="pipeReader">The reader to parse from.</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>The parsed <see cref="Torrent"/>.</returns>
         public override async ValueTask<Torrent> ParseAsync(PipeBencodeReader pipeReader, CancellationToken cancellationToken = default)
         {
             var data = await BencodeParser.ParseAsync<BDictionary>(pipeReader, cancellationToken);

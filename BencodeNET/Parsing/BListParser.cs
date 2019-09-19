@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -71,6 +71,13 @@ namespace BencodeNET.Parsing
             return list;
         }
 
+        /// <summary>
+        /// Parses the next <see cref="BList"/> from the reader.
+        /// </summary>
+        /// <param name="reader">The reader to parse from.</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>The parsed <see cref="BList"/>.</returns>
+        /// <exception cref="InvalidBencodeException{BList}">Invalid bencode.</exception>
         public override async ValueTask<BList> ParseAsync(PipeBencodeReader reader, CancellationToken cancellationToken = default)
         {
             if (reader == null) throw new ArgumentNullException(nameof(reader));

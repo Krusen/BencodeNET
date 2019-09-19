@@ -7,6 +7,9 @@ using System.Text;
 
 namespace BencodeNET.Objects
 {
+    /// <summary>
+    /// Extensions to simplify encoding directly as a string or byte array.
+    /// </summary>
     public static class BObjectExtensions
     {
         /// <summary>

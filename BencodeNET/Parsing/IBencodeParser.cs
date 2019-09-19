@@ -46,13 +46,24 @@ namespace BencodeNET.Parsing
         /// <param name="reader"></param>
         T Parse<T>(BencodeReader reader) where T : class, IBObject;
 
+        /// <summary>
+        /// Parse an <see cref="IBObject"/> from the <see cref="PipeReader"/>.
+        /// </summary>
         ValueTask<IBObject> ParseAsync(PipeReader pipeReader, CancellationToken cancellationToken = default);
 
+        /// <summary>
+        /// Parse an <see cref="IBObject"/> from the <see cref="PipeReader"/>.
+        /// </summary>
         ValueTask<IBObject> ParseAsync(PipeBencodeReader pipeReader, CancellationToken cancellationToken = default);
 
-        // TODO: XmlDoc
+        /// <summary>
+        /// Parse an <see cref="IBObject"/> from the <see cref="PipeBencodeReader"/>.
+        /// </summary>
         ValueTask<T> ParseAsync<T>(PipeReader pipeReader, CancellationToken cancellationToken = default) where T : class, IBObject;
 
+        /// <summary>
+        /// Parse an <see cref="IBObject"/> of type <typeparamref name="T"/> from the <see cref="PipeBencodeReader"/>.
+        /// </summary>
         ValueTask<T> ParseAsync<T>(PipeBencodeReader pipeReader, CancellationToken cancellationToken = default) where T : class, IBObject;
     }
 }

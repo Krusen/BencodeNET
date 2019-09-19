@@ -3,6 +3,9 @@ using BencodeNET.Objects;
 
 namespace BencodeNET.Parsing
 {
+    /// <summary>
+    /// Extensions to simplify parsing strings, byte arrays or files directly.
+    /// </summary>
     public static class BencodeParserExtensions
     {
         /// <summary>
@@ -96,7 +99,6 @@ namespace BencodeNET.Parsing
         /// Parses a stream through a <see cref="BufferedStream"/> into an <see cref="IBObject"/>.
         /// The input <paramref name="stream"/> is disposed when parsing is completed.
         /// </summary>
-        /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
         /// <param name="parser"></param>
         /// <param name="stream">The stream to parse.</param>
         /// <param name="bufferSize">The buffer size to use. Uses default size of <see cref="BufferedStream"/> if null.</param>

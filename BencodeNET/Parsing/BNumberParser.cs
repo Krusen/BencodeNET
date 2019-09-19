@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Buffers;
 using System.Linq;
 using System.Text;
@@ -64,6 +64,14 @@ namespace BencodeNET.Parsing
             }
         }
 
+        /// <summary>
+        /// Parses the next <see cref="BNumber"/> from the reader.
+        /// </summary>
+        /// <param name="reader">The reader to parse from.</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>The parsed <see cref="BNumber"/>.</returns>
+        /// <exception cref="InvalidBencodeException{BNumber}">Invalid bencode.</exception>
+        /// <exception cref="UnsupportedBencodeException{BNumber}">The bencode is unsupported by this library.</exception>
         public override async ValueTask<BNumber> ParseAsync(PipeBencodeReader reader, CancellationToken cancellationToken = default)
         {
             if (reader == null) throw new ArgumentNullException(nameof(reader));

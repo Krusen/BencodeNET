@@ -1,11 +1,11 @@
 ﻿using System.IO;
-using System.IO.Pipelines;
-using System.Threading.Tasks;
-using BencodeNET.IO;
 using BencodeNET.Objects;
 
 namespace BencodeNET.Parsing
 {
+    /// <summary>
+    /// Extensions to simplify parsing strings and byte arrays.
+    /// </summary>
     public static class BObjectParserExtensions
     {
         /// <summary>

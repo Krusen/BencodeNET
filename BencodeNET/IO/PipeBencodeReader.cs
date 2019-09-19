@@ -40,12 +40,12 @@ namespace BencodeNET.IO
         public ValueTask<char> PeekCharAsync(CancellationToken cancellationToken = default)
             => ReadCharAsync(peek: true, cancellationToken);
 
-        public ValueTask<char> ReadCharAsync(CancellationToken cancellationToken = default)
-            => ReadCharAsync(peek: false, cancellationToken);
-
         /// <summary>
         /// Read the next char in the pipe and advance the reader.
         /// </summary>
+        public ValueTask<char> ReadCharAsync(CancellationToken cancellationToken = default)
+            => ReadCharAsync(peek: false, cancellationToken);
+
         private ValueTask<char> ReadCharAsync(bool peek = false, CancellationToken cancellationToken = default)
         {
             if (_endOfStream)
@@ -63,6 +63,10 @@ namespace BencodeNET.IO
             return ReadCharConsume(result.Buffer, peek);
         }
 
+        /// <summary>
+        /// Reads the next char in the pipe and consumes it (advances the reader),
+        /// unless <paramref name="peek"/> is <c>true</c>.
+        /// </summary>
         private char ReadCharConsume(in ReadOnlySequence<byte> buffer, bool peek)
         {
             if (buffer.IsEmpty)

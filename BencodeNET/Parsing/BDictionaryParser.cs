@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -99,6 +99,13 @@ namespace BencodeNET.Parsing
             return dictionary;
         }
 
+        /// <summary>
+        /// Parses the next <see cref="BDictionary"/> and its contained keys and values from the reader.
+        /// </summary>
+        /// <param name="reader">The reader to parse from.</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>The parsed <see cref="BDictionary"/>.</returns>
+        /// <exception cref="InvalidBencodeException{BDictionary}">Invalid bencode.</exception>
         public override async ValueTask<BDictionary> ParseAsync(PipeBencodeReader reader, CancellationToken cancellationToken = default)
         {
             if (reader == null) throw new ArgumentNullException(nameof(reader));

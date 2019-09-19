@@ -79,7 +79,6 @@ namespace BencodeNET.Parsing
         /// <summary>
         ///  Parses an <see cref="IBObject"/> from the reader.
         /// </summary>
-        /// <param name="reader"></param>
         public virtual IBObject Parse(BencodeReader reader)
         {
             if (reader == null) throw new ArgumentNullException(nameof(reader));
@@ -109,7 +108,6 @@ namespace BencodeNET.Parsing
         /// Parse an <see cref="IBObject"/> of type <typeparamref name="T"/> from the reader.
         /// </summary>
         /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
-        /// <param name="reader"></param>
         public virtual T Parse<T>(BencodeReader reader) where T : class, IBObject
         {
             var parser = Parsers.Get<T>();
@@ -120,18 +118,28 @@ namespace BencodeNET.Parsing
             return parser.Parse(reader);
         }
 
+        /// <summary>
+        /// Parse an <see cref="IBObject"/> from the <see cref="PipeReader"/>.
+        /// </summary>
         public virtual ValueTask<IBObject> ParseAsync(PipeReader pipeReader, CancellationToken cancellationToken = default)
         {
             var reader = new PipeBencodeReader(pipeReader);
             return ParseAsync(reader, cancellationToken);
         }
 
+        /// <summary>
+        /// Parse an <see cref="IBObject"/> of type <typeparamref name="T"/> from the <see cref="PipeReader"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
         public virtual ValueTask<T> ParseAsync<T>(PipeReader pipeReader, CancellationToken cancellationToken = default) where T : class, IBObject
         {
             var reader = new PipeBencodeReader(pipeReader);
             return ParseAsync<T>(reader, cancellationToken);
         }
 
+        /// <summary>
+        /// Parse an <see cref="IBObject"/> from the <see cref="PipeBencodeReader"/>.
+        /// </summary>
         public virtual async ValueTask<IBObject> ParseAsync(PipeBencodeReader pipeReader, CancellationToken cancellationToken = default)
         {
             if (pipeReader == null) throw new ArgumentNullException(nameof(pipeReader));
@@ -159,6 +167,9 @@ namespace BencodeNET.Parsing
                 pipeReader.Position);
         }
 
+        /// <summary>
+        /// Parse an <see cref="IBObject"/> of type <typeparamref name="T"/> from the <see cref="PipeBencodeReader"/>.
+        /// </summary>
         public virtual async ValueTask<T> ParseAsync<T>(PipeBencodeReader pipeReader, CancellationToken cancellationToken = default) where T : class, IBObject
         {
             var parser = Parsers.Get<T>();
