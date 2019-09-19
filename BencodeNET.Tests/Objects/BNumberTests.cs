@@ -349,6 +349,20 @@ namespace BencodeNET.Tests.Objects
             var bnumber = new BNumber(1234);
             var (reader, writer) = new Pipe();
 
+            bnumber.EncodeTo(writer);
+            await writer.FlushAsync();
+            reader.TryRead(out var readResult);
+
+            var result = Encoding.UTF8.GetString(readResult.Buffer.First.Span.ToArray());
+            result.Should().Be("i1234e");
+        }
+
+        [Fact]
+        public async Task WriteToPipeWriterAsync()
+        {
+            var bnumber = new BNumber(1234);
+            var (reader, writer) = new Pipe();
+
             await bnumber.EncodeToAsync(writer);
             reader.TryRead(out var readResult);
 

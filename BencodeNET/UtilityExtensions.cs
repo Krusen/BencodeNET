@@ -159,11 +159,10 @@ namespace BencodeNET
         }
 #endif
 
-        public static ValueTask<FlushResult> WriteCharAsync(this PipeWriter writer, char c, CancellationToken cancellationToken)
+        public static void WriteChar(this PipeWriter writer, char c)
         {
             writer.GetSpan(1)[0] = (byte) c;
             writer.Advance(1);
-            return writer.FlushAsync(cancellationToken);
         }
 
         public static void WriteCharAt(this Span<byte> bytes, char c, int index)

@@ -289,6 +289,20 @@ namespace BencodeNET.Tests.Objects
             var bstring = new BString("æøå äö èéê ñ");
             var (reader, writer) = new Pipe();
 
+            bstring.EncodeTo(writer);
+            await writer.FlushAsync();
+            reader.TryRead(out var readResult);
+
+            var result = Encoding.UTF8.GetString(readResult.Buffer.First.Span.ToArray());
+            result.Should().Be("21:æøå äö èéê ñ");
+        }
+
+        [Fact]
+        public async Task WriteToPipeWriterAsync()
+        {
+            var bstring = new BString("æøå äö èéê ñ");
+            var (reader, writer) = new Pipe();
+
             await bstring.EncodeToAsync(writer);
             reader.TryRead(out var readResult);
 

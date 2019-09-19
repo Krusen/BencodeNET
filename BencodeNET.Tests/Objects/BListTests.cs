@@ -217,6 +217,20 @@ namespace BencodeNET.Tests.Objects
             var blist = new BList { 1, 2, "abc" };
             var (reader, writer) = new Pipe();
 
+            blist.EncodeTo(writer);
+            await writer.FlushAsync();
+            reader.TryRead(out var readResult);
+
+            var result = Encoding.UTF8.GetString(readResult.Buffer.First.Span.ToArray());
+            result.Should().Be("li1ei2e3:abce");
+        }
+
+        [Fact]
+        public async Task WriteToPipeWriterAsync()
+        {
+            var blist = new BList { 1, 2, "abc" };
+            var (reader, writer) = new Pipe();
+
             await blist.EncodeToAsync(writer);
             reader.TryRead(out var readResult);
 

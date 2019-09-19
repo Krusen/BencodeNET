@@ -24,7 +24,14 @@ namespace BencodeNET.Objects
         TStream EncodeTo<TStream>(TStream stream) where TStream : Stream;
 
         /// <summary>
-        /// Writes the object as bencode to the specified <see cref="PipeWriter"/>.
+        /// Writes the object as bencode to the specified <see cref="PipeWriter"/> without flushing the writer,
+        /// you should do that manually.
+        /// </summary>
+        /// <param name="writer">The writer to write to.</param>
+        void EncodeTo(PipeWriter writer);
+
+        /// <summary>
+        /// Writes the object as bencode to the specified <see cref="PipeWriter"/> and flushes the writer afterwards.
         /// </summary>
         /// <param name="writer">The writer to write to.</param>
         /// <param name="cancellationToken"></param>

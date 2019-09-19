@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.IO.Pipelines;
 using System.Threading;
 using System.Threading.Tasks;
@@ -34,7 +33,17 @@ namespace BencodeNET.Objects
         }
 
         /// <summary>
-        /// Writes the object as bencode to the specified <see cref="PipeWriter"/>.
+        /// Writes the object as bencode to the specified <see cref="PipeWriter"/> without flushing the writer,
+        /// you should do that manually.
+        /// </summary>
+        /// <param name="writer">The writer to write to.</param>
+        public void EncodeTo(PipeWriter writer)
+        {
+            EncodeObject(writer);
+        }
+
+        /// <summary>
+        /// Writes the object as bencode to the specified <see cref="PipeWriter"/> and flushes the writer afterwards.
         /// </summary>
         /// <param name="writer">The writer to write to.</param>
         /// <param name="cancellationToken"></param>
@@ -54,8 +63,18 @@ namespace BencodeNET.Objects
         /// Implementations of this method should encode their underlying value to bencode and write it to the <see cref="PipeWriter"/>.
         /// </summary>
         /// <param name="writer">The writer to encode to.</param>
+        protected abstract void EncodeObject(PipeWriter writer);
+
+        /// <summary>
+        /// Encodes and writes the underlying value to the <see cref="PipeWriter"/> and flushes the writer afterwards.
+        /// </summary>
+        /// <param name="writer">The writer to encode to.</param>
         /// <param name="cancellationToken"></param>
-        protected abstract ValueTask<FlushResult> EncodeObjectAsync(PipeWriter writer, CancellationToken cancellationToken = default);
+        protected virtual ValueTask<FlushResult> EncodeObjectAsync(PipeWriter writer, CancellationToken cancellationToken)
+        {
+            EncodeObject(writer);
+            return writer.FlushAsync(cancellationToken);
+        }
     }
 
     /// <summary>

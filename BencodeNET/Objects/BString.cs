@@ -4,8 +4,6 @@ using System.IO;
 using System.IO.Pipelines;
 using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace BencodeNET.Objects
 {
@@ -94,7 +92,7 @@ namespace BencodeNET.Objects
         }
 
         /// <inheritdoc/>
-        protected override ValueTask<FlushResult> EncodeObjectAsync(PipeWriter writer, CancellationToken cancellationToken = default)
+        protected override void EncodeObject(PipeWriter writer)
         {
             // Init
             var size = GetSizeInBytes();
@@ -123,7 +121,6 @@ namespace BencodeNET.Objects
 
             // Commit
             writer.Advance(size);
-            return writer.FlushAsync(cancellationToken);
         }
 
 #pragma warning disable 1591

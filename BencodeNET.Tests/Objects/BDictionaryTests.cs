@@ -404,6 +404,20 @@ namespace BencodeNET.Tests.Objects
             var dict = new BDictionary { { "key", "value" } };
             var (reader, writer) = new Pipe();
 
+            dict.EncodeTo(writer);
+            await writer.FlushAsync();
+            reader.TryRead(out var readResult);
+
+            var result = Encoding.UTF8.GetString(readResult.Buffer.First.Span.ToArray());
+            result.Should().Be("d3:key5:valuee");
+        }
+
+        [Fact]
+        public async Task WriteToPipeWriterAsync()
+        {
+            var dict = new BDictionary { { "key", "value" } };
+            var (reader, writer) = new Pipe();
+
             await dict.EncodeToAsync(writer);
             reader.TryRead(out var readResult);
 

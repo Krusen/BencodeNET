@@ -157,17 +157,31 @@ namespace BencodeNET.Objects
         }
 
         /// <inheritdoc/>
-        protected override async ValueTask<FlushResult> EncodeObjectAsync(PipeWriter writer, CancellationToken cancellationToken = default)
+        protected override void EncodeObject(PipeWriter writer)
         {
-            await writer.WriteCharAsync('d', cancellationToken);
-
+            writer.WriteChar('d');
             foreach (var entry in this)
             {
-                await entry.Key.EncodeToAsync(writer, cancellationToken);
-                await entry.Value.EncodeToAsync(writer, cancellationToken);
+                entry.Key.EncodeTo(writer);
+                entry.Value.EncodeTo(writer);
             }
 
-            return await writer.WriteCharAsync('e', cancellationToken);
+            writer.WriteChar('e');
+        }
+
+        /// <inheritdoc/>
+        protected override async ValueTask<FlushResult> EncodeObjectAsync(PipeWriter writer, CancellationToken cancellationToken)
+        {
+            writer.WriteChar('d');
+            foreach (var entry in this)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                await entry.Key.EncodeToAsync(writer, cancellationToken).ConfigureAwait(false);
+                await entry.Value.EncodeToAsync(writer, cancellationToken).ConfigureAwait(false);
+            }
+            writer.WriteChar('e');
+
+            return await writer.FlushAsync(cancellationToken).ConfigureAwait(false);
         }
 
         #region IDictionary<BString, IBObject> Members

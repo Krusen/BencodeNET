@@ -349,6 +349,13 @@ namespace BencodeNET.Torrents
         /// <summary>
         /// Encodes the torrent and writes it to the <see cref="PipeWriter"/>.
         /// </summary>
+        protected override void EncodeObject(PipeWriter writer)
+        {
+            var torrent = ToBDictionary();
+            torrent.EncodeTo(writer);
+        }
+
+        /// <inheritdoc/>
         protected override ValueTask<FlushResult> EncodeObjectAsync(PipeWriter writer, CancellationToken cancellationToken)
         {
             var torrent = ToBDictionary();

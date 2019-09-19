@@ -2,8 +2,6 @@
 using System.IO;
 using System.IO.Pipelines;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace BencodeNET.Objects
 {
@@ -58,7 +56,7 @@ namespace BencodeNET.Objects
         }
 
         /// <inheritdoc/>
-        protected override ValueTask<FlushResult> EncodeObjectAsync(PipeWriter writer, CancellationToken cancellationToken = default)
+        protected override void EncodeObject(PipeWriter writer)
         {
             var size = GetSizeInBytes();
             var buffer = writer.GetSpan(size).Slice(0, size);
@@ -75,7 +73,6 @@ namespace BencodeNET.Objects
             buffer[buffer.Length - 1] = (byte) 'e';
 
             writer.Advance(size);
-            return writer.FlushAsync(cancellationToken);
         }
 
 #pragma warning disable 1591
