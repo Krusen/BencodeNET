@@ -104,7 +104,7 @@ namespace BencodeNET.Parsing
             }
         }
 
-        private BNumber ParseNumber(ReadOnlySpan<char> digits, long startPosition)
+        private BNumber ParseNumber(in ReadOnlySpan<char> digits, long startPosition)
         {
             var isNegative = digits[0] == '-';
             var numberOfDigits = isNegative ? digits.Length - 1 : digits.Length;

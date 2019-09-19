@@ -122,7 +122,7 @@ namespace BencodeNET.IO
             }
         }
 
-        private bool TryReadConsume(ReadResult result, Span<byte> bytes, out long bytesRead)
+        private bool TryReadConsume(ReadResult result, in Span<byte> bytes, out long bytesRead)
         {
             if (result.IsCanceled) throw new InvalidOperationException("Read operation cancelled.");
 
