@@ -25,7 +25,7 @@ namespace BencodeNET.IO
         /// <summary>
         /// The position in the stream (does not included peeked char).
         /// </summary>
-        public long Position => _hasPeeked ? _stream.Position - 1 : _stream.Position;
+        public long Position { get; set; }
 
         /// <summary>
         /// The length of the stream, or <c>null</c> if the stream doesn't support the feature.
@@ -95,6 +95,8 @@ namespace BencodeNET.IO
             if (_hasPeeked)
             {
                 _hasPeeked = _peekedChar == default; // If null then EOS so don't reset peek as peeking again will just be EOS again
+                if (_peekedChar != default)
+                    Position++;
                 return _peekedChar;
             }
 
@@ -103,6 +105,9 @@ namespace BencodeNET.IO
             PreviousChar = read == 0
                 ? default
                 : (char) _tinyBuffer[0];
+
+            if (read > 0)
+                Position++;
 
             return PreviousChar;
         }
@@ -125,6 +130,7 @@ namespace BencodeNET.IO
                 // Just return right away if only reading this 1 byte
                 if (buffer.Length == 1)
                 {
+                    Position++;
                     return 1;
                 }
             }
@@ -138,6 +144,8 @@ namespace BencodeNET.IO
 
             if (totalRead > 0)
                 PreviousChar = (char) buffer[totalRead - 1];
+
+            Position += totalRead;
 
             return totalRead;
         }
