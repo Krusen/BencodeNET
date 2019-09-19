@@ -1,4 +1,8 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.IO.Pipelines;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BencodeNET.Objects
 {
@@ -30,11 +34,28 @@ namespace BencodeNET.Objects
         }
 
         /// <summary>
+        /// Writes the object as bencode to the specified <see cref="PipeWriter"/>.
+        /// </summary>
+        /// <param name="writer">The writer to write to.</param>
+        /// <param name="cancellationToken"></param>
+        public ValueTask<FlushResult> EncodeToAsync(PipeWriter writer, CancellationToken cancellationToken = default)
+        {
+            return EncodeObjectAsync(writer, cancellationToken);
+        }
+
+        /// <summary>
         /// Implementations of this method should encode their
         /// underlying value to bencode and write it to the stream.
         /// </summary>
         /// <param name="stream">The stream to encode to.</param>
         protected abstract void EncodeObject(Stream stream);
+
+        /// <summary>
+        /// Implementations of this method should encode their underlying value to bencode and write it to the <see cref="PipeWriter"/>.
+        /// </summary>
+        /// <param name="writer">The writer to encode to.</param>
+        /// <param name="cancellationToken"></param>
+        protected abstract ValueTask<FlushResult> EncodeObjectAsync(PipeWriter writer, CancellationToken cancellationToken = default);
     }
 
     /// <summary>

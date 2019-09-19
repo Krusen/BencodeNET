@@ -1,6 +1,8 @@
 ﻿using System;
+using System.IO.Pipelines;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using BencodeNET.Objects;
 using FluentAssertions;
 using Xunit;
@@ -207,6 +209,19 @@ namespace BencodeNET.Tests.Objects
         {
             var blist = new BList{1, 2, "abc"};
             blist.GetSizeInBytes().Should().Be(13);
+        }
+
+        [Fact]
+        public async Task WriteToPipeWriter()
+        {
+            var blist = new BList { 1, 2, "abc" };
+            var (reader, writer) = new Pipe();
+
+            await blist.EncodeToAsync(writer);
+            reader.TryRead(out var readResult);
+
+            var result = Encoding.UTF8.GetString(readResult.Buffer.First.Span.ToArray());
+            result.Should().Be("li1ei2e3:abce");
         }
     }
 }

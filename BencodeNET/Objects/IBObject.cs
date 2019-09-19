@@ -1,4 +1,7 @@
 ﻿using System.IO;
+using System.IO.Pipelines;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BencodeNET.Objects
 {
@@ -19,5 +22,12 @@ namespace BencodeNET.Objects
         /// <param name="stream">The stream to write to.</param>
         /// <returns>The used stream.</returns>
         TStream EncodeTo<TStream>(TStream stream) where TStream : Stream;
+
+        /// <summary>
+        /// Writes the object as bencode to the specified <see cref="PipeWriter"/>.
+        /// </summary>
+        /// <param name="writer">The writer to write to.</param>
+        /// <param name="cancellationToken"></param>
+        ValueTask<FlushResult> EncodeToAsync(PipeWriter writer, CancellationToken cancellationToken = default);
     }
 }

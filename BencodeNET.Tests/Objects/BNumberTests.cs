@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.IO.Pipelines;
 using System.Text;
+using System.Threading.Tasks;
 using BencodeNET.Objects;
 using FluentAssertions;
 using Xunit;
@@ -339,6 +341,19 @@ namespace BencodeNET.Tests.Objects
         {
             var bnumber = new BNumber(42);
             bnumber.GetSizeInBytes().Should().Be(4);
+        }
+
+        [Fact]
+        public async Task WriteToPipeWriter()
+        {
+            var bnumber = new BNumber(1234);
+            var (reader, writer) = new Pipe();
+
+            await bnumber.EncodeToAsync(writer);
+            reader.TryRead(out var readResult);
+
+            var result = Encoding.UTF8.GetString(readResult.Buffer.First.Span.ToArray());
+            result.Should().Be("i1234e");
         }
     }
 }

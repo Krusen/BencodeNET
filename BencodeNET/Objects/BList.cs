@@ -2,8 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Pipelines;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BencodeNET.Objects
 {
@@ -170,6 +173,19 @@ namespace BencodeNET.Objects
                 this[i].EncodeTo(stream);
             }
             stream.Write('e');
+        }
+
+        /// <inheritdoc/>
+        protected override async ValueTask<FlushResult> EncodeObjectAsync(PipeWriter writer, CancellationToken cancellationToken = default)
+        {
+            await writer.WriteCharAsync('l', cancellationToken);
+
+            for (var i = 0; i < this.Count; i++)
+            {
+                await this[i].EncodeToAsync(writer, cancellationToken);
+            }
+
+            return await writer.WriteCharAsync('e', cancellationToken);
         }
 
         #region IList<IBObject> Members

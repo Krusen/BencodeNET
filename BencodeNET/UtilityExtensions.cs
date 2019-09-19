@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Pipelines;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 #if !NETCOREAPP2_1
 using System.Buffers;
@@ -155,8 +159,25 @@ namespace BencodeNET
         }
 #endif
 
+        public static ValueTask<FlushResult> WriteCharAsync(this PipeWriter writer, char c, CancellationToken cancellationToken)
+        {
+            writer.GetSpan(1)[0] = (byte) c;
+            writer.Advance(1);
+            return writer.FlushAsync(cancellationToken);
+        }
+
+        public static void WriteCharAt(this Span<byte> bytes, char c, int index)
+        {
+            bytes[index] = (byte) c;
+        }
+
 #if NETCOREAPP2_1
         public static string AsString(this ReadOnlySpan<char> chars)
+        {
+            return new string(chars);
+        }
+
+        public static string AsString(this Span<char> chars)
         {
             return new string(chars);
         }
@@ -167,6 +188,11 @@ namespace BencodeNET
         }
 #else
         public static string AsString(this ReadOnlySpan<char> chars)
+        {
+            return new string(chars.ToArray());
+        }
+
+        public static string AsString(this Span<char> chars)
         {
             return new string(chars.ToArray());
         }

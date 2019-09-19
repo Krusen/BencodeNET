@@ -1,5 +1,9 @@
 ﻿using System;
 using System.IO;
+using System.IO.Pipelines;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BencodeNET.Objects
 {
@@ -51,6 +55,27 @@ namespace BencodeNET.Objects
             stream.Write('i');
             stream.Write(Value);
             stream.Write('e');
+        }
+
+        /// <inheritdoc/>
+        protected override ValueTask<FlushResult> EncodeObjectAsync(PipeWriter writer, CancellationToken cancellationToken = default)
+        {
+            var size = GetSizeInBytes();
+            var buffer = writer.GetSpan(size).Slice(0, size);
+
+            buffer[0] = (byte) 'i';
+            buffer = buffer.Slice(1);
+
+#if NETCOREAPP2_1
+            Encoding.ASCII.GetBytes(Value.ToString().AsSpan(), buffer);
+#else
+            var bytes = Encoding.ASCII.GetBytes(Value.ToString());
+            bytes.CopyTo(buffer);
+#endif
+            buffer[buffer.Length - 1] = (byte) 'e';
+
+            writer.Advance(size);
+            return writer.FlushAsync(cancellationToken);
         }
 
 #pragma warning disable 1591

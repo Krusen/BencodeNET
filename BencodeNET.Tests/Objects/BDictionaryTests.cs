@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO.Pipelines;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using BencodeNET.Objects;
 using FluentAssertions;
 using Xunit;
@@ -393,6 +396,19 @@ namespace BencodeNET.Tests.Objects
                 { "num", 42 }
             }; // 2
             bdict.GetSizeInBytes().Should().Be(49);
+        }
+
+        [Fact]
+        public async Task WriteToPipeWriter()
+        {
+            var dict = new BDictionary { { "key", "value" } };
+            var (reader, writer) = new Pipe();
+
+            await dict.EncodeToAsync(writer);
+            reader.TryRead(out var readResult);
+
+            var result = Encoding.UTF8.GetString(readResult.Buffer.First.Span.ToArray());
+            result.Should().Be("d3:key5:valuee");
         }
     }
 }

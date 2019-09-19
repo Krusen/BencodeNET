@@ -2,7 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Pipelines;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BencodeNET.Objects
 {
@@ -151,6 +154,20 @@ namespace BencodeNET.Objects
                 entry.Value.EncodeTo(stream);
             }
             stream.Write('e');
+        }
+
+        /// <inheritdoc/>
+        protected override async ValueTask<FlushResult> EncodeObjectAsync(PipeWriter writer, CancellationToken cancellationToken = default)
+        {
+            await writer.WriteCharAsync('d', cancellationToken);
+
+            foreach (var entry in this)
+            {
+                await entry.Key.EncodeToAsync(writer, cancellationToken);
+                await entry.Value.EncodeToAsync(writer, cancellationToken);
+            }
+
+            return await writer.WriteCharAsync('e', cancellationToken);
         }
 
         #region IDictionary<BString, IBObject> Members
