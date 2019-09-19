@@ -45,14 +45,14 @@ namespace BencodeNET.Tests.Parsing
         }
 
         [Theory]
-        [InlineData("5:spam")]
-        [InlineData("6:spam")]
-        [InlineData("100:spam")]
-        public void LessCharsThanSpecified_ThrowsInvalidBencodeException(string bencode)
+        [InlineData("5:spam", 4)]
+        [InlineData("6:spam", 4)]
+        [InlineData("100:spam", 4)]
+        public void LessCharsThanSpecified_ThrowsInvalidBencodeException(string bencode, int expectedReadBytes)
         {
             Action action = () => Parser.ParseString(bencode);
             action.Should().Throw<InvalidBencodeException<BString>>()
-                .WithMessage("*but could only read * bytes*")
+                .WithMessage($"*but could only read {expectedReadBytes} bytes*")
                 .Which.StreamPosition.Should().Be(0);
         }
 
