@@ -2,6 +2,7 @@
 using System.Text;
 using BencodeNET.IO;
 using FluentAssertions;
+using NSubstitute;
 using Xunit;
 
 namespace BencodeNET.Tests.IO
@@ -48,6 +49,26 @@ namespace BencodeNET.Tests.IO
                 read.Should().Be(12);
                 Assert.Equal("Hello World!", Encoding.UTF8.GetString(bytes, 0, read));
             }
+        }
+
+        [Theory]
+        [AutoMockedData]
+        public void ReadBytesWhenNotAllBytesAreReadOnFirstRead(Stream stream)
+        {
+            var ms = new MemoryStream(Encoding.UTF8.GetBytes("abcdef"));
+            var bs = new BencodeReader(stream);
+
+            stream.Read(null, 0, 0).ReturnsForAnyArgs(
+                x => ms.Read(x.Arg<byte[]>(), x.ArgAt<int>(1), 2),
+                x => ms.Read(x.Arg<byte[]>(), x.ArgAt<int>(1), 2),
+                x => ms.Read(x.Arg<byte[]>(), x.ArgAt<int>(1), 2)
+                );
+
+            var bytes = new byte[6];
+            var read = bs.Read(bytes);
+
+            read.Should().Be(6);
+            Assert.Equal("abcdef", Encoding.UTF8.GetString(bytes, 0, read));
         }
 
         [Fact]
@@ -97,7 +118,6 @@ namespace BencodeNET.Tests.IO
                 bs.Position.Should().Be(0);
             }
         }
-
 
         [Fact]
         public void ReadCharAfterPeekCharChangesStreamPosition()

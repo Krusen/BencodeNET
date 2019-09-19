@@ -115,11 +115,11 @@ namespace BencodeNET.IO
         /// <returns>The number of bytes actually read from the stream and filled into the buffer.</returns>
         public int Read(byte[] buffer)
         {
-            var read = 0;
+            var totalRead = 0;
             if (_hasPeeked && _peekedChar != default)
             {
                 buffer[0] = (byte) _peekedChar;
-                read = 1;
+                totalRead = 1;
                 _hasPeeked = false;
 
                 // Just return right away if only reading this 1 byte
@@ -129,12 +129,17 @@ namespace BencodeNET.IO
                 }
             }
 
-            read += _stream.Read(buffer, read, buffer.Length - read);
+            int read = -1;
+            while (read != 0 && totalRead < buffer.Length)
+            {
+                read = _stream.Read(buffer, totalRead, buffer.Length - totalRead);
+                totalRead += read;
+            }
 
-            if (read > 0)
-                PreviousChar = (char) buffer[read - 1];
+            if (totalRead > 0)
+                PreviousChar = (char) buffer[totalRead - 1];
 
-            return read;
+            return totalRead;
         }
 
         /// <inheritdoc/>
