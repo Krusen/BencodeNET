@@ -11,19 +11,25 @@ namespace BencodeNET.IO
     /// </summary>
     public class PipeBencodeReader
     {
-        private readonly PipeReader _reader;
+        /// <summary>
+        /// The <see cref="PipeReader"/> to read from.
+        /// </summary>
+        protected readonly PipeReader _reader;
 
-        private bool _endOfStream;
+        /// <summary>
+        /// Indicates if the <see cref="PipeReader"/> has been completed (i.e. "end of stream").
+        /// </summary>
+        protected bool _readerCompleted;
 
         /// <summary>
         /// The position in the pipe (number of read bytes/characters) (does not included peeked char).
         /// </summary>
-        public long Position { get; set; }
+        public virtual long Position { get; protected set; }
 
         /// <summary>
         /// The previously read/consumed char (does not include peeked char).
         /// </summary>
-        public char PreviousChar { get; protected set; }
+        public virtual char PreviousChar { get; protected set; }
 
         /// <summary>
         /// Creates a <see cref="PipeBencodeReader"/> that reads from the specified <see cref="PipeReader"/>.
@@ -37,18 +43,18 @@ namespace BencodeNET.IO
         /// <summary>
         /// Peek at the next char in the pipe, without advancing the reader.
         /// </summary>
-        public ValueTask<char> PeekCharAsync(CancellationToken cancellationToken = default)
+        public virtual ValueTask<char> PeekCharAsync(CancellationToken cancellationToken = default)
             => ReadCharAsync(peek: true, cancellationToken);
 
         /// <summary>
         /// Read the next char in the pipe and advance the reader.
         /// </summary>
-        public ValueTask<char> ReadCharAsync(CancellationToken cancellationToken = default)
+        public virtual ValueTask<char> ReadCharAsync(CancellationToken cancellationToken = default)
             => ReadCharAsync(peek: false, cancellationToken);
 
         private ValueTask<char> ReadCharAsync(bool peek = false, CancellationToken cancellationToken = default)
         {
-            if (_endOfStream)
+            if (_readerCompleted)
                 return new ValueTask<char>(default(char));
 
             if (_reader.TryRead(out var result))
@@ -67,12 +73,14 @@ namespace BencodeNET.IO
         /// Reads the next char in the pipe and consumes it (advances the reader),
         /// unless <paramref name="peek"/> is <c>true</c>.
         /// </summary>
-        private char ReadCharConsume(in ReadOnlySequence<byte> buffer, bool peek)
+        /// <param name="buffer">The buffer to read from</param>
+        /// <param name="peek">If true the char will not be consumed, i.e. the reader should not be advanced.</param>
+        protected virtual char ReadCharConsume(in ReadOnlySequence<byte> buffer, bool peek)
         {
             if (buffer.IsEmpty)
             {
                 // TODO: Add IsCompleted check?
-                _endOfStream = true;
+                _readerCompleted = true;
                 return default;
             }
 
@@ -98,9 +106,9 @@ namespace BencodeNET.IO
         /// </summary>
         /// <param name="bytes">The amount of bytes to read.</param>
         /// <param name="cancellationToken"></param>
-        public ValueTask<long> ReadAsync(Memory<byte> bytes, CancellationToken cancellationToken = default)
+        public virtual ValueTask<long> ReadAsync(Memory<byte> bytes, CancellationToken cancellationToken = default)
         {
-            if (bytes.Length == 0 || _endOfStream)
+            if (bytes.Length == 0 || _readerCompleted)
                 return new ValueTask<long>(0);
 
             if (_reader.TryRead(out var result) && TryReadConsume(result, bytes.Span, out var bytesRead))
@@ -123,7 +131,18 @@ namespace BencodeNET.IO
             }
         }
 
-        private bool TryReadConsume(ReadResult result, in Span<byte> bytes, out long bytesRead)
+        /// <summary>
+        /// Attempts to read the specified bytes from the reader and advances the reader if successful.
+        /// If the end of the pipe is reached then the available bytes is read and returned, if any.
+        /// <para>
+        /// Returns <c>true</c> if any bytes was read or the reader was completed.
+        /// </para>
+        /// </summary>
+        /// <param name="result">The read result from the pipe read operation.</param>
+        /// <param name="bytes">The bytes to read.</param>
+        /// <param name="bytesRead">The number of bytes read.</param>
+        /// <returns></returns>
+        protected virtual bool TryReadConsume(ReadResult result, in Span<byte> bytes, out long bytesRead)
         {
             if (result.IsCanceled) throw new InvalidOperationException("Read operation cancelled.");
 
@@ -143,7 +162,7 @@ namespace BencodeNET.IO
 
             if (result.IsCompleted)
             {
-                _endOfStream = true;
+                _readerCompleted = true;
 
                 if (buffer.IsEmpty)
                 {
