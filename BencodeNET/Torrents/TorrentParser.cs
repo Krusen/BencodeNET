@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -90,7 +90,7 @@ namespace BencodeNET.Torrents
         /// <returns>The parsed <see cref="Torrent"/>.</returns>
         public override async ValueTask<Torrent> ParseAsync(PipeBencodeReader pipeReader, CancellationToken cancellationToken = default)
         {
-            var data = await BencodeParser.ParseAsync<BDictionary>(pipeReader, cancellationToken);
+            var data = await BencodeParser.ParseAsync<BDictionary>(pipeReader, cancellationToken).ConfigureAwait(false);
             return CreateTorrent(data);
         }
 

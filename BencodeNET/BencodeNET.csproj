@@ -4,6 +4,7 @@
     <TargetFrameworks>netstandard1.3;netstandard2.0;netcoreapp2.1</TargetFrameworks>
     <LangVersion>7.3</LangVersion>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <CodeAnalysisRuleSet>BencodeNET.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <!-- Needed for code coverage -->
@@ -36,6 +37,7 @@
 
   <ItemGroup>
     <PackageReference Include="System.IO.Pipelines" Version="4.5.3" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.3.52" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
