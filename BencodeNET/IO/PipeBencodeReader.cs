@@ -14,12 +14,12 @@ namespace BencodeNET.IO
         /// <summary>
         /// The <see cref="PipeReader"/> to read from.
         /// </summary>
-        protected readonly PipeReader _reader;
+        protected PipeReader Reader { get; }
 
         /// <summary>
         /// Indicates if the <see cref="PipeReader"/> has been completed (i.e. "end of stream").
         /// </summary>
-        protected bool _readerCompleted;
+        protected bool ReaderCompleted { get; set; }
 
         /// <summary>
         /// The position in the pipe (number of read bytes/characters) (does not included peeked char).
@@ -37,7 +37,7 @@ namespace BencodeNET.IO
         /// <param name="reader"></param>
         public PipeBencodeReader(PipeReader reader)
         {
-            _reader = reader;
+            Reader = reader;
         }
 
         /// <summary>
@@ -54,10 +54,10 @@ namespace BencodeNET.IO
 
         private ValueTask<char> ReadCharAsync(bool peek = false, CancellationToken cancellationToken = default)
         {
-            if (_readerCompleted)
+            if (ReaderCompleted)
                 return new ValueTask<char>(default(char));
 
-            if (_reader.TryRead(out var result))
+            if (Reader.TryRead(out var result))
                 return new ValueTask<char>(ReadCharConsume(result.Buffer, peek));
 
             return ReadCharAsyncAwaited(peek, cancellationToken);
@@ -65,7 +65,7 @@ namespace BencodeNET.IO
 
         private async ValueTask<char> ReadCharAsyncAwaited(bool peek, CancellationToken cancellationToken)
         {
-            var result = await _reader.ReadAsync(cancellationToken).ConfigureAwait(false);
+            var result = await Reader.ReadAsync(cancellationToken).ConfigureAwait(false);
             return ReadCharConsume(result.Buffer, peek);
         }
 
@@ -80,7 +80,7 @@ namespace BencodeNET.IO
             if (buffer.IsEmpty)
             {
                 // TODO: Add IsCompleted check?
-                _readerCompleted = true;
+                ReaderCompleted = true;
                 return default;
             }
 
@@ -89,14 +89,14 @@ namespace BencodeNET.IO
             if (peek)
             {
                 // Advance reader to start (i.e. don't advance)
-                _reader.AdvanceTo(buffer.Start);
+                Reader.AdvanceTo(buffer.Start);
                 return c;
             }
 
             // Consume char by advancing reader
             Position++;
             PreviousChar = c;
-            _reader.AdvanceTo(buffer.GetPosition(1));
+            Reader.AdvanceTo(buffer.GetPosition(1));
             return c;
         }
 
@@ -108,10 +108,10 @@ namespace BencodeNET.IO
         /// <param name="cancellationToken"></param>
         public virtual ValueTask<long> ReadAsync(Memory<byte> bytes, CancellationToken cancellationToken = default)
         {
-            if (bytes.Length == 0 || _readerCompleted)
+            if (bytes.Length == 0 || ReaderCompleted)
                 return new ValueTask<long>(0);
 
-            if (_reader.TryRead(out var result) && TryReadConsume(result, bytes.Span, out var bytesRead))
+            if (Reader.TryRead(out var result) && TryReadConsume(result, bytes.Span, out var bytesRead))
             {
                 return new ValueTask<long>(bytesRead);
             }
@@ -123,7 +123,7 @@ namespace BencodeNET.IO
         {
             while (true)
             {
-                var result = await _reader.ReadAsync(cancellationToken).ConfigureAwait(false);
+                var result = await Reader.ReadAsync(cancellationToken).ConfigureAwait(false);
                 if (TryReadConsume(result, bytes.Span, out var bytesRead))
                 {
                     return bytesRead;
@@ -156,13 +156,13 @@ namespace BencodeNET.IO
                 Position += bytes.Length;
                 PreviousChar = (char) bytes[bytes.Length - 1];
                 bytesRead = bytes.Length;
-                _reader.AdvanceTo(buffer.GetPosition(bytes.Length));
+                Reader.AdvanceTo(buffer.GetPosition(bytes.Length));
                 return true;
             }
 
             if (result.IsCompleted)
             {
-                _readerCompleted = true;
+                ReaderCompleted = true;
 
                 if (buffer.IsEmpty)
                 {
@@ -176,12 +176,12 @@ namespace BencodeNET.IO
                 Position += buffer.Length;
                 PreviousChar = (char) buffer.Slice(buffer.Length - 1).First.Span[0];
                 bytesRead = buffer.Length;
-                _reader.AdvanceTo(buffer.End);
+                Reader.AdvanceTo(buffer.End);
                 return true;
             }
 
             // Not enough bytes read, advance reader
-            _reader.AdvanceTo(buffer.Start, buffer.End);
+            Reader.AdvanceTo(buffer.Start, buffer.End);
 
             bytesRead = -1;
             return false; // Consume unsuccessful
