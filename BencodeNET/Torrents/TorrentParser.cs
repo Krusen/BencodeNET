@@ -45,7 +45,7 @@ namespace BencodeNET.Torrents
         /// </summary>
         /// <param name="bencodeParser">The parser used for parsing the torrent <see cref="BDictionary"/>.</param>
         public TorrentParser(IBencodeParser bencodeParser)
-            : this(bencodeParser, TorrentParserMode.Strict)
+            : this(bencodeParser, TorrentParserMode.Tolerant)
         {
         }
 

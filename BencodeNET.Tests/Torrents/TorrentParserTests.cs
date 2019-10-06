@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using BencodeNET.IO;
@@ -435,14 +435,14 @@ namespace BencodeNET.Tests.Torrents
         }
 
         [Fact]
-        public void Root_MissingInfoField_ThrowsInvalidTorrentException()
+        public void Root_MissingInfoField_Strict_ThrowsInvalidTorrentException()
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
             ParsedData.Remove(TorrentFields.Info);
 
             // Act
-            var parser = new TorrentParser(BencodeParser);
+            var parser = new TorrentParser(BencodeParser, TorrentParserMode.Strict);
             Action action = () => parser.Parse((BencodeReader)null);
 
             // Assert
@@ -451,7 +451,7 @@ namespace BencodeNET.Tests.Torrents
         }
 
         [Fact]
-        public void Info_ContainingBothLengthAndFilesField_ThrowsInvalidTorrentException()
+        public void Info_ContainingBothLengthAndFilesField_Strict_ThrowsInvalidTorrentException()
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
@@ -460,7 +460,7 @@ namespace BencodeNET.Tests.Torrents
             info[TorrentInfoFields.Files] = new BList();
 
             // Act
-            var parser = new TorrentParser(BencodeParser);
+            var parser = new TorrentParser(BencodeParser, TorrentParserMode.Strict);
             Action action = () => parser.Parse((BencodeReader)null);
 
             // Assert
@@ -470,7 +470,7 @@ namespace BencodeNET.Tests.Torrents
         }
 
         [Fact]
-        public void Info_MissingPieceLengthField_ThrowsInvalidTorrentException()
+        public void Info_MissingPieceLengthField_Strict_ThrowsInvalidTorrentException()
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
@@ -478,7 +478,7 @@ namespace BencodeNET.Tests.Torrents
             info.Remove(TorrentInfoFields.PieceLength);
 
             // Act
-            var parser = new TorrentParser(BencodeParser);
+            var parser = new TorrentParser(BencodeParser, TorrentParserMode.Strict);
             Action action = () => parser.Parse((BencodeReader)null);
 
             // Assert
@@ -487,7 +487,7 @@ namespace BencodeNET.Tests.Torrents
         }
 
         [Fact]
-        public void Info_MissingPiecesField_ThrowsInvalidTorrentException()
+        public void Info_MissingPiecesField_Strict_ThrowsInvalidTorrentException()
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
@@ -495,7 +495,7 @@ namespace BencodeNET.Tests.Torrents
             info.Remove(TorrentInfoFields.Pieces);
 
             // Act
-            var parser = new TorrentParser(BencodeParser);
+            var parser = new TorrentParser(BencodeParser, TorrentParserMode.Strict);
             Action action = () => parser.Parse((BencodeReader)null);
 
             // Assert
@@ -504,7 +504,7 @@ namespace BencodeNET.Tests.Torrents
         }
 
         [Fact]
-        public void Info_MissingNameField_ThrowsInvalidTorrentException()
+        public void Info_MissingNameField_Strict_ThrowsInvalidTorrentException()
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
@@ -512,7 +512,7 @@ namespace BencodeNET.Tests.Torrents
             info.Remove(TorrentInfoFields.Name);
 
             // Act
-            var parser = new TorrentParser(BencodeParser);
+            var parser = new TorrentParser(BencodeParser, TorrentParserMode.Strict);
             Action action = () => parser.Parse((BencodeReader)null);
 
             // Assert
@@ -521,7 +521,7 @@ namespace BencodeNET.Tests.Torrents
         }
 
         [Fact]
-        public void MultiFileInfo_MissingFilesField_ThrowsInvalidTorrentException()
+        public void MultiFileInfo_MissingFilesField_Strict_ThrowsInvalidTorrentException()
         {
             // Arrange
             ParsedData = ValidMultiFileTorrentData;
@@ -529,7 +529,7 @@ namespace BencodeNET.Tests.Torrents
             info.Remove(TorrentInfoFields.Files);
 
             // Act
-            var parser = new TorrentParser(BencodeParser);
+            var parser = new TorrentParser(BencodeParser, TorrentParserMode.Strict);
             Action action = () => parser.Parse((BencodeReader)null);
 
             // Assert
@@ -538,7 +538,7 @@ namespace BencodeNET.Tests.Torrents
         }
 
         [Fact]
-        public void MultiFile_Files_MissingLengthField_ThrowsInvalidTorrentException()
+        public void MultiFile_Files_MissingLengthField_Strict_ThrowsInvalidTorrentException()
         {
             // Arrange
             ParsedData = ValidMultiFileTorrentData;
@@ -552,7 +552,7 @@ namespace BencodeNET.Tests.Torrents
             };
 
             // Act
-            var parser = new TorrentParser(BencodeParser);
+            var parser = new TorrentParser(BencodeParser, TorrentParserMode.Strict);
             Action action = () => parser.Parse((BencodeReader)null);
 
             // Assert
@@ -561,7 +561,7 @@ namespace BencodeNET.Tests.Torrents
         }
 
         [Fact]
-        public void MultiFile_Files_MissingPathField_ThrowsInvalidTorrentException()
+        public void MultiFile_Files_MissingPathField_Strict_ThrowsInvalidTorrentException()
         {
             // Arrange
             ParsedData = ValidMultiFileTorrentData;
@@ -575,7 +575,7 @@ namespace BencodeNET.Tests.Torrents
             };
 
             // Act
-            var parser = new TorrentParser(BencodeParser);
+            var parser = new TorrentParser(BencodeParser, TorrentParserMode.Strict);
             Action action = () => parser.Parse((BencodeReader)null);
 
             // Assert
