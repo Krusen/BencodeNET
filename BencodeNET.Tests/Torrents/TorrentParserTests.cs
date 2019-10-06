@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using BencodeNET.IO;
@@ -315,6 +315,31 @@ namespace BencodeNET.Tests.Torrents
             torrent.Trackers[0].Should().BeEquivalentTo(announceList1);
             torrent.Trackers[1].Should().HaveCount(announceList2.Count);
             torrent.Trackers[1].Should().BeEquivalentTo(announceList2);
+        }
+
+        [Theory]
+        [AutoMockedData]
+        public void AnnounceList_Multiple_StringsInsteadOfLists_IsParsed(string announce1, string announce2, string announce3)
+        {
+            // Arrange
+            ParsedData = ValidSingleFileTorrentData;
+            ParsedData[TorrentFields.AnnounceList] = new BList
+            {
+                new BString(announce1),
+                new BString(announce2),
+                new BString(announce3),
+            };
+
+            // Act
+            var parser = new TorrentParser(BencodeParser);
+            var torrent = parser.Parse((BencodeReader)null);
+
+            // Assert
+            torrent.Trackers.Should().HaveCount(1);
+            torrent.Trackers[0].Should().HaveCount(3);
+            torrent.Trackers[0][0].Should().Be(announce1);
+            torrent.Trackers[0][1].Should().Be(announce2);
+            torrent.Trackers[0][2].Should().Be(announce3);
         }
 
         [Theory]

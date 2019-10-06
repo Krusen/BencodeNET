@@ -347,6 +347,8 @@ namespace BencodeNET.Torrents
         /// <returns>A list of list of trackers (announce URLs).</returns>
         protected virtual IList<IList<string>> ParseTrackers(BDictionary data, Encoding encoding)
         {
+            // Specification: http://bittorrent.org/beps/bep_0012.html
+
             var trackerList = new List<IList<string>>();
             var primary = new List<string>();
             trackerList.Add(primary);
@@ -358,18 +360,31 @@ namespace BencodeNET.Torrents
                 primary.Add(announce);
             }
 
-            // Get the 'announce-list' list´s
-            var announceLists = data.Get<BList>(TorrentFields.AnnounceList)?.AsType<BList>() as IList<BList>;
-            if (announceLists?.Any() == true)
-            {
-                // Add the first list to the primary list and remove duplicates
-                primary.AddRange(announceLists.First().AsStrings(encoding));
-                trackerList[0] = primary.Distinct().ToList();
+            // Get the 'announce-list' list's
+            var announceLists = data.Get<BList>(TorrentFields.AnnounceList);
+            if (announceLists == null)
+                return trackerList;
 
-                // Add the other lists to the lists of lists of announce urls
-                trackerList.AddRange(
-                    announceLists.Skip(1)
-                        .Select(x => x.AsStrings(encoding).ToList()));
+            // According to the specification it should be a list of lists
+            if (announceLists.All(x => x is BList))
+            {
+                var lists = announceLists.AsType<BList>() as IList<BList>;
+                if (lists.Any())
+                {
+                    // Add the first list to the primary list and remove duplicates
+                    primary.AddRange(lists.First().AsStrings(encoding));
+                    trackerList[0] = primary.Distinct().ToList();
+
+                    // Add the other lists to the lists of lists of announce urls
+                    trackerList.AddRange(lists.Skip(1).Select(x => x.AsStrings(encoding).ToList()));
+                }
+            }
+            // It's not following the specification, it's strings instead of lists
+            else if (ParseMode == TorrentParserMode.Tolerant && announceLists.All(x => x is BString))
+            {
+                // Add them all to the first list
+                primary.AddRange(announceLists.AsStrings(encoding));
+                trackerList[0] = primary.Distinct().ToList();
             }
 
             return trackerList;
