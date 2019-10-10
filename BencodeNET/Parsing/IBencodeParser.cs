@@ -14,24 +14,14 @@ namespace BencodeNET.Parsing
     public interface IBencodeParser
     {
         /// <summary>
+        /// List of parsers used by the <see cref="IBencodeParser"/>.
+        /// </summary>
+        BObjectParserList Parsers { get; }
+
+        /// <summary>
         /// The encoding use for parsing.
         /// </summary>
         Encoding Encoding { get; }
-
-        /// <summary>
-        /// Parses a stream into an <see cref="IBObject"/>.
-        /// </summary>
-        /// <param name="stream">The stream to parse.</param>
-        /// <returns>The parsed object.</returns>
-        IBObject Parse(Stream stream);
-
-        /// <summary>
-        /// Parses a stream into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
-        /// </summary>
-        /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
-        /// <param name="stream">The bencoded string to parse.</param>
-        /// <returns>The parsed object.</returns>
-        T Parse<T>(Stream stream) where T : class, IBObject;
 
         /// <summary>
         ///  Parses an <see cref="IBObject"/> from the reader.
@@ -49,17 +39,7 @@ namespace BencodeNET.Parsing
         /// <summary>
         /// Parse an <see cref="IBObject"/> from the <see cref="PipeReader"/>.
         /// </summary>
-        ValueTask<IBObject> ParseAsync(PipeReader pipeReader, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Parse an <see cref="IBObject"/> from the <see cref="PipeReader"/>.
-        /// </summary>
         ValueTask<IBObject> ParseAsync(PipeBencodeReader pipeReader, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Parse an <see cref="IBObject"/> from the <see cref="PipeBencodeReader"/>.
-        /// </summary>
-        ValueTask<T> ParseAsync<T>(PipeReader pipeReader, CancellationToken cancellationToken = default) where T : class, IBObject;
 
         /// <summary>
         /// Parse an <see cref="IBObject"/> of type <typeparamref name="T"/> from the <see cref="PipeBencodeReader"/>.

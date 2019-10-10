@@ -1,4 +1,8 @@
 ﻿using System.IO;
+using System.IO.Pipelines;
+using System.Threading;
+using System.Threading.Tasks;
+using BencodeNET.IO;
 using BencodeNET.Objects;
 
 namespace BencodeNET.Parsing
@@ -94,44 +98,71 @@ namespace BencodeNET.Parsing
             }
         }
 
-#if !NETSTANDARD1_3
         /// <summary>
-        /// Parses a stream through a <see cref="BufferedStream"/> into an <see cref="IBObject"/>.
-        /// The input <paramref name="stream"/> is disposed when parsing is completed.
+        /// Parses a stream into an <see cref="IBObject"/>.
         /// </summary>
         /// <param name="parser"></param>
         /// <param name="stream">The stream to parse.</param>
-        /// <param name="bufferSize">The buffer size to use. Uses default size of <see cref="BufferedStream"/> if null.</param>
         /// <returns>The parsed object.</returns>
-        public static IBObject ParseBuffered(this IBencodeParser parser, Stream stream, int? bufferSize = null)
+        public static IBObject Parse(this IBencodeParser parser, Stream stream)
         {
-;
-            using (var bufferedStream = bufferSize == null
-                ? new BufferedStream(stream)
-                : new BufferedStream(stream, bufferSize.Value))
+            using (var reader = new BencodeReader(stream, leaveOpen: true))
             {
-                return parser.Parse(bufferedStream);
+                return parser.Parse(reader);
             }
         }
 
         /// <summary>
-        /// Parses a stream through a <see cref="BufferedStream"/> into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
-        /// The input <paramref name="stream"/> is disposed when parsing is completed.
+        /// Parses a stream into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
         /// </summary>
         /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
         /// <param name="parser"></param>
         /// <param name="stream">The stream to parse.</param>
-        /// <param name="bufferSize">The buffer size to use. Uses default size of <see cref="BufferedStream"/> if null.</param>
         /// <returns>The parsed object.</returns>
-        public static T ParseBuffered<T>(this IBencodeParser parser, Stream stream, int? bufferSize = null) where T : class, IBObject
+        public static T Parse<T>(this IBencodeParser parser, Stream stream) where T : class, IBObject
         {
-            using (var bufferedStream = bufferSize == null
-                ? new BufferedStream(stream)
-                : new BufferedStream(stream, bufferSize.Value))
+            using (var reader = new BencodeReader(stream, leaveOpen: true))
             {
-                return parser.Parse<T>(bufferedStream);
+                return parser.Parse<T>(reader);
             }
         }
-#endif
+
+        /// <summary>
+        /// Parses an <see cref="IBObject"/> from the <see cref="PipeReader"/>.
+        /// </summary>
+        public static ValueTask<IBObject> ParseAsync(this IBencodeParser parser, PipeReader pipeReader, CancellationToken cancellationToken = default)
+        {
+            var reader = new PipeBencodeReader(pipeReader);
+            return parser.ParseAsync(reader, cancellationToken);
+        }
+
+        /// <summary>
+        /// Parses an <see cref="IBObject"/> of type <typeparamref name="T"/> from the <see cref="PipeReader"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
+        public static ValueTask<T> ParseAsync<T>(this IBencodeParser parser, PipeReader pipeReader, CancellationToken cancellationToken = default) where T : class, IBObject
+        {
+            var reader = new PipeBencodeReader(pipeReader);
+            return parser.ParseAsync<T>(reader, cancellationToken);
+        }
+
+        /// <summary>
+        /// Parses an <see cref="IBObject"/> from the <see cref="Stream"/> asynchronously using a <see cref="PipeReader"/>.
+        /// </summary>
+        public static ValueTask<IBObject> ParseAsync(this IBencodeParser parser, Stream stream, StreamPipeReaderOptions readerOptions = null, CancellationToken cancellationToken = default)
+        {
+            var reader = PipeReader.Create(stream, readerOptions);
+            return parser.ParseAsync(reader, cancellationToken);
+        }
+
+        /// <summary>
+        /// Parses an <see cref="IBObject"/>  of type <typeparamref name="T"/> from the <see cref="Stream"/> asynchronously using a <see cref="PipeReader"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
+        public static ValueTask<T> ParseAsync<T>(this IBencodeParser parser, Stream stream, StreamPipeReaderOptions readerOptions = null, CancellationToken cancellationToken = default) where T : class, IBObject
+        {
+            var reader = PipeReader.Create(stream, readerOptions);
+            return parser.ParseAsync<T>(reader, cancellationToken);
+        }
     }
 }

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.IO.Pipelines;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,7 +13,10 @@ namespace BencodeNET.Parsing
     /// </summary>
     public class BencodeParser : IBencodeParser
     {
-        protected BObjectParserList Parsers { get; }
+        /// <summary>
+        /// List of parsers used by the <see cref="BencodeParser"/>.
+        /// </summary>
+        public BObjectParserList Parsers { get; }
 
         /// <summary>
         /// The encoding use for parsing.
@@ -47,33 +48,6 @@ namespace BencodeNET.Parsing
                 new BListParser(this),
                 new BDictionaryParser(this)
             };
-        }
-
-        /// <summary>
-        /// Parses a stream into an <see cref="IBObject"/>.
-        /// </summary>
-        /// <param name="stream">The stream to parse.</param>
-        /// <returns>The parsed object.</returns>
-        public virtual IBObject Parse(Stream stream)
-        {
-            using (var reader = new BencodeReader(stream, leaveOpen: true))
-            {
-                return Parse(reader);
-            }
-        }
-
-        /// <summary>
-        /// Parses a stream into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
-        /// </summary>
-        /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
-        /// <param name="stream">The stream to parse.</param>
-        /// <returns>The parsed object.</returns>
-        public virtual T Parse<T>(Stream stream) where T : class, IBObject
-        {
-            using (var reader = new BencodeReader(stream, leaveOpen: true))
-            {
-                return Parse<T>(reader);
-            }
         }
 
         /// <summary>
@@ -116,25 +90,6 @@ namespace BencodeNET.Parsing
                 throw new BencodeException($"Missing parser for the type '{typeof(T).FullName}'. Stream position: {reader.Position}");
 
             return parser.Parse(reader);
-        }
-
-        /// <summary>
-        /// Parse an <see cref="IBObject"/> from the <see cref="PipeReader"/>.
-        /// </summary>
-        public virtual ValueTask<IBObject> ParseAsync(PipeReader pipeReader, CancellationToken cancellationToken = default)
-        {
-            var reader = new PipeBencodeReader(pipeReader);
-            return ParseAsync(reader, cancellationToken);
-        }
-
-        /// <summary>
-        /// Parse an <see cref="IBObject"/> of type <typeparamref name="T"/> from the <see cref="PipeReader"/>.
-        /// </summary>
-        /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
-        public virtual ValueTask<T> ParseAsync<T>(PipeReader pipeReader, CancellationToken cancellationToken = default) where T : class, IBObject
-        {
-            var reader = new PipeBencodeReader(pipeReader);
-            return ParseAsync<T>(reader, cancellationToken);
         }
 
         /// <summary>
