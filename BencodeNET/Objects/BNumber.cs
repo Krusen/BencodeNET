@@ -64,7 +64,7 @@ namespace BencodeNET.Objects
             buffer[0] = (byte) 'i';
             buffer = buffer.Slice(1);
 
-#if NETCOREAPP2_1
+#if NETCOREAPP
             Encoding.ASCII.GetBytes(Value.ToString().AsSpan(), buffer);
 #else
             var bytes = Encoding.ASCII.GetBytes(Value.ToString());

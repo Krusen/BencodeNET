@@ -98,7 +98,7 @@ namespace BencodeNET.Objects
             var size = GetSizeInBytes();
             var buffer = writer.GetSpan(size);
 
-#if NETCOREAPP2_1
+#if NETCOREAPP
             // Write length
             var writtenBytes = Encoding.GetBytes(_value.Length.ToString().AsSpan(), buffer);
 
@@ -189,7 +189,7 @@ namespace BencodeNET.Objects
         /// </returns>
         public override string ToString()
         {
-#if NETCOREAPP2_1
+#if NETCOREAPP
             return _encoding.GetString(_value.AsSpan());
 #else
             return _encoding.GetString(_value);
@@ -206,7 +206,7 @@ namespace BencodeNET.Objects
         public string ToString(Encoding encoding)
         {
             encoding = encoding ?? _encoding;
-#if NETCOREAPP2_1
+#if NETCOREAPP
             return encoding.GetString(_value.AsSpan());
 #else
             return encoding.GetString(_value);

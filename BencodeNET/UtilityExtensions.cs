@@ -3,17 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Pipelines;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
-#if !NETCOREAPP2_1
+#if !NETCOREAPP
 using System.Buffers;
-#endif
-
-#if NETSTANDARD1_3
-using System.Reflection;
 #endif
 
 namespace BencodeNET
@@ -112,7 +105,7 @@ namespace BencodeNET
 
         public static void Write(this Stream stream, int number)
         {
-#if NETCOREAPP2_1
+#if NETCOREAPP
             Span<byte> buffer = stackalloc byte[11];
             var bytesRead = Encoding.ASCII.GetBytes(number.ToString().AsSpan(), buffer);
             stream.Write(buffer.Slice(0, bytesRead));
@@ -127,7 +120,7 @@ namespace BencodeNET
 
         public static void Write(this Stream stream, long number)
         {
-#if NETCOREAPP2_1
+#if NETCOREAPP
             Span<byte> buffer = stackalloc byte[20];
             var bytesRead = Encoding.ASCII.GetBytes(number.ToString().AsSpan(), buffer);
             stream.Write(buffer.Slice(0, bytesRead));
@@ -145,17 +138,10 @@ namespace BencodeNET
             stream.WriteByte((byte) c);
         }
 
-#if !NETCOREAPP2_1
+#if !NETCOREAPP
         public static void Write(this Stream stream, byte[] bytes)
         {
             stream.Write(bytes, 0, bytes.Length);
-        }
-#endif
-
-#if NETSTANDARD1_3
-        public static bool IsAssignableFrom(this Type type, Type otherType)
-        {
-            return type.GetTypeInfo().IsAssignableFrom(otherType.GetTypeInfo());
         }
 #endif
 
@@ -170,7 +156,7 @@ namespace BencodeNET
             bytes[index] = (byte) c;
         }
 
-#if NETCOREAPP2_1
+#if NETCOREAPP
         public static string AsString(this ReadOnlySpan<char> chars)
         {
             return new string(chars);

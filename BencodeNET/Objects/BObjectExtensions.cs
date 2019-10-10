@@ -1,9 +1,10 @@
-#if NETCOREAPP2_1
-using System;
-#endif
-using System.Buffers;
+﻿using System.Buffers;
 using System.IO;
 using System.Text;
+
+#if NETCOREAPP
+using System;
+#endif
 
 namespace BencodeNET.Objects
 {
@@ -40,7 +41,7 @@ namespace BencodeNET.Objects
                 using (var stream = new MemoryStream(buffer))
                 {
                     bobject.EncodeTo(stream);
-#if NETCOREAPP2_1
+#if NETCOREAPP
                     return encoding.GetString(buffer.AsSpan().Slice(0, size));
 #else
                     return encoding.GetString(buffer, 0, size);
