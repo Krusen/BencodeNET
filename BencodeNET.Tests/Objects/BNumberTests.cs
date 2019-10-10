@@ -369,5 +369,17 @@ namespace BencodeNET.Tests.Objects
             var result = Encoding.UTF8.GetString(readResult.Buffer.First.Span.ToArray());
             result.Should().Be("i1234e");
         }
+
+        [Fact]
+        public async Task WriteToStreamAsync()
+        {
+            var bnumber = new BNumber(1234);
+
+            var ms = new MemoryStream();
+            await bnumber.EncodeToAsync(ms);
+
+            var result = Encoding.UTF8.GetString(ms.ToArray());
+            result.Should().Be("i1234e");
+        }
     }
 }

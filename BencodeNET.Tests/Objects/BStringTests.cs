@@ -309,5 +309,17 @@ namespace BencodeNET.Tests.Objects
             var result = Encoding.UTF8.GetString(readResult.Buffer.First.Span.ToArray());
             result.Should().Be("21:æøå äö èéê ñ");
         }
+
+        [Fact]
+        public async Task WriteToStreamAsync()
+        {
+            var bstring = new BString("æøå äö èéê ñ");
+
+            var stream = new MemoryStream();
+            await bstring.EncodeToAsync(stream);
+
+            var result = Encoding.UTF8.GetString(stream.ToArray());
+            result.Should().Be("21:æøå äö èéê ñ");
+        }
     }
 }

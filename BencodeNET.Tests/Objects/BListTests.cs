@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.IO.Pipelines;
 using System.Linq;
 using System.Text;
@@ -235,6 +236,18 @@ namespace BencodeNET.Tests.Objects
             reader.TryRead(out var readResult);
 
             var result = Encoding.UTF8.GetString(readResult.Buffer.First.Span.ToArray());
+            result.Should().Be("li1ei2e3:abce");
+        }
+
+        [Fact]
+        public async Task WriteToStreamAsync()
+        {
+            var blist = new BList { 1, 2, "abc" };
+
+            var stream = new MemoryStream();
+            await blist.EncodeToAsync(stream);
+
+            var result = Encoding.UTF8.GetString(stream.ToArray());
             result.Should().Be("li1ei2e3:abce");
         }
     }

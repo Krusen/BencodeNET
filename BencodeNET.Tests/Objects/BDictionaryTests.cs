@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.Pipelines;
 using System.Linq;
 using System.Text;
@@ -422,6 +423,18 @@ namespace BencodeNET.Tests.Objects
             reader.TryRead(out var readResult);
 
             var result = Encoding.UTF8.GetString(readResult.Buffer.First.Span.ToArray());
+            result.Should().Be("d3:key5:valuee");
+        }
+
+        [Fact]
+        public async Task WriteToStreamAsync()
+        {
+            var dict = new BDictionary { { "key", "value" } };
+
+            var stream = new MemoryStream();
+            await dict.EncodeToAsync(stream);
+
+            var result = Encoding.UTF8.GetString(stream.ToArray());
             result.Should().Be("d3:key5:valuee");
         }
     }

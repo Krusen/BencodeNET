@@ -36,5 +36,13 @@ namespace BencodeNET.Objects
         /// <param name="writer">The writer to write to.</param>
         /// <param name="cancellationToken"></param>
         ValueTask<FlushResult> EncodeToAsync(PipeWriter writer, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Writes the object asynchronously as bencode to the specified <see cref="Stream"/> using a <see cref="PipeWriter"/>.
+        /// </summary>
+        /// <param name="stream">The stream to write to.</param>
+        /// <param name="writerOptions">The options for the <see cref="PipeWriter"/>.</param>
+        /// <param name="cancellationToken"></param>
+        ValueTask<FlushResult> EncodeToAsync(Stream stream, StreamPipeWriterOptions writerOptions = null, CancellationToken cancellationToken = default);
     }
 }
