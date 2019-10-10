@@ -60,10 +60,10 @@ namespace BencodeNET.IO
             if (Reader.TryRead(out var result))
                 return new ValueTask<char>(ReadCharConsume(result.Buffer, peek));
 
-            return ReadCharAsyncAwaited(peek, cancellationToken);
+            return ReadCharAwaitedAsync(peek, cancellationToken);
         }
 
-        private async ValueTask<char> ReadCharAsyncAwaited(bool peek, CancellationToken cancellationToken)
+        private async ValueTask<char> ReadCharAwaitedAsync(bool peek, CancellationToken cancellationToken)
         {
             var result = await Reader.ReadAsync(cancellationToken).ConfigureAwait(false);
             return ReadCharConsume(result.Buffer, peek);
@@ -116,10 +116,10 @@ namespace BencodeNET.IO
                 return new ValueTask<long>(bytesRead);
             }
 
-            return ReadAsyncAwaited(bytes, cancellationToken);
+            return ReadAwaitedAsync(bytes, cancellationToken);
         }
 
-        private async ValueTask<long> ReadAsyncAwaited(Memory<byte> bytes, CancellationToken cancellationToken)
+        private async ValueTask<long> ReadAwaitedAsync(Memory<byte> bytes, CancellationToken cancellationToken)
         {
             while (true)
             {
