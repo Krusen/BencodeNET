@@ -3,6 +3,7 @@ using System.Buffers;
 using System.IO.Pipelines;
 using System.Text;
 using System.Threading.Tasks;
+using AutoFixture.AutoNSubstitute;
 using BencodeNET.IO;
 using FluentAssertions;
 using NSubstitute;
@@ -68,7 +69,7 @@ namespace BencodeNET.Tests.IO
 
         [Theory]
         [AutoMockedData]
-        public async Task CanReadIncompleteFirstTry(PipeReader reader)
+        public async Task CanReadIncompleteFirstTry([Substitute] PipeReader reader)
         {
             var bytes = Encoding.UTF8.GetBytes("abcdef").AsMemory();
 
@@ -89,7 +90,7 @@ namespace BencodeNET.Tests.IO
 
         [Theory]
         [AutoMockedData]
-        public async Task CanReadLessThanReceivedAsync(PipeReader reader)
+        public async Task CanReadLessThanReceivedAsync([Substitute] PipeReader reader)
         {
             var bytes = Encoding.UTF8.GetBytes("abcdef").AsMemory();
 
