@@ -1,9 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Pipelines;
-using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using BencodeNET.IO;
 
 namespace BencodeNET.Objects
 {
@@ -14,7 +15,7 @@ namespace BencodeNET.Objects
     /// <remarks>
     /// The underlying value is a <see cref="byte"/> array.
     /// </remarks>
-    public sealed class BString : BObject<IReadOnlyList<byte>>, IComparable<BString>
+    public sealed class BString : BObject<ReadOnlyMemory<byte>>, IComparable<BString>
     {
         /// <summary>
         /// The maximum number of digits that can be handled as the length part of a bencoded string.
@@ -24,13 +25,12 @@ namespace BencodeNET.Objects
         /// <summary>
         /// The underlying bytes of the string.
         /// </summary>
-        public override IReadOnlyList<byte> Value => _value;
-        private readonly byte[] _value;
+        public override ReadOnlyMemory<byte> Value { get; }
 
         /// <summary>
         /// Gets the length of the string in bytes.
         /// </summary>
-        public int Length => _value.Length;
+        public int Length => Value.Length;
 
         private static readonly Encoding DefaultEncoding = Encoding.UTF8;
 
@@ -58,12 +58,10 @@ namespace BencodeNET.Objects
         /// </summary>
         /// <param name="bytes">The bytes representing the data.</param>
         /// <param name="encoding">The encoding of the bytes. Defaults to <see cref="System.Text.Encoding.UTF8"/>.</param>
-        public BString(IEnumerable<byte> bytes, Encoding encoding = null)
+        public BString(byte[] bytes, Encoding encoding = null)
         {
-            if (bytes == null) throw new ArgumentNullException(nameof(bytes));
-
+            Value = bytes ?? throw new ArgumentNullException(nameof(bytes));
             _encoding = encoding ?? DefaultEncoding;
-            _value = bytes as byte[] ?? bytes.ToArray();
         }
 
         /// <summary>
@@ -75,20 +73,31 @@ namespace BencodeNET.Objects
         public BString(string str, Encoding encoding = null)
         {
             _encoding = encoding ?? DefaultEncoding;
-            _value = string.IsNullOrEmpty(str)
-                ? Array.Empty<byte>()
-                : _encoding.GetBytes(str);
+
+            if (string.IsNullOrEmpty(str))
+            {
+                Value = Array.Empty<byte>();
+            }
+            else
+            {
+                var maxByteCount = _encoding.GetMaxByteCount(str.Length);
+                var span = new byte[maxByteCount].AsSpan();
+
+                var length = _encoding.GetBytes(str.AsSpan(), span);
+
+                Value = span.Slice(0, length).ToArray();
+            }
         }
 
         /// <inheritdoc/>
-        public override int GetSizeInBytes() => _value.Length + 1 + _value.Length.DigitCount();
+        public override int GetSizeInBytes() => Value.Length + 1 + Value.Length.DigitCount();
 
         /// <inheritdoc/>
         protected override void EncodeObject(Stream stream)
         {
-            stream.Write(_value.Length);
+            stream.Write(Value.Length);
             stream.Write(':');
-            stream.Write(_value);
+            stream.Write(Value.Span);
         }
 
         /// <inheritdoc/>
@@ -98,26 +107,14 @@ namespace BencodeNET.Objects
             var size = GetSizeInBytes();
             var buffer = writer.GetSpan(size);
 
-#if NETCOREAPP
             // Write length
-            var writtenBytes = Encoding.GetBytes(_value.Length.ToString().AsSpan(), buffer);
+            var writtenBytes = Encoding.GetBytes(Value.Length.ToString().AsSpan(), buffer);
 
             // Write ':'
             buffer[writtenBytes] = (byte) ':';
 
             // Write value
-            _value.AsSpan().CopyTo(buffer.Slice(writtenBytes + 1));
-#else
-            // Write length
-            var lengthBytes = Encoding.GetBytes(_value.Length.ToString());
-            lengthBytes.CopyTo(buffer);
-
-            // Write ':'
-            buffer[lengthBytes.Length] = (byte) ':';
-
-            // Write value
-            _value.AsSpan().CopyTo(buffer.Slice(lengthBytes.Length + 1));
-#endif
+            Value.Span.CopyTo(buffer.Slice(writtenBytes + 1));
 
             // Commit
             writer.Advance(size);
@@ -128,26 +125,26 @@ namespace BencodeNET.Objects
 
         public static bool operator ==(BString first, BString second)
         {
-            if (ReferenceEquals(first, null))
-                return ReferenceEquals(second, null);
+            if (first is null)
+                return second is null;
 
             return first.Equals(second);
         }
 
         public static bool operator !=(BString first, BString second) => !(first == second);
 
-        public override bool Equals(object other) => other is BString bstring && Value.SequenceEqual(bstring.Value);
+        public override bool Equals(object other) => other is BString bstring && Value.Span.SequenceEqual(bstring.Value.Span);
 
-        public bool Equals(BString bstring) => bstring != null && Value.SequenceEqual(bstring.Value);
+        public bool Equals(BString bstring) => bstring != null && Value.Span.SequenceEqual(bstring.Value.Span);
 
         public override int GetHashCode()
         {
-            var bytesToHash = Math.Min(Value.Count, 32);
+            var bytesToHash = Math.Min(Value.Length, 32);
 
             long hashValue = 0;
             for (var i = 0; i < bytesToHash; i++)
             {
-                hashValue = (37 * hashValue + Value[i]) % int.MaxValue;
+                hashValue = (37 * hashValue + Value.Span[i]) % int.MaxValue;
             }
 
             return (int)hashValue;
@@ -155,29 +152,7 @@ namespace BencodeNET.Objects
 
         public int CompareTo(BString other)
         {
-            if (other == null)
-                return 1;
-
-            var maxLength = Math.Max(this.Length, other.Length);
-
-            for (var i = 0; i < maxLength; i++)
-            {
-                // This is shorter and thereby this is "less than" the other
-                if (i >= this.Length)
-                    return -1;
-
-                // The other is shorter and thereby this is "greater than" the other
-                if (i >= other.Length)
-                    return 1;
-
-                if (this.Value[i] > other.Value[i])
-                    return 1;
-
-                if (this.Value[i] < other.Value[i])
-                    return -1;
-            }
-
-            return 0;
+            return Value.Span.SequenceCompareTo(other.Value.Span);
         }
 #pragma warning restore 1591
 
@@ -189,11 +164,7 @@ namespace BencodeNET.Objects
         /// </returns>
         public override string ToString()
         {
-#if NETCOREAPP
-            return _encoding.GetString(_value.AsSpan());
-#else
-            return _encoding.GetString(_value);
-#endif
+            return _encoding.GetString(Value.Span);
         }
 
         /// <summary>
@@ -206,11 +177,7 @@ namespace BencodeNET.Objects
         public string ToString(Encoding encoding)
         {
             encoding = encoding ?? _encoding;
-#if NETCOREAPP
-            return encoding.GetString(_value.AsSpan());
-#else
-            return encoding.GetString(_value);
-#endif
+            return encoding.GetString(Value.Span);
         }
     }
 }
