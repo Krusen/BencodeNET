@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net472;netcoreapp2.0;netcoreapp2.2;netcoreapp3.0</TargetFrameworks>
@@ -6,7 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Update="Files\ubuntu-14.10-desktop-amd64.iso.torrent" CopyToOutputDirectory="PreserveNewest" />
     <None Update="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 

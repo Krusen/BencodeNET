@@ -10,9 +10,6 @@ namespace BencodeNET.Objects
     /// </summary>
     public abstract class BObject : IBObject
     {
-        internal BObject()
-        { }
-
         /// <summary>
         /// Calculates the (encoded) size of the object in bytes.
         /// </summary>

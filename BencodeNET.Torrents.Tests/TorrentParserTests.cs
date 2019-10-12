@@ -4,12 +4,12 @@ using System.Text;
 using BencodeNET.IO;
 using BencodeNET.Objects;
 using BencodeNET.Parsing;
-using BencodeNET.Torrents;
+using BencodeNET.Tests;
 using FluentAssertions;
 using NSubstitute;
 using Xunit;
 
-namespace BencodeNET.Tests.Torrents
+namespace BencodeNET.Torrents.Tests
 {
     public class TorrentParserTests
     {

@@ -19,6 +19,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BencodeNET", "BencodeNET\Be
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BencodeNET.Tests", "BencodeNET.Tests\BencodeNET.Tests.csproj", "{5992CAC5-C0D3-4255-BFD7-C11C07969900}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BencodeNET.Torrents", "BencodeNET.Torrents\BencodeNET.Torrents.csproj", "{7334E3CD-AF7F-495F-9E23-5EEC662C6962}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BencodeNET.Torrents.Tests", "BencodeNET.Torrents.Tests\BencodeNET.Torrents.Tests.csproj", "{3052ABD9-490A-4F24-BC2D-4291364DF3B9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +37,14 @@ Global
 		{5992CAC5-C0D3-4255-BFD7-C11C07969900}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5992CAC5-C0D3-4255-BFD7-C11C07969900}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5992CAC5-C0D3-4255-BFD7-C11C07969900}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7334E3CD-AF7F-495F-9E23-5EEC662C6962}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7334E3CD-AF7F-495F-9E23-5EEC662C6962}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7334E3CD-AF7F-495F-9E23-5EEC662C6962}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7334E3CD-AF7F-495F-9E23-5EEC662C6962}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3052ABD9-490A-4F24-BC2D-4291364DF3B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3052ABD9-490A-4F24-BC2D-4291364DF3B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3052ABD9-490A-4F24-BC2D-4291364DF3B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3052ABD9-490A-4F24-BC2D-4291364DF3B9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

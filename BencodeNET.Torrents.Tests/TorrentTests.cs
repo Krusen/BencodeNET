@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 using BencodeNET.Exceptions;
 using BencodeNET.Objects;
-using BencodeNET.Torrents;
+using BencodeNET.Tests;
 using FluentAssertions;
 using Xunit;
 
-namespace BencodeNET.Tests.Torrents
+namespace BencodeNET.Torrents.Tests
 {
     public class TorrentTests
     {

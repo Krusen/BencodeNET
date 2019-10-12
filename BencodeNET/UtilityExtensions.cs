@@ -1,8 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Pipelines;
-using System.Linq;
 using System.Text;
 
 namespace BencodeNET
@@ -22,11 +21,6 @@ namespace BencodeNET
         public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
         {
             return dictionary.TryGetValue(key, out var value) ? value : default;
-        }
-
-        public static IEnumerable<T> Flatten<T>(this IEnumerable<IEnumerable<T>> source)
-        {
-            return source.SelectMany(x => x);
         }
 
         public static int DigitCount(this int value) => DigitCount((long) value);

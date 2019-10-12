@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net472;netcoreapp2.0;netcoreapp2.2;netcoreapp3.0</TargetFrameworks>
+    <LangVersion>7.3</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BencodeNET.Tests\BencodeNET.Tests.csproj" />
+    <ProjectReference Include="..\BencodeNET.Torrents\BencodeNET.Torrents.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Files\ubuntu-14.10-desktop-amd64.iso.torrent">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
