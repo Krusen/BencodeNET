@@ -1,13 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Pipelines;
 using System.Linq;
 using System.Text;
-
-#if !NETCOREAPP
-using System.Buffers;
-#endif
 
 namespace BencodeNET
 {
@@ -105,45 +101,22 @@ namespace BencodeNET
 
         public static void Write(this Stream stream, int number)
         {
-#if NETCOREAPP
             Span<byte> buffer = stackalloc byte[11];
             var bytesRead = Encoding.ASCII.GetBytes(number.ToString().AsSpan(), buffer);
             stream.Write(buffer.Slice(0, bytesRead));
-#else
-            var str = number.ToString();
-            var buffer = ArrayPool<byte>.Shared.Rent(str.Length);
-            var count = Encoding.ASCII.GetBytes(str, 0, str.Length, buffer, 0);
-            stream.Write(buffer, 0, count);
-            ArrayPool<byte>.Shared.Return(buffer);
-#endif
         }
 
         public static void Write(this Stream stream, long number)
         {
-#if NETCOREAPP
             Span<byte> buffer = stackalloc byte[20];
             var bytesRead = Encoding.ASCII.GetBytes(number.ToString().AsSpan(), buffer);
             stream.Write(buffer.Slice(0, bytesRead));
-#else
-            var str = number.ToString();
-            var buffer = ArrayPool<byte>.Shared.Rent(str.Length);
-            var count = Encoding.ASCII.GetBytes(str, 0, str.Length, buffer, 0);
-            stream.Write(buffer, 0, count);
-            ArrayPool<byte>.Shared.Return(buffer);
-#endif
         }
 
         public static void Write(this Stream stream, char c)
         {
             stream.WriteByte((byte) c);
         }
-
-#if !NETCOREAPP
-        public static void Write(this Stream stream, byte[] bytes)
-        {
-            stream.Write(bytes, 0, bytes.Length);
-        }
-#endif
 
         public static void WriteChar(this PipeWriter writer, char c)
         {

@@ -17,7 +17,7 @@ namespace BencodeNET.Tests.Objects
         public void Add_NullStringValue_ResultsInEmptyBString()
         {
             var dict = new BDictionary {{"key", (string) null}};
-            dict.Get<BString>("key").Value.Should().BeEmpty();
+            dict.Get<BString>("key").Value.ToArray().Should().BeEmpty();
         }
 
         [Fact]

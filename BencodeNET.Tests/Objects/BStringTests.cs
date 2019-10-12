@@ -14,14 +14,14 @@ namespace BencodeNET.Tests.Objects
         public void ConstructorEmpty_ResultsInEmptyValue()
         {
             var bstring = new BString();
-            bstring.Value.Should().BeEmpty();
+            bstring.Value.ToArray().Should().BeEmpty();
         }
 
         [Fact]
         public void ConstructorWithNullValue_ResultsInEmptyValue()
         {
             var bstring = new BString((string)null);
-            bstring.Value.Should().BeEmpty();
+            bstring.Value.ToArray().Should().BeEmpty();
         }
 
         #region Equals

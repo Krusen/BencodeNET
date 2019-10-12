@@ -64,12 +64,8 @@ namespace BencodeNET.Objects
             buffer[0] = (byte) 'i';
             buffer = buffer.Slice(1);
 
-#if NETCOREAPP
             Encoding.ASCII.GetBytes(Value.ToString().AsSpan(), buffer);
-#else
-            var bytes = Encoding.ASCII.GetBytes(Value.ToString());
-            bytes.CopyTo(buffer);
-#endif
+
             buffer[buffer.Length - 1] = (byte) 'e';
 
             writer.Advance(size);
@@ -135,9 +131,7 @@ namespace BencodeNET.Objects
 
         public static bool operator ==(BNumber bnumber, BNumber other)
         {
-            if (ReferenceEquals(bnumber, null) && ReferenceEquals(other, null)) return true;
-            if (ReferenceEquals(bnumber, null) || ReferenceEquals(other, null)) return false;
-            return bnumber.Value == other.Value;
+            return bnumber?.Value == other?.Value;
         }
 
         public static bool operator !=(BNumber bnumber, BNumber other) => !(bnumber == other);
