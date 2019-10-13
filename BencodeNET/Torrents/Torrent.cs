@@ -8,7 +8,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using BencodeNET.Exceptions;
-using BencodeNET.IO;
 using BencodeNET.Objects;
 
 namespace BencodeNET.Torrents
