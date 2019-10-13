@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO.Pipelines;
 using System.Text;
+using System.Threading.Tasks;
 using BencodeNET.Exceptions;
 using BencodeNET.Objects;
 using BencodeNET.Parsing;
@@ -10,49 +12,42 @@ namespace BencodeNET.Tests.Parsing
 {
     public partial class BStringParserTests
     {
-        private BStringParser Parser { get; }
-
-        public BStringParserTests()
-        {
-            Parser = new BStringParser();
-        }
-
         [Theory]
         [InlineData("4:spam")]
         [InlineData("8:spameggs")]
         [InlineData("9:spam eggs")]
         [InlineData("9:spam:eggs")]
         [InlineData("14:!@#¤%&/()=?$|")]
-        public void CanParseSimple(string bencode)
+        public async Task CanParseSimpleAsync(string bencode)
         {
             var parts = bencode.Split(new[] {':'}, 2);
             var length = int.Parse(parts[0]);
             var value = parts[1];
 
-            var bstring = Parser.ParseString(bencode);
+            var bstring = await Parser.ParseStringAsync(bencode);
 
             bstring.Length.Should().Be(length);
             bstring.Should().Be(value);
         }
 
         [Fact]
-        public void CanParse_EmptyString()
+        public async Task CanParse_EmptyStringAsync()
         {
-            var bstring = Parser.ParseString("0:");
+            var bstring = await Parser.ParseStringAsync("0:");
 
             bstring.Length.Should().Be(0);
             bstring.Should().Be("");
         }
 
         [Theory]
-        [InlineData("5:spam", 4)]
-        [InlineData("6:spam", 4)]
-        [InlineData("100:spam", 4)]
-        public void LessCharsThanSpecified_ThrowsInvalidBencodeException(string bencode, int expectedReadBytes)
+        [InlineData("5:spam")]
+        [InlineData("6:spam")]
+        [InlineData("100:spam")]
+        public void LessCharsThanSpecified_ThrowsInvalidBencodeExceptionAsync(string bencode)
         {
-            Action action = () => Parser.ParseString(bencode);
+            Func<Task> action = async () => await Parser.ParseStringAsync(bencode);
             action.Should().Throw<InvalidBencodeException<BString>>()
-                .WithMessage($"*but could only read {expectedReadBytes} bytes*")
+                .WithMessage("*but could only read * bytes*")
                 .Which.StreamPosition.Should().Be(0);
         }
 
@@ -64,9 +59,9 @@ namespace BencodeNET.Tests.Parsing
         [InlineData("4;spam", 1)]
         [InlineData("4,spam", 1)]
         [InlineData("4|spam", 1)]
-        public void MissingDelimiter_ThrowsInvalidBencodeException(string bencode, int errorIndex)
+        public void MissingDelimiter_ThrowsInvalidBencodeExceptionAsync(string bencode, int errorIndex)
         {
-            Action action = () => Parser.ParseString(bencode);
+            Func<Task> action = async () => await Parser.ParseStringAsync(bencode);
             action.Should().Throw<InvalidBencodeException<BString>>()
                 .WithMessage("*Unexpected character. Expected ':'*")
                 .Which.StreamPosition.Should().Be(errorIndex);
@@ -81,22 +76,11 @@ namespace BencodeNET.Tests.Parsing
         [InlineData("?spam")]
         [InlineData("!spam")]
         [InlineData("#spam")]
-        public void NonDigitFirstChar_ThrowsInvalidBencodeException(string bencode)
+        public void NonDigitFirstChar_ThrowsInvalidBencodeExceptionAsync(string bencode)
         {
-            Action action = () => Parser.ParseString(bencode);
+            Func<Task> action = async () => await Parser.ParseStringAsync(bencode);
             action.Should().Throw<InvalidBencodeException<BString>>()
                 .WithMessage($"*Unexpected character. Expected ':' but found '{bencode[0]}'*")
-                .Which.StreamPosition.Should().Be(0);
-        }
-
-        [Theory]
-        [InlineData("0")]
-        [InlineData("4")]
-        public void LessThanMinimumLength2_ThrowsInvalidBencodeException(string bencode)
-        {
-            Action action = () => Parser.ParseString(bencode);
-            action.Should().Throw<InvalidBencodeException<BString>>()
-                .WithMessage("*Invalid length*")
                 .Which.StreamPosition.Should().Be(0);
         }
 
@@ -105,9 +89,9 @@ namespace BencodeNET.Tests.Parsing
         [InlineData("123456789012:spam")]
         [InlineData("1234567890123:spam")]
         [InlineData("12345678901234:spam")]
-        public void LengthAboveMaxDigits10_ThrowsUnsupportedException(string bencode)
+        public void LengthAboveMaxDigits10_ThrowsUnsupportedExceptionAsync(string bencode)
         {
-            Action action = () => Parser.ParseString(bencode);
+            Func<Task> action = async () => await Parser.ParseStringAsync(bencode);
             action.Should().Throw<UnsupportedBencodeException<BString>>()
                 .WithMessage("*Length of string is more than * digits*")
                 .Which.StreamPosition.Should().Be(0);
@@ -124,32 +108,32 @@ namespace BencodeNET.Tests.Parsing
         [InlineData("12345678:spam")]
         [InlineData("123456789:spam")]
         [InlineData("1234567890:spam")]
-        public void LengthAtOrBelowMaxDigits10_DoesNotThrowUnsupportedException(string bencode)
+        public void LengthAtOrBelowMaxDigits10_DoesNotThrowUnsupportedExceptionAsync(string bencode)
         {
-            Action action = () => Parser.ParseString(bencode);
+            Func<Task> action = async () => await Parser.ParseStringAsync(bencode);
             action.Should().NotThrow<UnsupportedBencodeException<BString>>();
         }
 
         [Fact]
-        public void LengthAboveInt32MaxValue_ThrowsUnsupportedException()
+        public void LengthAboveInt32MaxValue_ThrowsUnsupportedExceptionAsync()
         {
             var bencode = "2147483648:spam";
-            Action action = () => Parser.ParseString(bencode);
+            Func<Task> action = async () => await Parser.ParseStringAsync(bencode);
             action.Should().Throw<UnsupportedBencodeException<BString>>()
                 .WithMessage("*Length of string is * but maximum supported length is *")
                 .Which.StreamPosition.Should().Be(0);
         }
 
         [Fact]
-        public void LengthBelowInt32MaxValue_DoesNotThrowUnsupportedException()
+        public void LengthBelowInt32MaxValue_DoesNotThrowUnsupportedExceptionAsync()
         {
             var bencode = "2147483647:spam";
-            Action action = () => Parser.ParseString(bencode);
+            Func<Task> action = async () => await Parser.ParseStringAsync(bencode);
             action.Should().NotThrow<UnsupportedBencodeException<BString>>();
         }
 
         [Fact]
-        public void CanParseEncodedAsLatin1()
+        public async Task CanParseEncodedAsLatin1Async()
         {
             var encoding = Encoding.GetEncoding("LATIN1");
             var expected = new BString("æøå", encoding);
@@ -157,9 +141,13 @@ namespace BencodeNET.Tests.Parsing
 
             // "3:æøå"
             var bytes = new byte[] {51, 58, 230, 248, 229};
-            var bstring = parser.Parse(bytes);
+            var (reader, writer) = new Pipe();
+            await writer.WriteAsync(bytes);
+
+            var bstring = await parser.ParseAsync(reader);
 
             bstring.Should().Be(expected);
+            bstring.GetSizeInBytes().Should().Be(5);
         }
 
         [Theory]
@@ -167,24 +155,12 @@ namespace BencodeNET.Tests.Parsing
         [InlineData("1abc:a", 1)]
         [InlineData("123?:asdf", 3)]
         [InlineData("3abc:abc", 1)]
-        public void InvalidLengthString_ThrowsInvalidException(string bencode, int errorIndex)
+        public void InvalidLengthString_ThrowsInvalidExceptionAsync(string bencode, int errorIndex)
         {
-            Action action = () => Parser.ParseString(bencode);
+            Func<Task> action = async () => await Parser.ParseStringAsync(bencode);
             action.Should().Throw<InvalidBencodeException<BString>>()
                 .WithMessage("*Unexpected character. Expected ':'*")
                 .Which.StreamPosition.Should().Be(errorIndex);
-        }
-
-        [Theory]
-        [InlineData("")]
-        [InlineData("0")]
-        public void BelowMinimumLength_WhenStreamWithoutLengthSupport_ThrowsInvalidException(string bencode)
-        {
-            var stream = new LengthNotSupportedStream(bencode);
-            Action action = () => Parser.Parse(stream);
-            action.Should().Throw<InvalidBencodeException<BString>>()
-                .WithMessage("*Unexpected character. Expected ':' but reached end of stream*")
-                .Which.StreamPosition.Should().Be(0);
         }
     }
 }

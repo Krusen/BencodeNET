@@ -1,5 +1,8 @@
 using System.IO;
+using System.IO.Pipelines;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using BencodeNET.IO;
 using BencodeNET.Objects;
 
@@ -14,72 +17,26 @@ namespace BencodeNET.Parsing
         /// <summary>
         /// The encoding used for parsing.
         /// </summary>
-        protected abstract Encoding Encoding { get; }
+        public abstract Encoding Encoding { get; }
 
-        /// <summary>
-        /// Parses a bencoded string into an <see cref="IBObject"/>.
-        /// </summary>
-        /// <param name="bencodedString">The bencoded string to parse.</param>
-        /// <returns>The parsed object.</returns>
-        IBObject IBObjectParser.ParseString(string bencodedString)
-        {
-            return ParseString(bencodedString);
-        }
-
-        /// <summary>
-        /// Parses a byte array into an <see cref="IBObject"/>.
-        /// </summary>
-        /// <param name="bytes">The bytes to parse.</param>
-        /// <returns>The parsed object.</returns>
-        IBObject IBObjectParser.Parse(byte[] bytes)
-        {
-            return Parse(bytes);
-        }
-
-        /// <summary>
-        /// Parses a stream into an <see cref="IBObject"/>.
-        /// </summary>
-        /// <param name="stream">The stream to parse.</param>
-        /// <returns>The parsed object.</returns>
         IBObject IBObjectParser.Parse(Stream stream)
         {
             return Parse(stream);
         }
 
-        /// <summary>
-        /// Parses a bencoded stream into an <see cref="IBObject"/>.
-        /// </summary>
-        /// <param name="stream">The bencoded stream to parse.</param>
-        /// <returns>The parsed object.</returns>
-        IBObject IBObjectParser.Parse(BencodeStream stream)
+        IBObject IBObjectParser.Parse(BencodeReader reader)
         {
-            return Parse(stream);
+            return Parse(reader);
         }
 
-        /// <summary>
-        /// Parses a bencoded string into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
-        /// </summary>
-        /// <param name="bencodedString">The bencoded string to parse.</param>
-        /// <returns>The parsed object.</returns>
-        public virtual T ParseString(string bencodedString)
+        async ValueTask<IBObject> IBObjectParser.ParseAsync(PipeReader pipeReader, CancellationToken cancellationToken)
         {
-            using (var stream = bencodedString.AsStream(Encoding))
-            {
-                return Parse(stream);
-            }
+            return await ParseAsync(new PipeBencodeReader(pipeReader), cancellationToken).ConfigureAwait(false);
         }
 
-        /// <summary>
-        /// Parses a byte array into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
-        /// </summary>
-        /// <param name="bytes">The bytes to parse.</param>
-        /// <returns>The parsed object.</returns>
-        public virtual T Parse(byte[] bytes)
+        async ValueTask<IBObject> IBObjectParser.ParseAsync(PipeBencodeReader pipeReader, CancellationToken cancellationToken)
         {
-            using (var stream = new MemoryStream(bytes))
-            {
-                return Parse(stream);
-            }
+            return await ParseAsync(pipeReader, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -87,16 +44,30 @@ namespace BencodeNET.Parsing
         /// </summary>
         /// <param name="stream">The stream to parse.</param>
         /// <returns>The parsed object.</returns>
-        public virtual T Parse(Stream stream)
-        {
-            return Parse(new BencodeStream(stream));
-        }
+        public virtual T Parse(Stream stream) => Parse(new BencodeReader(stream, leaveOpen: true));
 
         /// <summary>
-        /// Parses a bencoded stream into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
+        /// Parses an <see cref="IBObject"/> of type <typeparamref name="T"/> from a <see cref="BencodeReader"/>.
         /// </summary>
-        /// <param name="stream">The bencoded stream to parse.</param>
+        /// <param name="reader">The reader to read from.</param>
         /// <returns>The parsed object.</returns>
-        public abstract T Parse(BencodeStream stream);
+        public abstract T Parse(BencodeReader reader);
+
+        /// <summary>
+        /// Parses an <see cref="IBObject"/> of type <typeparamref name="T"/> from a <see cref="PipeReader"/>.
+        /// </summary>
+        /// <param name="pipeReader">The pipe reader to read from.</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>The parsed object.</returns>
+        public ValueTask<T> ParseAsync(PipeReader pipeReader, CancellationToken cancellationToken = default)
+            => ParseAsync(new PipeBencodeReader(pipeReader), cancellationToken);
+
+        /// <summary>
+        /// Parses an <see cref="IBObject"/> of type <typeparamref name="T"/> from a <see cref="PipeBencodeReader"/>.
+        /// </summary>
+        /// <param name="pipeReader">The pipe reader to read from.</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>The parsed object.</returns>
+        public abstract ValueTask<T> ParseAsync(PipeBencodeReader pipeReader, CancellationToken cancellationToken = default);
     }
 }

@@ -1,13 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using BencodeNET.Exceptions;
+using System.Threading;
+using System.Threading.Tasks;
 using BencodeNET.IO;
 using BencodeNET.Objects;
-using BencodeNET.Torrents;
+using BencodeNET.Parsing;
 
-namespace BencodeNET.Parsing
+namespace BencodeNET.Torrents
 {
     /// <summary>
     /// A parser for torrent files.
@@ -20,13 +21,31 @@ namespace BencodeNET.Parsing
         /// </summary>
         public TorrentParserMode ParseMode { get; set; }
 
+
+        /// <summary>
+        /// Creates an instance using a default <see cref="IBencodeParser"/>.
+        /// </summary>
+        public TorrentParser()
+            : this(new BencodeParser())
+        {
+        }
+
+        /// <summary>
+        /// Creates an instance with the specified <see cref="TorrentParserMode"/> using a default <see cref="IBencodeParser"/>.
+        /// </summary>
+        /// <param name="torrentParserMode">The parser used for parsing the torrent <see cref="BDictionary"/>.</param>
+        public TorrentParser(TorrentParserMode torrentParserMode)
+            : this(new BencodeParser(), torrentParserMode)
+        {
+        }
+
         /// <summary>
         /// Creates an instance using the specified <see cref="IBencodeParser"/> for parsing
         /// the torrent <see cref="BDictionary"/>.
         /// </summary>
         /// <param name="bencodeParser">The parser used for parsing the torrent <see cref="BDictionary"/>.</param>
         public TorrentParser(IBencodeParser bencodeParser)
-            : this(bencodeParser, TorrentParserMode.Strict)
+            : this(bencodeParser, TorrentParserMode.Tolerant)
         {
         }
 
@@ -38,9 +57,7 @@ namespace BencodeNET.Parsing
         /// <param name="torrentParserMode">The parsing mode to use.</param>
         public TorrentParser(IBencodeParser bencodeParser, TorrentParserMode torrentParserMode)
         {
-            if (bencodeParser == null) throw new ArgumentNullException(nameof(bencodeParser));
-
-            BencodeParser = bencodeParser;
+            BencodeParser = bencodeParser ?? throw new ArgumentNullException(nameof(bencodeParser));
             ParseMode = torrentParserMode;
         }
 
@@ -52,21 +69,33 @@ namespace BencodeNET.Parsing
         /// <summary>
         /// The encoding used for parsing.
         /// </summary>
-        protected override Encoding Encoding => BencodeParser.Encoding;
+        public override Encoding Encoding => BencodeParser.Encoding;
 
         /// <summary>
-        /// Parses the next <see cref="BDictionary"/> from the stream as a <see cref="Torrent"/>.
+        /// Parses the next <see cref="BDictionary"/> from the reader as a <see cref="Torrent"/>.
         /// </summary>
-        /// <param name="stream">The stream to parse from.</param>
+        /// <param name="reader">The reader to parse from.</param>
         /// <returns>The parsed <see cref="Torrent"/>.</returns>
-        public override Torrent Parse(BencodeStream stream)
+        public override Torrent Parse(BencodeReader reader)
         {
-            var data = BencodeParser.Parse<BDictionary>(stream);
+            var data = BencodeParser.Parse<BDictionary>(reader);
             return CreateTorrent(data);
         }
 
         /// <summary>
-        /// Creates a torrrent by reading the relevant data from the <see cref="BDictionary"/>.
+        /// Parses the next <see cref="BDictionary"/> from the reader as a <see cref="Torrent"/>.
+        /// </summary>
+        /// <param name="pipeReader">The reader to parse from.</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>The parsed <see cref="Torrent"/>.</returns>
+        public override async ValueTask<Torrent> ParseAsync(PipeBencodeReader pipeReader, CancellationToken cancellationToken = default)
+        {
+            var data = await BencodeParser.ParseAsync<BDictionary>(pipeReader, cancellationToken).ConfigureAwait(false);
+            return CreateTorrent(data);
+        }
+
+        /// <summary>
+        /// Creates a torrent by reading the relevant data from the <see cref="BDictionary"/>.
         /// </summary>
         /// <param name="data">The torrent bencode data.</param>
         /// <returns>A <see cref="Torrent"/> matching the input.</returns>
@@ -318,6 +347,8 @@ namespace BencodeNET.Parsing
         /// <returns>A list of list of trackers (announce URLs).</returns>
         protected virtual IList<IList<string>> ParseTrackers(BDictionary data, Encoding encoding)
         {
+            // Specification: http://bittorrent.org/beps/bep_0012.html
+
             var trackerList = new List<IList<string>>();
             var primary = new List<string>();
             trackerList.Add(primary);
@@ -329,18 +360,31 @@ namespace BencodeNET.Parsing
                 primary.Add(announce);
             }
 
-            // Get the 'announce-list' list´s
-            var announceLists = data.Get<BList>(TorrentFields.AnnounceList)?.AsType<BList>() as IList<BList>;
-            if (announceLists?.Any() == true)
-            {
-                // Add the first list to the primary list and remove duplicates
-                primary.AddRange(announceLists.First().AsStrings(encoding));
-                trackerList[0] = primary.Distinct().ToList();
+            // Get the 'announce-list' list's
+            var announceLists = data.Get<BList>(TorrentFields.AnnounceList);
+            if (announceLists == null)
+                return trackerList;
 
-                // Add the other lists to the lists of lists of announce urls
-                trackerList.AddRange(
-                    announceLists.Skip(1)
-                        .Select(x => x.AsStrings(encoding).ToList()));
+            // According to the specification it should be a list of lists
+            if (announceLists.All(x => x is BList))
+            {
+                var lists = announceLists.AsType<BList>() as IList<BList>;
+                if (lists.Any())
+                {
+                    // Add the first list to the primary list and remove duplicates
+                    primary.AddRange(lists.First().AsStrings(encoding));
+                    trackerList[0] = primary.Distinct().ToList();
+
+                    // Add the other lists to the lists of lists of announce urls
+                    trackerList.AddRange(lists.Skip(1).Select(x => x.AsStrings(encoding).ToList()));
+                }
+            }
+            // It's not following the specification, it's strings instead of lists
+            else if (ParseMode == TorrentParserMode.Tolerant && announceLists.All(x => x is BString))
+            {
+                // Add them all to the first list
+                primary.AddRange(announceLists.AsStrings(encoding));
+                trackerList[0] = primary.Distinct().ToList();
             }
 
             return trackerList;

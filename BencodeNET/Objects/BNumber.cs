@@ -1,5 +1,7 @@
 ﻿using System;
-using BencodeNET.IO;
+using System.IO;
+using System.IO.Pipelines;
+using System.Text;
 
 namespace BencodeNET.Objects
 {
@@ -9,7 +11,7 @@ namespace BencodeNET.Objects
     /// <remarks>
     /// The underlying value is a <see cref="long"/>.
     /// </remarks>
-    public class BNumber : BObject<long>, IComparable<BNumber>
+    public sealed class BNumber : BObject<long>, IComparable<BNumber>
     {
         private static readonly DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
@@ -42,14 +44,34 @@ namespace BencodeNET.Objects
             Value = datetime?.Subtract(Epoch).Ticks / TimeSpan.TicksPerSecond ?? 0;
         }
 
-#pragma warning disable 1591
-        protected override void EncodeObject(BencodeStream stream)
+        /// <inheritdoc/>
+        public override int GetSizeInBytes() => Value.DigitCount() + 2;
+
+        /// <inheritdoc/>
+        protected override void EncodeObject(Stream stream)
         {
             stream.Write('i');
             stream.Write(Value);
             stream.Write('e');
         }
-        
+
+        /// <inheritdoc/>
+        protected override void EncodeObject(PipeWriter writer)
+        {
+            var size = GetSizeInBytes();
+            var buffer = writer.GetSpan(size).Slice(0, size);
+
+            buffer[0] = (byte) 'i';
+            buffer = buffer.Slice(1);
+
+            Encoding.ASCII.GetBytes(Value.ToString().AsSpan(), buffer);
+
+            buffer[buffer.Length - 1] = (byte) 'e';
+
+            writer.Advance(size);
+        }
+
+#pragma warning disable 1591
         public static implicit operator int?(BNumber bint)
         {
             if (bint == null) return null;
@@ -78,7 +100,6 @@ namespace BencodeNET.Objects
         {
             if (bint == null) throw new InvalidCastException();
             return bint.Value > 0;
-
         }
 
         public static implicit operator DateTime?(BNumber number)
@@ -100,37 +121,20 @@ namespace BencodeNET.Objects
             return Epoch.AddSeconds(number);
         }
 
-        public static implicit operator BNumber(int value)
-        {
-            return new BNumber(value);
-        }
+        public static implicit operator BNumber(int value) => new BNumber(value);
 
-        public static implicit operator BNumber(long value)
-        {
-            return new BNumber(value);
-        }
+        public static implicit operator BNumber(long value) => new BNumber(value);
 
-        public static implicit operator BNumber(bool value)
-        {
-            return new BNumber(value ? 1 : 0);
-        }
+        public static implicit operator BNumber(bool value) => new BNumber(value ? 1 : 0);
 
-        public static implicit operator BNumber(DateTime? datetime)
-        {
-            return new BNumber(datetime);
-        }
+        public static implicit operator BNumber(DateTime? datetime) => new BNumber(datetime);
 
         public static bool operator ==(BNumber bnumber, BNumber other)
         {
-            if (ReferenceEquals(bnumber, null) && ReferenceEquals(other, null)) return true;
-            if (ReferenceEquals(bnumber, null) || ReferenceEquals(other, null)) return false;
-            return bnumber.Value == other.Value;
+            return bnumber?.Value == other?.Value;
         }
 
-        public static bool operator !=(BNumber bnumber, BNumber other)
-        {
-            return !(bnumber == other);
-        }
+        public static bool operator !=(BNumber bnumber, BNumber other) => !(bnumber == other);
 
         public override bool Equals(object other)
         {
@@ -141,10 +145,7 @@ namespace BencodeNET.Objects
         /// <summary>
         /// Returns the hash code for this instance.
         /// </summary>
-        public override int GetHashCode()
-        {
-            return Value.GetHashCode();
-        }
+        public override int GetHashCode() => Value.GetHashCode();
 
         public int CompareTo(BNumber other)
         {
@@ -154,25 +155,13 @@ namespace BencodeNET.Objects
             return Value.CompareTo(other.Value);
         }
 
-        public override string ToString()
-        {
-            return Value.ToString();
-        }
+        public override string ToString() => Value.ToString();
 
-        public string ToString(string format)
-        {
-            return Value.ToString(format);
-        }
+        public string ToString(string format) => Value.ToString(format);
 
-        public string ToString(IFormatProvider formatProvider)
-        {
-            return Value.ToString(formatProvider);
-        }
+        public string ToString(IFormatProvider formatProvider) => Value.ToString(formatProvider);
 
-        public string ToString(string format, IFormatProvider formatProvider)
-        {
-            return Value.ToString(format, formatProvider);
-        }
+        public string ToString(string format, IFormatProvider formatProvider) => Value.ToString(format, formatProvider);
 #pragma warning restore 1591
     }
 }

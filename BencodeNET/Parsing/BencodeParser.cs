@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using BencodeNET.Exceptions;
 using BencodeNET.IO;
 using BencodeNET.Objects;
@@ -14,130 +14,50 @@ namespace BencodeNET.Parsing
     public class BencodeParser : IBencodeParser
     {
         /// <summary>
-        /// Creates an instance using <see cref="System.Text.Encoding.UTF8"/> and the default parsers.
-        /// </summary>
-        public BencodeParser()
-            : this(Encoding.UTF8)
-        { }
-
-        /// <summary>
-        /// Creates an instance using the specified encoding and the default parsers.
-        /// </summary>
-        /// <param name="encoding">The encoding to use when parsing.</param>
-        public BencodeParser(Encoding encoding)
-        {
-            Encoding = encoding;
-
-            Parsers = new BObjectParserList
-            {
-                new BStringParser(encoding),
-                new BNumberParser(),
-                new BListParser(this),
-                new BDictionaryParser(this),
-                new TorrentParser(this)
-            };
-        }
-
-        /// <summary>
-        /// Creates an instance using <see cref="System.Text.Encoding.UTF8"/> and the default parsers plus the specified parsers.
-        /// Existing default parsers for the same type will be replaced by the new parsers.
-        /// </summary>
-        /// <param name="parsers">The new parsers to add or replace.</param>
-        public BencodeParser(IEnumerable<KeyValuePair<Type, IBObjectParser>> parsers)
-            : this(parsers, Encoding.UTF8)
-        { }
-
-        /// <summary>
-        /// Creates an instance using <see cref="System.Text.Encoding.UTF8"/> and the default parsers plus the specified parsers.
-        /// Existing default parsers for the same type will be replaced by the new parsers.
-        /// </summary>
-        /// <param name="parsers">The new parsers to add or replace.</param>
-        public BencodeParser(IDictionary<Type, IBObjectParser> parsers)
-            : this(parsers, Encoding.UTF8)
-        { }
-
-        /// <summary>
-        /// Creates an instance using the specified encoding and the default parsers plus the specified parsers.
-        /// Existing default parsers for the same type will be replaced by the new parsers.
-        /// </summary>
-        /// <param name="parsers">The new parsers to add or replace.</param>
-        /// <param name="encoding">The encoding to use when parsing.</param>
-        public BencodeParser(IEnumerable<KeyValuePair<Type, IBObjectParser>> parsers, Encoding encoding)
-        {
-            Encoding = encoding;
-
-            foreach (var entry in parsers)
-            {
-                Parsers.AddOrReplace(entry.Key, entry.Value);
-            }
-        }
-
-        /// <summary>
-        /// Creates an instance using the specified encoding and the default parsers plus the specified parsers.
-        /// Existing default parsers for the same type will be replaced by the new parsers.
-        /// </summary>
-        /// <param name="parsers">The new parsers to add or replace.</param>
-        /// <param name="encoding">The encoding to use when parsing.</param>
-        public BencodeParser(IDictionary<Type, IBObjectParser> parsers, Encoding encoding)
-            : this((IEnumerable<KeyValuePair<Type, IBObjectParser>>)parsers, encoding)
-        { }
-
-        /// <summary>
-        /// The encoding use for parsing.
-        /// </summary>
-        public Encoding Encoding { get; protected set; }
-
-        /// <summary>
-        /// The parsers used by this instance when parsing bencoded.
+        /// List of parsers used by the <see cref="BencodeParser"/>.
         /// </summary>
         public BObjectParserList Parsers { get; }
 
         /// <summary>
-        /// Parses a bencoded string into an <see cref="IBObject"/>.
+        /// The encoding use for parsing.
         /// </summary>
-        /// <param name="bencodedString">The bencoded string to parse.</param>
-        /// <returns>The parsed object.</returns>
-        public IBObject ParseString(string bencodedString)
+        public Encoding Encoding
         {
-            using (var stream = bencodedString.AsStream(Encoding))
+            get => _encoding;
+            set
             {
-                return Parse(stream);
+                _encoding = value ?? throw new ArgumentNullException(nameof(value));
+                Parsers.GetSpecific<BStringParser>()?.ChangeEncoding(value);
             }
         }
+        private Encoding _encoding;
 
         /// <summary>
-        /// Parses a bencoded array of bytes into an <see cref="IBObject"/>.
+        /// Creates an instance using the specified encoding and the default parsers.
+        /// Encoding defaults to <see cref="System.Text.Encoding.UTF8"/> if not specified.
         /// </summary>
-        /// <param name="bytes">The bencoded bytes to parse.</param>
-        /// <returns>The parsed object.</returns>
-        public IBObject Parse(byte[] bytes)
+        /// <param name="encoding">The encoding to use when parsing.</param>
+        public BencodeParser(Encoding encoding = null)
         {
-            using (var stream = new MemoryStream(bytes))
+            _encoding = encoding ?? Encoding.UTF8;
+
+            Parsers = new BObjectParserList
             {
-                return Parse(stream);
-            }
+                new BNumberParser(),
+                new BStringParser(_encoding),
+                new BListParser(this),
+                new BDictionaryParser(this)
+            };
         }
 
         /// <summary>
-        /// Parses a stream into an <see cref="IBObject"/>.
+        ///  Parses an <see cref="IBObject"/> from the reader.
         /// </summary>
-        /// <param name="stream">The stream to parse.</param>
-        /// <returns>The parsed object.</returns>
-        public IBObject Parse(Stream stream)
+        public virtual IBObject Parse(BencodeReader reader)
         {
-            return Parse(new BencodeStream(stream));
-        }
+            if (reader == null) throw new ArgumentNullException(nameof(reader));
 
-        /// <summary>
-        /// Parses a <see cref="BencodeStream"/> into an <see cref="IBObject"/>.
-        /// </summary>
-        /// <param name="stream">The stream to parse.</param>
-        /// <returns>The parsed object.</returns>
-        public IBObject Parse(BencodeStream stream)
-        {
-            if (stream == null) throw new ArgumentNullException(nameof(stream));
-
-            switch (stream.PeekChar())
+            switch (reader.PeekChar())
             {
                 case '0':
                 case '1':
@@ -148,94 +68,71 @@ namespace BencodeNET.Parsing
                 case '6':
                 case '7':
                 case '8':
-                case '9': return Parse<BString>(stream);
-                case 'i': return Parse<BNumber>(stream);
-                case 'l': return Parse<BList>(stream);
-                case 'd': return Parse<BDictionary>(stream);
+                case '9': return Parse<BString>(reader);
+                case 'i': return Parse<BNumber>(reader);
+                case 'l': return Parse<BList>(reader);
+                case 'd': return Parse<BDictionary>(reader);
+                case default(char): return null;
             }
 
-            throw InvalidBencodeException<IBObject>.InvalidBeginningChar(stream.PeekChar(), stream.Position);
+            throw InvalidBencodeException<IBObject>.InvalidBeginningChar(reader.PeekChar(), reader.Position);
         }
 
         /// <summary>
-        /// Parses a bencoded file into an <see cref="IBObject"/>.
-        /// </summary>
-        /// <param name="filePath">The path to the file to parse.</param>
-        /// <returns>The parsed object.</returns>
-        public IBObject Parse(string filePath)
-        {
-            using (var stream = File.OpenRead(filePath))
-            {
-                return Parse(stream);
-            }
-        }
-
-        /// <summary>
-        /// Parses a bencoded string into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
+        /// Parse an <see cref="IBObject"/> of type <typeparamref name="T"/> from the reader.
         /// </summary>
         /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
-        /// <param name="bencodedString">The bencoded string to parse.</param>
-        /// <returns>The parsed object.</returns>
-        public T ParseString<T>(string bencodedString) where T : class, IBObject
-        {
-            using (var stream = bencodedString.AsStream(Encoding))
-            {
-                return Parse<T>(stream);
-            }
-        }
-
-        /// <summary>
-        /// Parses a bencoded array of bytes into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
-        /// </summary>
-        /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
-        /// <param name="bytes">The bencoded bytes to parse.</param>
-        /// <returns>The parsed object.</returns>
-        public T Parse<T>(byte[] bytes) where T : class, IBObject
-        {
-            using (var stream = new MemoryStream(bytes))
-            {
-                return Parse<T>(stream);
-            }
-        }
-
-        /// <summary>
-        /// Parses a stream into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
-        /// </summary>
-        /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
-        /// <param name="stream">The bencoded string to parse.</param>
-        /// <returns>The parsed object.</returns>
-        public T Parse<T>(Stream stream) where T : class, IBObject
-        {
-            return Parse<T>(new BencodeStream(stream));
-        }
-
-        /// <summary>
-        /// Parses a <see cref="BencodeStream"/> into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
-        /// </summary>
-        /// <typeparam name="T">The type of <see cref="IBObject"/> to parse as.</typeparam>
-        /// <param name="stream">The bencoded string to parse.</param>
-        /// <returns>The parsed object.</returns>
-        public T Parse<T>(BencodeStream stream) where T : class, IBObject
+        public virtual T Parse<T>(BencodeReader reader) where T : class, IBObject
         {
             var parser = Parsers.Get<T>();
 
             if (parser == null)
-                throw new BencodeException($"Missing parser for the type '{typeof(T).FullName}'. Stream position: {stream.Position}");
+                throw new BencodeException($"Missing parser for the type '{typeof(T).FullName}'. Stream position: {reader.Position}");
 
-            return parser.Parse(stream);
+            return parser.Parse(reader);
         }
 
         /// <summary>
-        /// Parses a bencoded file into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
+        /// Parse an <see cref="IBObject"/> from the <see cref="PipeBencodeReader"/>.
         /// </summary>
-        /// <param name="filePath">The path to the file to parse.</param>
-        /// <returns>The parsed object.</returns>
-        public T Parse<T>(string filePath) where T : class, IBObject
+        public virtual async ValueTask<IBObject> ParseAsync(PipeBencodeReader pipeReader, CancellationToken cancellationToken = default)
         {
-            using (var stream = File.OpenRead(filePath))
+            if (pipeReader == null) throw new ArgumentNullException(nameof(pipeReader));
+
+            switch (await pipeReader.PeekCharAsync(cancellationToken).ConfigureAwait(false))
             {
-                return Parse<T>(stream);
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9': return await ParseAsync<BString>(pipeReader, cancellationToken).ConfigureAwait(false);
+                case 'i': return await ParseAsync<BNumber>(pipeReader, cancellationToken).ConfigureAwait(false);
+                case 'l': return await ParseAsync<BList>(pipeReader, cancellationToken).ConfigureAwait(false);
+                case 'd': return await ParseAsync<BDictionary>(pipeReader, cancellationToken).ConfigureAwait(false);
+                case default(char): return null;
             }
+
+            throw InvalidBencodeException<IBObject>.InvalidBeginningChar(
+                await pipeReader.PeekCharAsync(cancellationToken).ConfigureAwait(false),
+                pipeReader.Position);
+        }
+
+        /// <summary>
+        /// Parse an <see cref="IBObject"/> of type <typeparamref name="T"/> from the <see cref="PipeBencodeReader"/>.
+        /// </summary>
+        public virtual async ValueTask<T> ParseAsync<T>(PipeBencodeReader pipeReader, CancellationToken cancellationToken = default) where T : class, IBObject
+        {
+            var parser = Parsers.Get<T>();
+
+            if (parser == null)
+                throw new BencodeException($"Missing parser for the type '{typeof(T).FullName}'. Stream position: {pipeReader.Position}");
+
+            return await parser.ParseAsync(pipeReader, cancellationToken).ConfigureAwait(false);
         }
     }
 }

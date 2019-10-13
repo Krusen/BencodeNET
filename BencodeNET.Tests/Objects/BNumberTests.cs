@@ -1,5 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.IO.Pipelines;
+using System.Text;
+using System.Threading.Tasks;
 using BencodeNET.Objects;
 using FluentAssertions;
 using Xunit;
@@ -73,6 +76,8 @@ namespace BencodeNET.Tests.Objects
             hash1.Should().Be(hash2);
         }
 
+        #region Encode
+
         [Theory]
         [InlineAutoMockedData(1)]
         [InlineAutoMockedData(10)]
@@ -124,7 +129,7 @@ namespace BencodeNET.Tests.Objects
         }
 
         [Fact]
-        public void CanEnodeToStream()
+        public void CanEncodeToStream()
         {
             var bnumber = new BNumber(42);
 
@@ -136,6 +141,19 @@ namespace BencodeNET.Tests.Objects
                 stream.AsString().Should().Be("i42e");
             }
         }
+
+        [Fact]
+        public void CanEncodeAsBytes()
+        {
+            var bnumber = new BNumber(42);
+            var expected = Encoding.ASCII.GetBytes("i42e");
+
+            var bytes = bnumber.EncodeAsBytes();
+
+            bytes.Should().BeEquivalentTo(expected);
+        }
+
+        #endregion
 
         [Fact]
         public void ToString_SameAsLong()
@@ -158,6 +176,8 @@ namespace BencodeNET.Tests.Objects
 
             str1.Should().Be(str2);
         }
+
+        #region Casts
 
         [Fact]
         public void CanCastFromInt()
@@ -312,6 +332,54 @@ namespace BencodeNET.Tests.Objects
             BNumber bnumber = null;
             Action action = () => { var b = (bool) bnumber; };
             action.Should().Throw<InvalidCastException>();
+        }
+
+        #endregion
+
+        [Fact]
+        public void GetSizeInBytes()
+        {
+            var bnumber = new BNumber(42);
+            bnumber.GetSizeInBytes().Should().Be(4);
+        }
+
+        [Fact]
+        public async Task WriteToPipeWriter()
+        {
+            var bnumber = new BNumber(1234);
+            var (reader, writer) = new Pipe();
+
+            bnumber.EncodeTo(writer);
+            await writer.FlushAsync();
+            reader.TryRead(out var readResult);
+
+            var result = Encoding.UTF8.GetString(readResult.Buffer.First.Span.ToArray());
+            result.Should().Be("i1234e");
+        }
+
+        [Fact]
+        public async Task WriteToPipeWriterAsync()
+        {
+            var bnumber = new BNumber(1234);
+            var (reader, writer) = new Pipe();
+
+            await bnumber.EncodeToAsync(writer);
+            reader.TryRead(out var readResult);
+
+            var result = Encoding.UTF8.GetString(readResult.Buffer.First.Span.ToArray());
+            result.Should().Be("i1234e");
+        }
+
+        [Fact]
+        public async Task WriteToStreamAsync()
+        {
+            var bnumber = new BNumber(1234);
+
+            var ms = new MemoryStream();
+            await bnumber.EncodeToAsync(ms);
+
+            var result = Encoding.UTF8.GetString(ms.ToArray());
+            result.Should().Be("i1234e");
         }
     }
 }

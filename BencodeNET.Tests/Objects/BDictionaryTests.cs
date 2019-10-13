@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Pipelines;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using BencodeNET.Objects;
 using FluentAssertions;
 using Xunit;
@@ -10,15 +14,14 @@ namespace BencodeNET.Tests.Objects
     public class BDictionaryTests
     {
         [Fact]
-        public void Add_NullValue_ThrowsArgumentNullException()
+        public void Add_NullStringValue_ResultsInEmptyBString()
         {
-            var dict = new BDictionary();
-            Action action = () => dict.Add("key", null);
-            action.Should().Throw<ArgumentNullException>();
+            var dict = new BDictionary {{"key", (string) null}};
+            dict.Get<BString>("key").Value.ToArray().Should().BeEmpty();
         }
 
         [Fact]
-        public void Add_NullIBobjectValue_ThrowsArgumentNullException()
+        public void Add_NullIBObjectValue_ThrowsArgumentNullException()
         {
             var dict = new BDictionary();
             Action action = () => dict.Add("key", (IBObject)null);
@@ -40,6 +43,8 @@ namespace BencodeNET.Tests.Objects
             Action action = () => dict["key"] = null;
             action.Should().Throw<ArgumentNullException>();
         }
+
+        #region MergeWith
 
         [Fact]
         public void MergeWith_StringReplacesExistingKey()
@@ -226,6 +231,10 @@ namespace BencodeNET.Tests.Objects
             dict1.Get<BDictionary>("main2").Should().HaveCount(1).And.ContainKeys("key2");
         }
 
+        #endregion
+
+        #region SequenceEqual
+
         [Fact]
         public void SequenceEqual_WithKeysAddedInSameOrder_AreEqual()
         {
@@ -298,6 +307,10 @@ namespace BencodeNET.Tests.Objects
             bdict1.SequenceEqual(bdict2).Should().BeFalse();
         }
 
+        #endregion
+
+        #region Encode
+
         [Fact]
         public void CanEncode_Simple()
         {
@@ -365,6 +378,64 @@ namespace BencodeNET.Tests.Objects
 
             bencode.Should()
                 .Be("d6:A Listl3:foo3:bari123ed9:more spam9:more eggsee6:foobard7:numbersli1ei2ei3eee4:spam3:egge");
+        }
+
+        #endregion
+
+        [Fact]
+        public void GetSizeInBytes()
+        {
+            var bdict = new BDictionary
+            {
+                // 6 + 5
+                {"spam", "egg"},
+                // 6 + 3 + 3 + 3 + 3 (+ 2)
+                { "list", new BList { 1, 2, 3} },
+                // 5 + 5
+                { "str", "abc" },
+                // 5 + 4
+                { "num", 42 }
+            }; // 2
+            bdict.GetSizeInBytes().Should().Be(49);
+        }
+
+        [Fact]
+        public async Task WriteToPipeWriter()
+        {
+            var dict = new BDictionary { { "key", "value" } };
+            var (reader, writer) = new Pipe();
+
+            dict.EncodeTo(writer);
+            await writer.FlushAsync();
+            reader.TryRead(out var readResult);
+
+            var result = Encoding.UTF8.GetString(readResult.Buffer.First.Span.ToArray());
+            result.Should().Be("d3:key5:valuee");
+        }
+
+        [Fact]
+        public async Task WriteToPipeWriterAsync()
+        {
+            var dict = new BDictionary { { "key", "value" } };
+            var (reader, writer) = new Pipe();
+
+            await dict.EncodeToAsync(writer);
+            reader.TryRead(out var readResult);
+
+            var result = Encoding.UTF8.GetString(readResult.Buffer.First.Span.ToArray());
+            result.Should().Be("d3:key5:valuee");
+        }
+
+        [Fact]
+        public async Task WriteToStreamAsync()
+        {
+            var dict = new BDictionary { { "key", "value" } };
+
+            var stream = new MemoryStream();
+            await dict.EncodeToAsync(stream);
+
+            var result = Encoding.UTF8.GetString(stream.ToArray());
+            result.Should().Be("d3:key5:valuee");
         }
     }
 }

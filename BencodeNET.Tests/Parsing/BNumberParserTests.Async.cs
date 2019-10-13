@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using BencodeNET.Exceptions;
 using BencodeNET.Objects;
 using BencodeNET.Parsing;
@@ -9,13 +10,6 @@ namespace BencodeNET.Tests.Parsing
 {
     public partial class BNumberParserTests
     {
-        private BNumberParser Parser { get; }
-
-        public BNumberParserTests()
-        {
-            Parser = new BNumberParser();
-        }
-
         [Theory]
         [InlineData("i1e", 1)]
         [InlineData("i2e", 2)]
@@ -23,16 +17,16 @@ namespace BencodeNET.Tests.Parsing
         [InlineData("i42e", 42)]
         [InlineData("i100e", 100)]
         [InlineData("i1234567890e", 1234567890)]
-        public void CanParsePositive(string bencode, int value)
+        public async Task CanParsePositiveAsync(string bencode, int value)
         {
-            var bnumber = Parser.ParseString(bencode);
+            var bnumber = await Parser.ParseStringAsync(bencode);
             bnumber.Should().Be(value);
         }
 
         [Fact]
-        public void CanParseZero()
+        public async Task CanParseZeroAsync()
         {
-            var bnumber = Parser.ParseString("i0e");
+            var bnumber = await Parser.ParseStringAsync("i0e");
             bnumber.Should().Be(0);
         }
 
@@ -43,18 +37,18 @@ namespace BencodeNET.Tests.Parsing
         [InlineData("i-42e", -42)]
         [InlineData("i-100e", -100)]
         [InlineData("i-1234567890e", -1234567890)]
-        public void CanParseNegative(string bencode, int value)
+        public async Task CanParseNegativeAsync(string bencode, int value)
         {
-            var bnumber = Parser.ParseString(bencode);
+            var bnumber = await Parser.ParseStringAsync(bencode);
             bnumber.Should().Be(value);
         }
 
         [Theory]
         [InlineData("i9223372036854775807e", 9223372036854775807)]
         [InlineData("i-9223372036854775808e", -9223372036854775808)]
-        public void CanParseInt64(string bencode, long value)
+        public async Task CanParseInt64Async(string bencode, long value)
         {
-            var bnumber = Parser.ParseString(bencode);
+            var bnumber = await Parser.ParseStringAsync(bencode);
             bnumber.Should().Be(value);
         }
 
@@ -63,18 +57,18 @@ namespace BencodeNET.Tests.Parsing
         [InlineData("i012e")]
         [InlineData("i01234567890e")]
         [InlineData("i00001e")]
-        public void LeadingZeros_ThrowsInvalidBencodeException(string bencode)
+        public void LeadingZeros_ThrowsInvalidBencodeExceptionAsync(string bencode)
         {
-            Action action = () => Parser.ParseString(bencode);
+            Func<Task> action = async () => await Parser.ParseStringAsync(bencode);
             action.Should().Throw<InvalidBencodeException<BNumber>>()
                 .WithMessage("*Leading '0's are not valid.*")
                 .Which.StreamPosition.Should().Be(0);
         }
 
         [Fact]
-        public void MinusZero_ThrowsInvalidBencodeException()
+        public void MinusZero_ThrowsInvalidBencodeExceptionAsync()
         {
-            Action action = () => Parser.ParseString("i-0e");
+            Func<Task> action = async () => await Parser.ParseStringAsync("i-0e");
             action.Should().Throw<InvalidBencodeException<BNumber>>()
                 .WithMessage("*'-0' is not a valid number.*")
                 .Which.StreamPosition.Should().Be(0);
@@ -83,9 +77,9 @@ namespace BencodeNET.Tests.Parsing
         [Theory]
         [InlineData("i12")]
         [InlineData("i123")]
-        public void MissingEndChar_ThrowsInvalidBencodeException(string bencode)
+        public void MissingEndChar_ThrowsInvalidBencodeExceptionAsync(string bencode)
         {
-            Action action = () => Parser.ParseString(bencode);
+            Func<Task> action = async () => await Parser.ParseStringAsync(bencode);
             action.Should().Throw<InvalidBencodeException<BNumber>>()
                 .WithMessage("*Missing end character of object.*")
                 .Which.StreamPosition.Should().Be(0);
@@ -98,18 +92,18 @@ namespace BencodeNET.Tests.Parsing
         [InlineData("l42e")]
         [InlineData("100e")]
         [InlineData("1234567890e")]
-        public void InvalidFirstChar_ThrowsInvalidBencodeException(string bencode)
+        public void InvalidFirstChar_ThrowsInvalidBencodeExceptionAsync(string bencode)
         {
-            Action action = () => Parser.ParseString(bencode);
+            Func<Task> action = async () => await Parser.ParseStringAsync(bencode);
             action.Should().Throw<InvalidBencodeException<BNumber>>()
                 .WithMessage("*Unexpected character. Expected 'i'*")
                 .Which.StreamPosition.Should().Be(0);
         }
 
         [Fact]
-        public void JustNegativeSign_ThrowsInvalidBencodeException()
+        public void JustNegativeSign_ThrowsInvalidBencodeExceptionAsync()
         {
-            Action action = () => Parser.ParseString("i-e");
+            Func<Task> action = async () => await Parser.ParseStringAsync("i-e");
             action.Should().Throw<InvalidBencodeException<BNumber>>()
                 .WithMessage("*It contains no digits.*")
                 .Which.StreamPosition.Should().Be(0);
@@ -120,9 +114,9 @@ namespace BencodeNET.Tests.Parsing
         [InlineData("i--42e")]
         [InlineData("i---100e")]
         [InlineData("i----1234567890e")]
-        public void MoreThanOneNegativeSign_ThrowsInvalidBencodeException(string bencode)
+        public void MoreThanOneNegativeSign_ThrowsInvalidBencodeExceptionAsync(string bencode)
         {
-            Action action = () => Parser.ParseString(bencode);
+            Func<Task> action = async () => await Parser.ParseStringAsync(bencode);
             action.Should().Throw<InvalidBencodeException<BNumber>>()
                 .WithMessage("*The value '*' is not a valid number.*")
                 .Which.StreamPosition.Should().Be(0);
@@ -134,9 +128,9 @@ namespace BencodeNET.Tests.Parsing
         [InlineData("i.e")]
         [InlineData("i42.e")]
         [InlineData("i42ae")]
-        public void NonDigit_ThrowsInvalidBencodeException(string bencode)
+        public void NonDigit_ThrowsInvalidBencodeExceptionAsync(string bencode)
         {
-            Action action = () => Parser.ParseString(bencode);
+            Func<Task> action = async () => await Parser.ParseStringAsync(bencode);
             action.Should().Throw<InvalidBencodeException<BNumber>>()
                 .WithMessage("*The value '*' is not a valid number.*")
                 .Which.StreamPosition.Should().Be(0);
@@ -144,35 +138,23 @@ namespace BencodeNET.Tests.Parsing
 
 
         [Theory]
-        [InlineData("")]
-        [InlineData("i")]
-        [InlineData("ie")]
-        public void BelowMinimumLength_ThrowsInvalidBencodeException(string bencode)
+        [InlineData("", "reached end of stream")]
+        [InlineData("i", "contains no digits")]
+        [InlineData("ie", "contains no digits")]
+        public void BelowMinimumLength_ThrowsInvalidBencodeExceptionAsync(string bencode, string exceptionMessage)
         {
-            Action action = () => Parser.ParseString(bencode);
+            Func<Task> action = async () => await Parser.ParseStringAsync(bencode);
             action.Should().Throw<InvalidBencodeException<BNumber>>()
-                .WithMessage("*Invalid length.*")
-                .Which.StreamPosition.Should().Be(0);
-        }
-
-        [Theory]
-        [InlineData("")]
-        [InlineData("i")]
-        [InlineData("ie")]
-        public void BelowMinimumLength_WhenStreamWithoutLengthSupport_ThrowsInvalidException(string bencode)
-        {
-            var stream = new LengthNotSupportedStream(bencode);
-            Action action = () => Parser.Parse(stream);
-            action.Should().Throw<InvalidBencodeException<BNumber>>()
+                .WithMessage($"*{exceptionMessage}*")
                 .Which.StreamPosition.Should().Be(0);
         }
 
         [Theory]
         [InlineData("i9223372036854775808e")]
         [InlineData("i-9223372036854775809e")]
-        public void LargerThanInt64_ThrowsUnsupportedException(string bencode)
+        public void LargerThanInt64_ThrowsUnsupportedExceptionAsync(string bencode)
         {
-            Action action = () => Parser.ParseString(bencode);
+            Func<Task> action = async () => await Parser.ParseStringAsync(bencode);
             action.Should().Throw<UnsupportedBencodeException<BNumber>>()
                 .WithMessage("*The value '*' is not a valid long (Int64)*")
                 .Which.StreamPosition.Should().Be(0);
@@ -182,9 +164,9 @@ namespace BencodeNET.Tests.Parsing
         [InlineData("i12345678901234567890e")]
         [InlineData("i123456789012345678901e")]
         [InlineData("i123456789012345678901234567890e")]
-        public void LongerThanMaxDigits19_ThrowsUnsupportedException(string bencode)
+        public void LongerThanMaxDigits19_ThrowsUnsupportedExceptionAsync(string bencode)
         {
-            Action action = () => Parser.ParseString(bencode);
+            Func<Task> action = async () => await Parser.ParseStringAsync(bencode);
             action.Should().Throw<UnsupportedBencodeException<BNumber>>()
                 .WithMessage("*The number '*' has more than 19 digits and cannot be stored as a long*")
                 .Which.StreamPosition.Should().Be(0);

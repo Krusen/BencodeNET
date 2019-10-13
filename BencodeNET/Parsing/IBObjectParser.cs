@@ -1,4 +1,8 @@
 ﻿using System.IO;
+using System.IO.Pipelines;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using BencodeNET.IO;
 using BencodeNET.Objects;
 
@@ -10,18 +14,9 @@ namespace BencodeNET.Parsing
     public interface IBObjectParser
     {
         /// <summary>
-        /// Parses a bencoded string into an <see cref="IBObject"/>.
+        /// The encoding used for parsing.
         /// </summary>
-        /// <param name="bencodedString">The bencoded string to parse.</param>
-        /// <returns>The parsed object.</returns>
-        IBObject ParseString(string bencodedString);
-
-        /// <summary>
-        /// Parses a byte array into an <see cref="IBObject"/>.
-        /// </summary>
-        /// <param name="bytes">The bytes to parse.</param>
-        /// <returns>The parsed object.</returns>
-        IBObject Parse(byte[] bytes);
+        Encoding Encoding { get; }
 
         /// <summary>
         /// Parses a stream into an <see cref="IBObject"/>.
@@ -31,32 +26,32 @@ namespace BencodeNET.Parsing
         IBObject Parse(Stream stream);
 
         /// <summary>
-        /// Parses a bencoded stream into an <see cref="IBObject"/>.
+        /// Parses an <see cref="IBObject"/> from a <see cref="BencodeReader"/>.
         /// </summary>
-        /// <param name="stream">The bencoded stream to parse.</param>
+        IBObject Parse(BencodeReader reader);
+
+        /// <summary>
+        /// Parses an <see cref="IBObject"/> from a <see cref="PipeReader"/>.
+        /// </summary>
+        /// <param name="pipeReader">The pipe reader to read from.</param>
+        /// <param name="cancellationToken"></param>
         /// <returns>The parsed object.</returns>
-        IBObject Parse(BencodeStream stream);
+        ValueTask<IBObject> ParseAsync(PipeReader pipeReader, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Parses an <see cref="IBObject"/> from a <see cref="PipeBencodeReader"/>.
+        /// </summary>
+        /// <param name="pipeReader">The pipe reader to read from.</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>The parsed object.</returns>
+        ValueTask<IBObject> ParseAsync(PipeBencodeReader pipeReader, CancellationToken cancellationToken = default);
     }
 
     /// <summary>
     /// A contract for parsing bencode from different sources as type <typeparamref name="T"/> inheriting <see cref="IBObject"/>.
     /// </summary>
-    public interface IBObjectParser<out T> : IBObjectParser where T : IBObject
+    public interface IBObjectParser<T> : IBObjectParser where T : IBObject
     {
-        /// <summary>
-        /// Parses a bencoded string into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
-        /// </summary>
-        /// <param name="bencodedString">The bencoded string to parse.</param>
-        /// <returns>The parsed object.</returns>
-        new T ParseString(string bencodedString);
-
-        /// <summary>
-        /// Parses a byte array into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
-        /// </summary>
-        /// <param name="bytes">The bytes to parse.</param>
-        /// <returns>The parsed object.</returns>
-        new T Parse(byte[] bytes);
-
         /// <summary>
         /// Parses a stream into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
         /// </summary>
@@ -65,10 +60,24 @@ namespace BencodeNET.Parsing
         new T Parse(Stream stream);
 
         /// <summary>
-        /// Parses a bencoded stream into an <see cref="IBObject"/> of type <typeparamref name="T"/>.
+        /// Parses an <see cref="IBObject"/> of type <typeparamref name="T"/> from a <see cref="BencodeReader"/>.
         /// </summary>
-        /// <param name="stream">The bencoded stream to parse.</param>
+        new T Parse(BencodeReader reader);
+
+        /// <summary>
+        /// Parses an <see cref="IBObject"/> of type <typeparamref name="T"/> from a <see cref="PipeReader"/>.
+        /// </summary>
+        /// <param name="pipeReader">The pipe reader to read from.</param>
+        /// <param name="cancellationToken"></param>
         /// <returns>The parsed object.</returns>
-        new T Parse(BencodeStream stream);
+        new ValueTask<T> ParseAsync(PipeReader pipeReader, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Parses an <see cref="IBObject"/> of type <typeparamref name="T"/> from a <see cref="PipeBencodeReader"/>.
+        /// </summary>
+        /// <param name="pipeReader">The pipe reader to read from.</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>The parsed object.</returns>
+        new ValueTask<T> ParseAsync(PipeBencodeReader pipeReader, CancellationToken cancellationToken = default);
     }
 }

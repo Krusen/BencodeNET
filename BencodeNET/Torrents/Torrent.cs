@@ -1,12 +1,15 @@
-﻿using BencodeNET.Objects;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Pipelines;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using BencodeNET.Exceptions;
 using BencodeNET.IO;
+using BencodeNET.Objects;
 
 namespace BencodeNET.Torrents
 {
@@ -157,6 +160,7 @@ namespace BencodeNET.Torrents
         public virtual long PieceSize { get; set; }
 
         // TODO: Split into list of 20-byte hashes and rename to something appropriate?
+
         /// <summary>
         /// A concatenation of all 20-byte SHA1 hash values (one for each piece).
         /// Use <see cref="PiecesAsHexString"/> to get/set this value as a hex string instead.
@@ -329,15 +333,33 @@ namespace BencodeNET.Torrents
             return TorrentUtil.CreateMagnetLink(this, options);
         }
 
+        /// <inheritdoc/>
+        public override int GetSizeInBytes() => ToBDictionary().GetSizeInBytes();
+
         /// <summary>
         /// Encodes the torrent and writes it to the stream.
         /// </summary>
         /// <param name="stream"></param>
-        /// <returns></returns>
-        protected override void EncodeObject(BencodeStream stream)
+        protected override void EncodeObject(Stream stream)
         {
             var torrent = ToBDictionary();
             torrent.EncodeTo(stream);
+        }
+
+        /// <summary>
+        /// Encodes the torrent and writes it to the <see cref="PipeWriter"/>.
+        /// </summary>
+        protected override void EncodeObject(PipeWriter writer)
+        {
+            var torrent = ToBDictionary();
+            torrent.EncodeTo(writer);
+        }
+
+        /// <inheritdoc/>
+        protected override ValueTask<FlushResult> EncodeObjectAsync(PipeWriter writer, CancellationToken cancellationToken)
+        {
+            var torrent = ToBDictionary();
+            return torrent.EncodeToAsync(writer, cancellationToken);
         }
 
 #pragma warning disable 1591

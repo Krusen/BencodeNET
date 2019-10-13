@@ -1,6 +1,7 @@
 ﻿using System.IO;
-using System.Text;
-using BencodeNET.IO;
+using System.IO.Pipelines;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BencodeNET.Objects
 {
@@ -13,43 +14,9 @@ namespace BencodeNET.Objects
         { }
 
         /// <summary>
-        /// Encodes the object and returns the result as a string using <see cref="Encoding.UTF8"/>.
+        /// Calculates the (encoded) size of the object in bytes.
         /// </summary>
-        /// <returns>
-        /// The object bencoded and converted to a string using <see cref="Encoding.UTF8"/>.
-        /// </returns>
-        public virtual string EncodeAsString()
-        {
-            return EncodeAsString(Encoding.UTF8);
-        }
-
-        /// <summary>
-        /// Encodes the object and returns the result as a string using the specified encoding.
-        /// </summary>
-        /// <param name="encoding">The encoding used to convert the encoded bytes to a string.</param>
-        /// <returns>
-        /// The object bencoded and converted to a string using the specified encoding.
-        /// </returns>
-        public virtual string EncodeAsString(Encoding encoding)
-        {
-            using (var stream = EncodeTo(new MemoryStream()))
-            {
-                return encoding.GetString(stream.ToArray());
-            }
-        }
-
-        /// <summary>
-        /// Encodes the object and returns the raw bytes.
-        /// </summary>
-        /// <returns>The raw bytes of the bencoded object.</returns>
-        public virtual byte[] EncodeAsBytes()
-        {
-            using (var stream = new MemoryStream())
-            {
-                EncodeTo(stream);
-                return stream.ToArray();
-            }
-        }
+        public abstract int GetSizeInBytes();
 
         /// <summary>
         /// Writes the object as bencode to the specified stream.
@@ -59,31 +26,41 @@ namespace BencodeNET.Objects
         /// <returns>The used stream.</returns>
         public TStream EncodeTo<TStream>(TStream stream) where TStream : Stream
         {
-            EncodeObject(new BencodeStream(stream));
-            return stream;
-        }
-
-        /// <summary>
-        /// Writes the object as bencode to the specified stream.
-        /// </summary>
-        /// <param name="stream">The stream to write to.</param>
-        /// <returns>The used stream.</returns>
-        public BencodeStream EncodeTo(BencodeStream stream)
-        {
+            var size = GetSizeInBytes();
+            stream.TrySetLength(size);
             EncodeObject(stream);
             return stream;
         }
 
         /// <summary>
-        /// Writes the object as bencode to the specified file path.
+        /// Writes the object as bencode to the specified <see cref="PipeWriter"/> without flushing the writer,
+        /// you should do that manually.
         /// </summary>
-        /// <param name="filePath">The file path to write the encoded object to.</param>
-        public virtual void EncodeTo(string filePath)
+        /// <param name="writer">The writer to write to.</param>
+        public void EncodeTo(PipeWriter writer)
         {
-            using (var stream = File.OpenWrite(filePath))
-            {
-                EncodeTo(stream);
-            }
+            EncodeObject(writer);
+        }
+
+        /// <summary>
+        /// Writes the object as bencode to the specified <see cref="PipeWriter"/> and flushes the writer afterwards.
+        /// </summary>
+        /// <param name="writer">The writer to write to.</param>
+        /// <param name="cancellationToken"></param>
+        public ValueTask<FlushResult> EncodeToAsync(PipeWriter writer, CancellationToken cancellationToken = default)
+        {
+            return EncodeObjectAsync(writer, cancellationToken);
+        }
+
+        /// <summary>
+        /// Writes the object asynchronously as bencode to the specified <see cref="Stream"/> using a <see cref="PipeWriter"/>.
+        /// </summary>
+        /// <param name="stream">The stream to write to.</param>
+        /// <param name="writerOptions">The options for the <see cref="PipeWriter"/>.</param>
+        /// <param name="cancellationToken"></param>
+        public ValueTask<FlushResult> EncodeToAsync(Stream stream, StreamPipeWriterOptions writerOptions = null, CancellationToken cancellationToken = default)
+        {
+            return EncodeObjectAsync(PipeWriter.Create(stream, writerOptions), cancellationToken);
         }
 
         /// <summary>
@@ -91,7 +68,24 @@ namespace BencodeNET.Objects
         /// underlying value to bencode and write it to the stream.
         /// </summary>
         /// <param name="stream">The stream to encode to.</param>
-        protected abstract void EncodeObject(BencodeStream stream);
+        protected abstract void EncodeObject(Stream stream);
+
+        /// <summary>
+        /// Implementations of this method should encode their underlying value to bencode and write it to the <see cref="PipeWriter"/>.
+        /// </summary>
+        /// <param name="writer">The writer to encode to.</param>
+        protected abstract void EncodeObject(PipeWriter writer);
+
+        /// <summary>
+        /// Encodes and writes the underlying value to the <see cref="PipeWriter"/> and flushes the writer afterwards.
+        /// </summary>
+        /// <param name="writer">The writer to encode to.</param>
+        /// <param name="cancellationToken"></param>
+        protected virtual ValueTask<FlushResult> EncodeObjectAsync(PipeWriter writer, CancellationToken cancellationToken)
+        {
+            EncodeObject(writer);
+            return writer.FlushAsync(cancellationToken);
+        }
     }
 
     /// <summary>

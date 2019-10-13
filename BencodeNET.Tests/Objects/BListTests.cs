@@ -1,6 +1,9 @@
 ﻿using System;
+using System.IO;
+using System.IO.Pipelines;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using BencodeNET.Objects;
 using FluentAssertions;
 using Xunit;
@@ -73,6 +76,8 @@ namespace BencodeNET.Tests.Objects
             blist1.SequenceEqual(blist2).Should().BeFalse();
         }
 
+        #region Encode
+
         [Fact]
         public void CanEncode_Simple()
         {
@@ -138,6 +143,10 @@ namespace BencodeNET.Tests.Objects
             bencode.Should().Be("l4:spami666el3:foo3:bari123ed9:more spam9:more eggsee6:foobard7:numbersli1ei2ei3eeee");
         }
 
+        #endregion
+
+        #region AsType/AsStrings/AsNumbers
+
         [Fact]
         public void AsType_ConvertsToListOfType()
         {
@@ -192,6 +201,54 @@ namespace BencodeNET.Tests.Objects
             var blist = new BList {1, 2, "3"};
             Action action = () => blist.AsNumbers();
             action.Should().Throw<InvalidCastException>();
+        }
+
+        #endregion
+
+        [Fact]
+        public void GetSizeInBytes()
+        {
+            var blist = new BList{1, 2, "abc"};
+            blist.GetSizeInBytes().Should().Be(13);
+        }
+
+        [Fact]
+        public async Task WriteToPipeWriter()
+        {
+            var blist = new BList { 1, 2, "abc" };
+            var (reader, writer) = new Pipe();
+
+            blist.EncodeTo(writer);
+            await writer.FlushAsync();
+            reader.TryRead(out var readResult);
+
+            var result = Encoding.UTF8.GetString(readResult.Buffer.First.Span.ToArray());
+            result.Should().Be("li1ei2e3:abce");
+        }
+
+        [Fact]
+        public async Task WriteToPipeWriterAsync()
+        {
+            var blist = new BList { 1, 2, "abc" };
+            var (reader, writer) = new Pipe();
+
+            await blist.EncodeToAsync(writer);
+            reader.TryRead(out var readResult);
+
+            var result = Encoding.UTF8.GetString(readResult.Buffer.First.Span.ToArray());
+            result.Should().Be("li1ei2e3:abce");
+        }
+
+        [Fact]
+        public async Task WriteToStreamAsync()
+        {
+            var blist = new BList { 1, 2, "abc" };
+
+            var stream = new MemoryStream();
+            await blist.EncodeToAsync(stream);
+
+            var result = Encoding.UTF8.GetString(stream.ToArray());
+            result.Should().Be("li1ei2e3:abce");
         }
     }
 }

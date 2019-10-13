@@ -1,5 +1,7 @@
-﻿using System;
+using System;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using BencodeNET.Exceptions;
 using BencodeNET.IO;
 using BencodeNET.Objects;
@@ -22,9 +24,7 @@ namespace BencodeNET.Parsing
         /// <param name="bencodeParser">The parser used for parsing contained objects.</param>
         public BListParser(IBencodeParser bencodeParser)
         {
-            if (bencodeParser == null) throw new ArgumentNullException(nameof(bencodeParser));
-
-            BencodeParser = bencodeParser;
+            BencodeParser = bencodeParser ?? throw new ArgumentNullException(nameof(bencodeParser));
         }
 
         /// <summary>
@@ -35,39 +35,71 @@ namespace BencodeNET.Parsing
         /// <summary>
         /// The encoding used for parsing.
         /// </summary>
-        protected override Encoding Encoding => BencodeParser.Encoding;
+        public override Encoding Encoding => BencodeParser.Encoding;
 
         /// <summary>
-        /// Parses the next <see cref="BList"/> from the stream.
+        /// Parses the next <see cref="BList"/> from the reader.
         /// </summary>
-        /// <param name="stream">The stream to parse from.</param>
+        /// <param name="reader">The reader to parse from.</param>
         /// <returns>The parsed <see cref="BList"/>.</returns>
-        /// <exception cref="InvalidBencodeException{BList}">Invalid bencode</exception>
-        public override BList Parse(BencodeStream stream)
+        /// <exception cref="InvalidBencodeException{BList}">Invalid bencode.</exception>
+        public override BList Parse(BencodeReader reader)
         {
-            if (stream == null) throw new ArgumentNullException(nameof(stream));
+            if (reader == null) throw new ArgumentNullException(nameof(reader));
 
-            if (stream.Length < MinimumLength)
-                throw InvalidBencodeException<BList>.BelowMinimumLength(MinimumLength, stream.Length, stream.Position);
+            if (reader.Length < MinimumLength)
+                throw InvalidBencodeException<BList>.BelowMinimumLength(MinimumLength, reader.Length.Value, reader.Position);
+
+            var startPosition = reader.Position;
 
             // Lists must start with 'l'
-            if (stream.ReadChar() != 'l')
-                throw InvalidBencodeException<BList>.UnexpectedChar('l', stream.ReadPreviousChar(), stream.Position);
+            if (reader.ReadChar() != 'l')
+                throw InvalidBencodeException<BList>.UnexpectedChar('l', reader.PreviousChar, startPosition);
 
             var list = new BList();
             // Loop until next character is the end character 'e' or end of stream
-            while (stream.Peek() != 'e' && stream.Peek() != -1)
+            while (reader.PeekChar() != 'e' && reader.PeekChar() != default)
             {
                 // Decode next object in stream
-                var bObject = BencodeParser.Parse(stream);
+                var bObject = BencodeParser.Parse(reader);
                 list.Add(bObject);
             }
 
-            if (stream.ReadChar() != 'e')
+            if (reader.ReadChar() != 'e')
+                 throw InvalidBencodeException<BList>.MissingEndChar(startPosition);
+
+            return list;
+        }
+
+        /// <summary>
+        /// Parses the next <see cref="BList"/> from the reader.
+        /// </summary>
+        /// <param name="reader">The reader to parse from.</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>The parsed <see cref="BList"/>.</returns>
+        /// <exception cref="InvalidBencodeException{BList}">Invalid bencode.</exception>
+        public override async ValueTask<BList> ParseAsync(PipeBencodeReader reader, CancellationToken cancellationToken = default)
+        {
+            if (reader == null) throw new ArgumentNullException(nameof(reader));
+
+            var startPosition = reader.Position;
+
+            // Lists must start with 'l'
+            if (await reader.ReadCharAsync(cancellationToken).ConfigureAwait(false) != 'l')
+                throw InvalidBencodeException<BList>.UnexpectedChar('l', reader.PreviousChar, startPosition);
+
+            var list = new BList();
+            // Loop until next character is the end character 'e' or end of stream
+            while (await reader.PeekCharAsync(cancellationToken).ConfigureAwait(false) != 'e' &&
+                   await reader.PeekCharAsync(cancellationToken).ConfigureAwait(false) != default)
             {
-                if (stream.EndOfStream) throw InvalidBencodeException<BList>.MissingEndChar();
-                throw InvalidBencodeException<BList>.InvalidEndChar(stream.ReadPreviousChar(), stream.Position);
+                // Decode next object in stream
+                var bObject = await BencodeParser.ParseAsync(reader, cancellationToken).ConfigureAwait(false);
+                list.Add(bObject);
             }
+
+            if (await reader.ReadCharAsync(cancellationToken).ConfigureAwait(false) != 'e')
+                throw InvalidBencodeException<BList>.MissingEndChar(startPosition);
 
             return list;
         }

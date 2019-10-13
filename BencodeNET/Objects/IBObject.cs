@@ -1,6 +1,7 @@
 ﻿using System.IO;
-using System.Text;
-using BencodeNET.IO;
+using System.IO.Pipelines;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BencodeNET.Objects
 {
@@ -10,27 +11,9 @@ namespace BencodeNET.Objects
     public interface IBObject
     {
         /// <summary>
-        /// Encodes the object and returns the result as a string using <see cref="Encoding.UTF8"/>.
+        /// Calculates the (encoded) size of the object in bytes.
         /// </summary>
-        /// <returns>
-        /// The object bencoded and converted to a string using <see cref="Encoding.UTF8"/>.
-        /// </returns>
-        string EncodeAsString();
-
-        /// <summary>
-        /// Encodes the object and returns the result as a string using the specified encoding.
-        /// </summary>
-        /// <param name="encoding">The encoding used to convert the encoded bytes to a string.</param>
-        /// <returns>
-        /// The object bencoded and converted to a string using the specified encoding.
-        /// </returns>
-        string EncodeAsString(Encoding encoding);
-
-        /// <summary>
-        /// Encodes the object and returns the raw bytes.
-        /// </summary>
-        /// <returns>The raw bytes of the bencoded object.</returns>
-        byte[] EncodeAsBytes();
+        int GetSizeInBytes();
 
         /// <summary>
         /// Writes the object as bencode to the specified stream.
@@ -41,16 +24,25 @@ namespace BencodeNET.Objects
         TStream EncodeTo<TStream>(TStream stream) where TStream : Stream;
 
         /// <summary>
-        /// Writes the object as bencode to the specified stream.
+        /// Writes the object as bencode to the specified <see cref="PipeWriter"/> without flushing the writer,
+        /// you should do that manually.
         /// </summary>
-        /// <param name="stream">The stream to write to.</param>
-        /// <returns>The used stream.</returns>
-        BencodeStream EncodeTo(BencodeStream stream);
+        /// <param name="writer">The writer to write to.</param>
+        void EncodeTo(PipeWriter writer);
 
         /// <summary>
-        /// Writes the object as bencode to the specified file.
+        /// Writes the object as bencode to the specified <see cref="PipeWriter"/> and flushes the writer afterwards.
         /// </summary>
-        /// <param name="filePath">The file path to write the encoded object to.</param>
-        void EncodeTo(string filePath);
+        /// <param name="writer">The writer to write to.</param>
+        /// <param name="cancellationToken"></param>
+        ValueTask<FlushResult> EncodeToAsync(PipeWriter writer, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Writes the object asynchronously as bencode to the specified <see cref="Stream"/> using a <see cref="PipeWriter"/>.
+        /// </summary>
+        /// <param name="stream">The stream to write to.</param>
+        /// <param name="writerOptions">The options for the <see cref="PipeWriter"/>.</param>
+        /// <param name="cancellationToken"></param>
+        ValueTask<FlushResult> EncodeToAsync(Stream stream, StreamPipeWriterOptions writerOptions = null, CancellationToken cancellationToken = default);
     }
 }

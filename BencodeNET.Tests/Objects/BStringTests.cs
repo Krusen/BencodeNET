@@ -1,6 +1,7 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
+using System.IO.Pipelines;
 using System.Text;
+using System.Threading.Tasks;
 using BencodeNET.Objects;
 using FluentAssertions;
 using Xunit;
@@ -10,12 +11,20 @@ namespace BencodeNET.Tests.Objects
     public class BStringTests
     {
         [Fact]
-        public void ConstructorWithNullValue_ThrowsArgumentNullException()
+        public void ConstructorEmpty_ResultsInEmptyValue()
         {
-            Action action = () => new BString((string) null);
-
-            action.Should().Throw<ArgumentNullException>();
+            var bstring = new BString();
+            bstring.Value.ToArray().Should().BeEmpty();
         }
+
+        [Fact]
+        public void ConstructorWithNullValue_ResultsInEmptyValue()
+        {
+            var bstring = new BString((string)null);
+            bstring.Value.ToArray().Should().BeEmpty();
+        }
+
+        #region Equals
 
         [Theory]
         [InlineAutoMockedData("hello world", "hello world")]
@@ -139,12 +148,16 @@ namespace BencodeNET.Tests.Objects
             bstring.GetHashCode().Should().NotBe(otherBString.GetHashCode());
         }
 
+        #endregion
+
         [Fact]
         public void Encoding_DefaultIsUTF8()
         {
             var bstring = new BString("foo");
             bstring.Encoding.Should().Be(Encoding.UTF8);
         }
+
+        #region Encode
 
         [Theory]
         [InlineAutoMockedData("some string", 11)]
@@ -155,6 +168,14 @@ namespace BencodeNET.Tests.Objects
             var bstring = new BString(str);
             var bencode = bstring.EncodeAsString();
             bencode.Should().Be($"{length}:{str}");
+        }
+
+        [Fact]
+        public void CanEncode_NullString()
+        {
+            var bstring = new BString();
+            var bencode = bstring.EncodeAsString();
+            bencode.Should().Be("0:");
         }
 
         [Fact]
@@ -205,6 +226,33 @@ namespace BencodeNET.Tests.Objects
         }
 
         [Fact]
+        public void CanEncodeToStream()
+        {
+            var bstring = new BString("hello world");
+
+            using (var stream = new MemoryStream())
+            {
+                bstring.EncodeTo(stream);
+
+                stream.Length.Should().Be(14);
+                stream.AsString().Should().Be("11:hello world");
+            }
+        }
+
+        [Fact]
+        public void CanEncodeAsBytes()
+        {
+            var bstring = new BString("hello world");
+            var expected = Encoding.ASCII.GetBytes("11:hello world");
+
+            var bytes = bstring.EncodeAsBytes();
+
+            bytes.Should().BeEquivalentTo(expected);
+        }
+
+        #endregion
+
+        [Fact]
         public void ToString_WithoutEncoding_EncodesUsingUTF8()
         {
             var bstring = new BString("æøå äö èéê ñ", Encoding.UTF8);
@@ -222,17 +270,56 @@ namespace BencodeNET.Tests.Objects
         }
 
         [Fact]
-        public void CanEncodeToStream()
+        public void GetSizeInBytes()
         {
-            var bstring = new BString("hello world");
+            var bstring = new BString("abc", Encoding.UTF8);
+            bstring.GetSizeInBytes().Should().Be(5);
+        }
 
-            using (var stream = new MemoryStream())
-            {
-                bstring.EncodeTo(stream);
+        [Fact]
+        public void GetSizeInBytes_UTF8()
+        {
+            var bstring = new BString("æøå äö èéê ñ", Encoding.UTF8);
+            bstring.GetSizeInBytes().Should().Be(24);
+        }
 
-                stream.Length.Should().Be(14);
-                stream.AsString().Should().Be("11:hello world");
-            }
+        [Fact]
+        public async Task WriteToPipeWriter()
+        {
+            var bstring = new BString("æøå äö èéê ñ");
+            var (reader, writer) = new Pipe();
+
+            bstring.EncodeTo(writer);
+            await writer.FlushAsync();
+            reader.TryRead(out var readResult);
+
+            var result = Encoding.UTF8.GetString(readResult.Buffer.First.Span.ToArray());
+            result.Should().Be("21:æøå äö èéê ñ");
+        }
+
+        [Fact]
+        public async Task WriteToPipeWriterAsync()
+        {
+            var bstring = new BString("æøå äö èéê ñ");
+            var (reader, writer) = new Pipe();
+
+            await bstring.EncodeToAsync(writer);
+            reader.TryRead(out var readResult);
+
+            var result = Encoding.UTF8.GetString(readResult.Buffer.First.Span.ToArray());
+            result.Should().Be("21:æøå äö èéê ñ");
+        }
+
+        [Fact]
+        public async Task WriteToStreamAsync()
+        {
+            var bstring = new BString("æøå äö èéê ñ");
+
+            var stream = new MemoryStream();
+            await bstring.EncodeToAsync(stream);
+
+            var result = Encoding.UTF8.GetString(stream.ToArray());
+            result.Should().Be("21:æøå äö èéê ñ");
         }
     }
 }
