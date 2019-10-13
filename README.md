@@ -1,3 +1,5 @@
+![Icon](Assets/icon_64.png)
+
 BencodeNET 
 ==========
 [![license](https://img.shields.io/badge/license-Unlicense-blue.svg)](https://github.com/Krusen/BencodeNET/blob/master/LICENSE.md)
@@ -7,143 +9,105 @@ BencodeNET
 [![NuGet](https://buildstats.info/nuget/bencodenet?includePreReleases=false)](https://www.nuget.org/packages/BencodeNET/)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bhttps%3A%2F%2Fgithub.com%2FKrusen%2FBencodeNET.svg?type=shield)](https://app.fossa.io/projects/git%2Bhttps%3A%2F%2Fgithub.com%2FKrusen%2FBencodeNET?ref=badge_shield)
 
-A .NET library for encoding and decoding bencode.
+A lightweight and fast .NET library for encoding and decoding bencode (e.g. torrent files and BitTorrent client/tracker communication).
 
 - http://en.wikipedia.org/wiki/Bencode
 - https://wiki.theory.org/BitTorrentSpecification#Bencoding
 
-Overview
+The main focus of this library is on supporting the bencode format; torrent file reading/manipulation is secondary.
+
+Contents
 --------
 
+- [Project status](#project-status)
 - [Installation](#installation)
-- [Usage](#usage)
+- [Getting started](#getting-started)
+  - [Parsing](#parsing)
+  - [Encoding](#encoding)
+  - [String character encoding](#string-character-encoding)
   - [Torrents](#torrents)
     - [File modes](#file-modes)
     - [Non-standard fields](#non-standard-fields)
-  - [Parsing](#parsing)
-  - [Encoding](#encoding)
-- [String Character Encoding](#string-character-encoding)
-- [Upgrading from 1.x to 2.0](#upgrading-from-version-1x-to-20)
+- [Roadmap](#roadmap)
+- [Building the project](#building-the-project)
+- [Contributing](#contributing)
+- [Support](#support)
+
+Project status
+--------------
+The project is in maintenance mode and only getting updated if issues are being reported or if new features are requested.
+
+So, while I can't promise anything, go ahead and report any issues or feature requests by creating a new issue.
 
 
 Installation
 ------------
-
-Install the package **BencodeNET** from [NuGet](https://www.nuget.org/packages/BencodeNET/) 
-or install it from the [Package Manager Console](https://docs.microsoft.com/da-dk/nuget/tools/package-manager-console):
+Install the package **BencodeNET** from [NuGet](https://www.nuget.org/packages/BencodeNET/), using `<PackageReference>` or from the command line:
 
 ```
-PM> Install-Package BencodeNET
+// .csproj using PackageReference
+<PackageReference Include="BencodeNET" Version="2.3.0" />
+
+// .NET CLI
+> dotnet add package BencodeNET
 ```
 
-Usage
------
-### Torrents
-Working with torrent files:
 
-```C#
-// Parse torrent by specifying the file path
-var parser = new BencodeParser(); // Default encoding is Encoding.UT8F, but you can specify another if you need to
-var torrent = parser.Parse<Torrent>("C:\ubuntu.torrent");
-
-// Alternatively, handle the stream yourself
-using (var stream = File.OpenRead("C:\ubuntu.torrent"))
-{
-    torrent = parser.Parse<Torrent>(stream);
-}
-
-// Calculate the info hash
-string infoHash = torrent.GetInfoHash();
-// "B415C913643E5FF49FE37D304BBB5E6E11AD5101"
-
-// or as bytes instead of a string
-byte[] infoHashBytes = torrent.GetInfoHashBytes();
-
-// Get Magnet link
-string magnetLink = torrent.GetMagnetLink();
-// magnet:?xt=urn:btih:1CA512A4822EDC7C1B1CE354D7B8D2F84EE11C32&dn=ubuntu-14.10-desktop-amd64.iso&tr=http://torrent.ubuntu.com:6969/announce&tr=http://ipv6.torrent.ubuntu.com:6969/announce
-
-// Convert Torrent to its BDictionary representation
-BDictionary bencode = torrent.ToBDictionary();
-```
-
-#### File modes
-The property `FileMode` indicates if the torrent is single-file or multi-file. 
-
-For single-file torrents the `File` property contains the relevant file info. 
-The `Files` property is null.
-
-For multi-file torrents the `Files` property contains a list of file info and the directory name.
-The `File` property is null.
-
-####  Non-standard fields
-The `ExtraFields` property is for any non-standard fields which are not accessible through any other property.
-Data set on this property will overwrite any data from the `Torrent` itself when encoding it. This way you are able to add to or owerwrite fields.
-
+Getting started
+---------------
 ### Parsing
-Simple parsing of a bencoded string:
+Here are some simple examples for parsing bencode strings directly.
 
 ```C#
+using BencodeNET.Parsing;
+using BencodeNET.Objects;
+
 var parser = new BencodeParser();
-BString bstring = parser.ParseString("12:Hellow World!");
+
+// Parse unknown type
+IBObject bstring = parser.ParseString("12:Hellow World!");
 // "Hello World!" (BString)
 
 // If you know the type of the bencode you are parsing, you can use the generic version of `ParseString()` instead.
-var bstring2 = parser.ParseString<BString>("12:Hello World!");
+BString bstring = parser.ParseString<BString>("12:Hello World!");
 // "Hello World!" (BString)
 
-var bnumber = parser.ParseString<BNumber>("i42e");
+BNumber bnumber = parser.ParseString<BNumber>("i42e");
 // 42 (BNumber)
 
-var blist = parser.ParseString<BList>("l3:foo3:bari42ee");
+BList blist = parser.ParseString<BList>("l3:foo3:bari42ee");
 // { "foo", "bar", 42 } (BList)
 
-var bdictionary = parser.ParseString<BDictionary>("d3:fooi42e5:Hello6:World!e");
+BDictionary bdictionary = parser.ParseString<BDictionary>("d3:fooi42e5:Hello6:World!e");
 // { { "foo", 42 }, { "Hello", "World" } } (BDictionary)
 ```
 
-If you are unsure of the type you can just use the non-generic version:
+Usually you would probably either parse a `Stream` of some kind or a `PipeReader` if using .NET Core.
 
 ```C#
-IBObject bobject = parser.ParseString("12:Hello World!");
-
-if (bobject is BString)
-{
-    // The parsed object is a string
-}
-```
-
-It is also possible to decode directly from a stream instead, for example a `FileStream` or a `MemoryStream`:
-
-```C#
-using (var stream = File.OpenRead("Ubuntu.torrent"))
-{
-    var bdictionary = parser.Parse<BDictionary>(stream);
-}
+BDictionary bdictionary = parser.Parse<BDictionary>(stream);
+BDictionary bdictionary = await parser.ParseAsync<BDictionary>(stream);
+BDictionary bdictionary = await parser.ParseAsync<BDictionary>(pipeReader);
 ```
 
 ### Encoding
-You have the option to encode `BObject`s either as a `string`, a `byte[]`, to a `Stream` or directly to a file path.
+Encoding an object is simple and can be done in the following ways:
 
 ```C#
 var bstring = new BString("Hello World!");
+
 bstring.EncodeAsString();    // "12:Hello World!"
 bstring.EncodeAsBytes();     // [ 49, 50, 58, 72, ... ]
+
 bstring.EncodeTo("C:\\data.bencode"); // Writes "12:Hello World!" to the specified file
-bstring.EncodeTo(new MemoryStream());
-
-var bnumber = new BNumber(42);
-bnumber.EncodeAsString();    // "i42e"
-
-var blist = new BList { "foo", 42, "bar" };
-blist.EncodeAsString();      // "l3:fooi42e3:bare"
-
-var bdictionary = new BDictionary { { "foo", 42 }, { "Hello", "World!" } };
-bdictionary.EncodeAsString() // "d3:fooi42e5:Hello6:World!e"
+bstring.EncodeTo(stream);
+await bstring.EncodeToAsync(stream);
+bstring.EncodeTo(pipeWriter);
+await bstring.EncodeToAsync(pipeWriter);
 ```
 
-String Character Encoding
--------------------------
+### String character encoding
+
 By default `Encoding.UTF8` is used when rendering strings. 
 
 When parsing a string directly the encoding is used to convert the string to an array of bytes.
@@ -152,12 +116,14 @@ If no encoding is passed to `ToString` it will use the encoding the `BString` wa
 
 ```C#
 // Using the default encoding from Bencode.DefaultEncoding (UTF8)
-var bstring = Bencode.DecodeString("21:æøå äö èéê ñ");
+var parser = new BencodeParser();
+var bstring = parser.ParseString("21:æøå äö èéê ñ");
 bstring.ToString()              // "æøå äö èéê ñ"
 bstring.ToString(Encoding.UTF8) // "æøå äö èéê ñ"
 
 // Using ISO-8859-1
-bstring = Bencode.DecodeString("12:æøå äö èéê ñ", Encoding.GetEncoding("ISO-8859-1"));
+var parser = new BencodeParser(Encoding.GetEncoding("ISO-8859-1"));
+bstring = parser.ParseString("12:æøå äö èéê ñ");
 bstring.ToString();              // "æøå äö èéê ñ"
 bstring.ToString(Encoding.UTF8); // "??? ?? ??? ?"
 ```
@@ -182,7 +148,7 @@ bstring.ToString(Encoding.GetEncoding("ISO-8859-1"));
 
 // You have to specify the used encoding when creating the parser
 // BStrings will then use that as the default when encoding the string
-parser = new BencodeParser(Encoding.GetEncoding("ISO-8859-1"));
+var parser = new BencodeParser(Encoding.GetEncoding("ISO-8859-1"));
 bstring = parser.Parse<BString>(bytes);
 bstring.ToString();
 // "æøå äö èéê ñ"
@@ -207,35 +173,78 @@ blist.EncodeAsString(Encoding.UTF8);                      // "l12:??? ?? ??? ?e
 blist.EncodeAsString(Encoding.GetEncoding("ISO-8859-1")); // "l12:æøå äö èéê ñe""
 ```
 
-Upgrading from version 1.x to 2.0
----------------------------------
-The API has changed quite a bit in version 2.0, but mostly naming wise and the usage is more or less
-the same with some added functionality and ease of use.
+### Torrents
 
-Probably the biggest difference is that in 1.x you would use the static class `Bencode` and the methods
-`DecodeString(string)`, `DecodeNumber(string)` etc. In 2.0 you have to create an instance of `BencodeParser`
-and use the methods on that.
-
-Use `BencodeParser.ParseString(string)` for parsing strings directly or `BencodeParser.Parse(...)` 
-for parsing `Stream`, `byte[]` or a file by file path (`string`) without opening af stream yourself.
+Working with torrent files:
 
 ```C#
-// 1.x - Parsing strings directly
-BString bstring = Bencode.DecodeString("12:Hello World!");
-BNumber bnumber = Bencode.DecodeNumber("i42e");
-BList blist = Bencode.DecodeList("l3:foo3:bari42ee");
-BDictionary bdictionary = Bencode.DecodeDictionary("d3:fooi42e5:Hello6:World!e");
+using BencodeNET.Objects;
+using BencodeNET.Parsing;
+using BencodeNET.Torrents;
 
-// 2.0 - Parsing strings directly
-var parser = new BencodeParser();
-BString bstring = parser.ParseString<BString>("12:Hello World!");
-BNumber bnumber = parser.ParseString<BNumber>("i42e");
-BList blist = parser.ParseString<BList>("l3:foo3:bari42ee");
-BDictionary bdictionary = parser.ParseString<BDictionary>("d3:fooi42e5:Hello6:World!e");
+// Parse torrent by specifying the file path
+var parser = new BencodeParser(); // Default encoding is Encoding.UTF8, but you can specify another if you need to
+Torrent torrent = parser.Parse<Torrent>("C:\\ubuntu.torrent");
 
-// If you don't know the type you are parsing, you can use the non-generic method
-IBObject bobject = parser.ParseString("12:Hellow World!");
+// Or parse a stream
+Torrent torrent = parser.Parse<Torrent>(stream);
+
+// Calculate the info hash
+string infoHash = torrent.GetInfoHash();
+// "B415C913643E5FF49FE37D304BBB5E6E11AD5101"
+
+// or as bytes instead of a string
+byte[] infoHashBytes = torrent.GetInfoHashBytes();
+
+// Get Magnet link
+string magnetLink = torrent.GetMagnetLink();
+// magnet:?xt=urn:btih:1CA512A4822EDC7C1B1CE354D7B8D2F84EE11C32&dn=ubuntu-14.10-desktop-amd64.iso&tr=http://torrent.ubuntu.com:6969/announce&tr=http://ipv6.torrent.ubuntu.com:6969/announce
+
+// Convert Torrent to its BDictionary representation
+BDictionary bdictinoary = torrent.ToBDictionary();
 ```
+
+#### File modes
+The property `FileMode` indicates if the torrent is single-file or multi-file. 
+
+For single-file torrents the `File` property contains the relevant file info. 
+The `Files` property is null.
+
+For multi-file torrents the `Files` property contains a list of file info and the directory name.
+The `File` property is null.
+
+####  Non-standard fields
+The `ExtraFields` property is for any non-standard fields which are not accessible through any other property.
+Data set on this property will overwrite any data from the `Torrent` itself when encoding it. This way you are able to add to or owerwrite fields.
+
+
+Roadmap
+-------
+The project is in maintenance mode and no new features are currently planned.
+Feel free to request new features by creating a new issue.
+
+
+Building the project
+---------------------------------
+Requirements:
+- .NET Core 3.0 SDK
+- Visual Studio 2019 (or other IDE support .NET Core 3.0)
+
+Simply checkout the project, restore nuget packages and build the project.
+
+
+Contributing
+------------
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+Please make sure to update or add tests as appropriate.
+
+
+Support
+-------
+If you use this or one of my other libraries and want to say thank you or support the development feel free to buy me a Red Bull through [buymeacoffee.com](https://www.buymeacoffee.com/UCkS2tw) or through [ko-fi.com](https://ko-fi.com/krusen).
+
+<a href="https://www.buymeacoffee.com/UCkS2tw" target="_blank"><img src="https://bmc-cdn.nyc3.digitaloceanspaces.com/BMC-button-images/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: auto !important;width: auto !important;" ></a>
 
 
 ## License
