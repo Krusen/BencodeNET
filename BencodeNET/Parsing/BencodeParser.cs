@@ -27,7 +27,7 @@ namespace BencodeNET.Parsing
             set
             {
                 _encoding = value ?? throw new ArgumentNullException(nameof(value));
-                Parsers.AddOrReplace(new BStringParser(value));
+                Parsers.GetSpecific<BStringParser>()?.ChangeEncoding(value);
             }
         }
         private Encoding _encoding;

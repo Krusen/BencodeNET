@@ -14,6 +14,7 @@ namespace BencodeNET.Parsing
     /// </summary>
     public class BStringParser : BObjectParser<BString>
     {
+
         /// <summary>
         /// The minimum stream length in bytes for a valid string ('0:').
         /// </summary>
@@ -32,13 +33,23 @@ namespace BencodeNET.Parsing
         /// <param name="encoding"></param>
         public BStringParser(Encoding encoding)
         {
-            Encoding = encoding ?? throw new ArgumentNullException(nameof(encoding));
+            _encoding = encoding ?? throw new ArgumentNullException(nameof(encoding));
         }
 
         /// <summary>
         /// The encoding used when creating the <see cref="BString"/> when parsing.
         /// </summary>
-        public override Encoding Encoding { get; }
+        public override Encoding Encoding => _encoding;
+        private Encoding _encoding;
+
+        /// <summary>
+        /// Changes the encoding used for parsing.
+        /// </summary>
+        /// <param name="encoding">The new encoding to use.</param>
+        public void ChangeEncoding(Encoding encoding)
+        {
+            _encoding = encoding;
+        }
 
         /// <summary>
         /// Parses the next <see cref="BString"/> from the reader.
