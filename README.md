@@ -28,6 +28,7 @@ Contents
   - [Torrents](#torrents)
     - [File modes](#file-modes)
     - [Non-standard fields](#non-standard-fields)
+- [Changelog](#changelog)
 - [Roadmap](#roadmap)
 - [Building the project](#building-the-project)
 - [Contributing](#contributing)
@@ -216,6 +217,13 @@ The `File` property is null.
 ####  Non-standard fields
 The `ExtraFields` property is for any non-standard fields which are not accessible through any other property.
 Data set on this property will overwrite any data from the `Torrent` itself when encoding it. This way you are able to add to or owerwrite fields.
+
+
+Changelog
+---------
+See [CHANGELOG.md](CHANGELOG.md) for any yet unreleased changes and changes made between different version.
+
+https://keepachangelog.com
 
 
 Roadmap
