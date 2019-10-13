@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 
-## [3.0.0]
+## [3.0.0] - 2019-10-13
 There is a few changes to the public API, but most people shouldn't be affected by this unless they have extended/overriden functionality.
 Basic usage should not see any or only minor changes compared to v2.3.0.
 
