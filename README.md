@@ -254,6 +254,8 @@ If you use this or one of my other libraries and want to say thank you or suppor
 
 <a href="https://www.buymeacoffee.com/UCkS2tw" target="_blank"><img src="https://bmc-cdn.nyc3.digitaloceanspaces.com/BMC-button-images/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: auto !important;width: auto !important;" ></a>
 
+<a href="https://ko-fi.com/krusen" target="_blank"><img height="37" src="https://az743702.vo.msecnd.net/cdn/kofi1.png?v=2"/></a>
+
 
 ## License
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bhttps%3A%2F%2Fgithub.com%2FKrusen%2FBencodeNET.svg?type=large)](https://app.fossa.io/projects/git%2Bhttps%3A%2F%2Fgithub.com%2FKrusen%2FBencodeNET?ref=badge_large)
