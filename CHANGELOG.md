@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.1] - 2019-10-17
+### Fixed
+- Fixed missing parser for `Torrent` (#44)
+
 
 ## [3.0.0] - 2019-10-13
 There is a few changes to the public API, but most people shouldn't be affected by this unless they have extended/overriden functionality.
@@ -121,7 +125,8 @@ and generally better usability; albeit a bit more complex.
 ## [1.0.0] - 2015-09-19
 
 
-[Unreleased]: ../../compare/v3.0.0...HEAD
+[Unreleased]: ../../compare/v3.0.1...HEAD
+[3.0.1]: ../../compare/v3.0.0...v3.0.1
 [3.0.0]: ../../compare/v2.3.0...v3.0.0
 [2.3.0]: ../../compare/v2.2.9...v2.3.0
 [2.2.9]: ../../compare/v2.2.0...v2.2.9
