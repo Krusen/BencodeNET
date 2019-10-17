@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BencodeNET.Exceptions;
 using BencodeNET.IO;
 using BencodeNET.Objects;
+using BencodeNET.Torrents;
 
 namespace BencodeNET.Parsing
 {
@@ -46,7 +47,8 @@ namespace BencodeNET.Parsing
                 new BNumberParser(),
                 new BStringParser(_encoding),
                 new BListParser(this),
-                new BDictionaryParser(this)
+                new BDictionaryParser(this),
+                new TorrentParser(this)
             };
         }
 
