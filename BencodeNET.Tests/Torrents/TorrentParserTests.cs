@@ -24,13 +24,14 @@ namespace BencodeNET.Tests.Torrents
         public TorrentParserTests()
         {
             BencodeParser = Substitute.For<IBencodeParser>();
-            BencodeParser.Parse<BDictionary>((BencodeReader) null).ReturnsForAnyArgs(x => ParsedData);
+            BencodeParser.Parse<BDictionary>(null).ReturnsForAnyArgs(x => ParsedData);
 
             ValidSingleFileTorrentData = new BDictionary
             {
                 [TorrentFields.Info] = new BDictionary
                 {
                     [TorrentInfoFields.Name] = (BString) "",
+                    [TorrentInfoFields.NameUtf8] = (BString) "",
                     [TorrentInfoFields.Pieces] = (BString) "",
                     [TorrentInfoFields.PieceLength] = (BNumber) 0,
                     [TorrentInfoFields.Length] = (BNumber) 0
@@ -42,6 +43,7 @@ namespace BencodeNET.Tests.Torrents
                 [TorrentFields.Info] = new BDictionary
                 {
                     [TorrentInfoFields.Name] = (BString) "",
+                    [TorrentInfoFields.NameUtf8] = (BString) "",
                     [TorrentInfoFields.Pieces] = (BString) "",
                     [TorrentInfoFields.PieceLength] = (BNumber) 0,
                     [TorrentInfoFields.Files] = new BList()
@@ -394,13 +396,14 @@ namespace BencodeNET.Tests.Torrents
 
         [Theory]
         [AutoMockedData]
-        public void SingleFileInfo_IsParsed(long length, string fileName, string md5Sum)
+        public void SingleFileInfo_IsParsed(long length, string fileName,  string fileNameUtf8, string md5Sum)
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
             var info = ParsedData.Get<BDictionary>(TorrentFields.Info);
             info[TorrentInfoFields.Length] = (BNumber) length;
             info[TorrentInfoFields.Name] = (BString) fileName;
+            info[TorrentInfoFields.NameUtf8] = (BString) fileNameUtf8;
             info[TorrentInfoFields.Md5Sum] = (BString) md5Sum;
 
             // Act
@@ -414,12 +417,34 @@ namespace BencodeNET.Tests.Torrents
             torrent.File.Should().NotBeNull();
             torrent.File.FileSize.Should().Be(length);
             torrent.File.FileName.Should().Be(fileName);
+            torrent.File.FileNameUtf8.Should().Be(fileNameUtf8);
             torrent.File.Md5Sum.Should().Be(md5Sum);
+        }
+
+        [Fact]
+        public void SingleFileInfo_NameUtf8_IsParsedAsUtf8EncodingIndependentlyOfActualEncoding()
+        {
+            var encoding = "ISO-8859-1";
+            var fileName = "øæå"; // Use characters with different byte values for UTF8 and ISO-8859-1
+
+            ParsedData = ValidSingleFileTorrentData;
+            ParsedData[TorrentFields.Encoding] = (BString) encoding;
+            var info = ParsedData.Get<BDictionary>(TorrentFields.Info);
+            info[TorrentInfoFields.Name] = new BString(fileName, Encoding.GetEncoding(encoding));
+            info[TorrentInfoFields.NameUtf8] = new BString(fileName, Encoding.UTF8);
+
+            // Act
+            var parser = new TorrentParser(BencodeParser);
+            var torrent = parser.Parse((BencodeReader)null);
+
+            // Assert
+            torrent.File.FileName.Should().Be(fileName);
+            torrent.File.FileNameUtf8.Should().Be(fileName);
         }
 
         [Theory]
         [AutoMockedData]
-        public void MultiFileInfo_IsParsed(string directoryName, long length1, IList<string> paths1, string md5Sum1, long length2, IList<string> paths2, string md5Sum2)
+        public void MultiFileInfo_IsParsed(string directoryName, long length1, IList<string> paths1, IList<string> paths1Utf8, string md5Sum1, long length2, IList<string> paths2, IList<string> paths2Utf8, string md5Sum2)
         {
             // Arrange
             ParsedData = ValidMultiFileTorrentData;
@@ -431,12 +456,14 @@ namespace BencodeNET.Tests.Torrents
                 {
                     [TorrentFilesFields.Length] = (BNumber) length1,
                     [TorrentFilesFields.Path] = new BList(paths1),
+                    [TorrentFilesFields.PathUtf8] = new BList(paths1Utf8),
                     [TorrentFilesFields.Md5Sum] = (BString) md5Sum1
                 },
                 new BDictionary
                 {
                     [TorrentFilesFields.Length] = (BNumber) length2,
                     [TorrentFilesFields.Path] = new BList(paths2),
+                    [TorrentFilesFields.PathUtf8] = new BList(paths2Utf8),
                     [TorrentFilesFields.Md5Sum] = (BString) md5Sum2
                 }
             };
@@ -453,9 +480,11 @@ namespace BencodeNET.Tests.Torrents
             torrent.Files.Should().HaveCount(2);
             torrent.Files[0].FileSize.Should().Be(length1);
             torrent.Files[0].Path.Should().BeEquivalentTo(paths1);
+            torrent.Files[0].PathUtf8.Should().BeEquivalentTo(paths1Utf8);
             torrent.Files[0].Md5Sum.Should().Be(md5Sum1);
             torrent.Files[1].FileSize.Should().Be(length2);
             torrent.Files[1].Path.Should().BeEquivalentTo(paths2);
+            torrent.Files[1].PathUtf8.Should().BeEquivalentTo(paths2Utf8);
             torrent.Files[1].Md5Sum.Should().Be(md5Sum2);
         }
 

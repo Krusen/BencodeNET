@@ -34,6 +34,7 @@ namespace BencodeNET.Torrents
     public static class TorrentInfoFields
     {
         public const string Name = "name";
+        public const string NameUtf8 = "name.utf-8";
         public const string Private = "private";
         public const string PieceLength = "piece length";
         public const string Pieces = "pieces";
@@ -44,6 +45,7 @@ namespace BencodeNET.Torrents
         public static readonly BString[] Keys =
         {
             Name,
+            NameUtf8,
             Private,
             PieceLength,
             Pieces,
@@ -60,12 +62,14 @@ namespace BencodeNET.Torrents
     {
         public const string Length = "length";
         public const string Path = "path";
+        public const string PathUtf8 = "path.utf-8";
         public const string Md5Sum = "md5sum";
 
         public static readonly BString[] Keys =
         {
             Length,
             Path,
+            PathUtf8,
             Md5Sum
         };
     }

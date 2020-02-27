@@ -16,7 +16,12 @@ namespace BencodeNET.Torrents
         /// <summary>
         /// The file name. It just returns the last part of <see cref="Path"/>.
         /// </summary>
-        public string FileName => Path.LastOrDefault();
+        public string FileName => Path?.LastOrDefault();
+
+        /// <summary>
+        /// The UTF-8 encoded file name. It just returns the last part of <see cref="PathUtf8"/>.
+        /// </summary>
+        public string FileNameUtf8 => PathUtf8?.LastOrDefault();
 
         /// <summary>
         /// The file size in bytes.
@@ -37,12 +42,26 @@ namespace BencodeNET.Torrents
         public IList<string> Path { get; set; } = new List<string>();
 
         /// <summary>
+        /// A list of UTF-8 encoded file path elements.
+        /// </summary>
+        public IList<string> PathUtf8 { get; set; } = new List<string>();
+
+        /// <summary>
         /// The full path of the file including file name.
         /// </summary>
         public string FullPath
         {
             get => string.Join(System.IO.Path.DirectorySeparatorChar.ToString(), Path);
             set => Path = value.Split(new[] { System.IO.Path.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
+        }
+
+        /// <summary>
+        /// The full UTF-8 encoded path of the file including file name.
+        /// </summary>
+        public string FullPathUtf8
+        {
+            get => string.Join(System.IO.Path.DirectorySeparatorChar.ToString(), PathUtf8);
+            set => PathUtf8 = value.Split(new[] { System.IO.Path.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
         }
     }
 }

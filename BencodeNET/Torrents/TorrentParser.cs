@@ -180,7 +180,7 @@ namespace BencodeNET.Torrents
             }
         }
 
-        private static void EnsureFields(IEnumerable<string> requiredFields, BDictionary data, string message = null)
+        private static void EnsureFields(IList<string> requiredFields, BDictionary data, string message = null)
         {
             message = message ?? "Torrent is missing required field.";
 
@@ -190,7 +190,7 @@ namespace BencodeNET.Torrents
             }
         }
 
-        private static void EnsureFields(IEnumerable<string> requiredFields, IEnumerable<BDictionary> list, string message = null)
+        private static void EnsureFields(IList<string> requiredFields, IEnumerable<BDictionary> list, string message = null)
         {
             message = message ?? "Torrent is missing required field.";
 
@@ -217,6 +217,7 @@ namespace BencodeNET.Torrents
             return new SingleFileInfo
             {
                 FileName = info.Get<BString>(TorrentInfoFields.Name)?.ToString(encoding),
+                FileNameUtf8 = info.Get<BString>(TorrentInfoFields.NameUtf8)?.ToString(Encoding.UTF8),
                 FileSize = info.Get<BNumber>(TorrentInfoFields.Length),
                 Md5Sum = info.Get<BString>(TorrentInfoFields.Md5Sum)?.ToString(encoding)
             };
@@ -243,6 +244,7 @@ namespace BencodeNET.Torrents
                 {
                     FileSize = x.Get<BNumber>(TorrentFilesFields.Length),
                     Path = x.Get<BList>(TorrentFilesFields.Path)?.AsStrings(encoding).ToList(),
+                    PathUtf8 = x.Get<BList>(TorrentFilesFields.PathUtf8)?.AsStrings(Encoding.UTF8).ToList(),
                     Md5Sum = x.Get<BString>(TorrentFilesFields.Md5Sum)?.ToString(encoding)
                 });
 

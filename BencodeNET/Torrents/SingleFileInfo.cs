@@ -8,7 +8,6 @@
     /// </remarks>
     public class SingleFileInfo
     {
-        // Name
         /// <summary>
         /// The file name. This is purely advisory.
         /// </summary>
@@ -16,6 +15,14 @@
         /// Corresponds to the 'name' field.
         /// </remarks>
         public string FileName { get; set; }
+
+        /// <summary>
+        /// The UTF-8 encoded file name. This is purely advisory.
+        /// </summary>
+        /// <remarks>
+        /// Corresponds to the 'name.utf-8' field.
+        /// </remarks>
+        public string FileNameUtf8 { get; set; }
 
         /// <summary>
         /// The file size in bytes.
