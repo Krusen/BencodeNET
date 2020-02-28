@@ -164,7 +164,7 @@ namespace BencodeNET.Torrents
         /// A concatenation of all 20-byte SHA1 hash values (one for each piece).
         /// Use <see cref="PiecesAsHexString"/> to get/set this value as a hex string instead.
         /// </summary>
-        public virtual byte[] Pieces { get; set; }
+        public virtual byte[] Pieces { get; set; } = new byte[0];
 
         /// <summary>
         /// Gets or sets <see cref="Pieces"/> from/to a hex string (without dashes), e.g. 1C115D26444AEF2A5E936133DCF8789A552BBE9F[...].
@@ -218,7 +218,9 @@ namespace BencodeNET.Torrents
         /// <summary>
         /// The total number of file pieces.
         /// </summary>
-        public virtual int NumberOfPieces => (int)Math.Ceiling((double)TotalSize / PieceSize);
+        public virtual int NumberOfPieces => Pieces != null
+            ? (int) Math.Ceiling((double) Pieces.Length / PieceSize)
+            : 0;
 
         /// <summary>
         /// Converts the torrent to a <see cref="BDictionary"/>.
