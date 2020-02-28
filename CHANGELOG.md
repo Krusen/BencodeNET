@@ -5,9 +5,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+...
+
+## [3.1.0] - 2020-02-28
 ### Added
-- Added `FileNameUtf8` and `PathUtf8` and `FullPathUtf8` properties to `SingleFileInfo`/`MultiFileInfo` 
-  - These properties reads from `name.utf-8` and `path.utf-8` fields.
+- Added `FileNameUtf8` and `PathUtf8` and `FullPathUtf8` properties to `SingleFileInfo`/`MultiFileInfo` (#47) 
+  - These properties reads from the `name.utf-8` and `path.utf-8` fields.
+
+### Changed
+- `Torrent.NumberOfPieces` now uses `Pieces.Length` instead of `TotalSize` for the calculation (#48)
 
 ## [3.0.1] - 2019-10-17
 ### Fixed
@@ -128,7 +135,8 @@ and generally better usability; albeit a bit more complex.
 ## [1.0.0] - 2015-09-19
 
 
-[Unreleased]: ../../compare/v3.0.1...HEAD
+[Unreleased]: ../../compare/v3.1.0...HEAD
+[3.1.0]: ../../compare/v3.0.1...v3.1.0
 [3.0.1]: ../../compare/v3.0.0...v3.0.1
 [3.0.0]: ../../compare/v2.3.0...v3.0.0
 [2.3.0]: ../../compare/v2.2.9...v2.3.0
