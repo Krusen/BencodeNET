@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ...
 
+## [3.1.3] - 2020-03-03
+### Added
+- Added `Torrent.DisplayNameUtf8` and `MultiFileInfoList.DirectoryNameUtf8`, both mapped to the `name.utf-8` field
+
+### Changed
+- New UTF-8 fields are now also added to `BDictionary` created by `Torrent.ToBDictionary` (and used by encode methods)
+
+### Fixed
+- `Torrent.NumberOfPieces` is now correctly calculated by dividing by 20 instead of `Pieces.Length` (introduced in 3.1.0) (#48)
+
 ## [3.1.0] - 2020-02-28
 ### Added
 - Added `FileNameUtf8` and `PathUtf8` and `FullPathUtf8` properties to `SingleFileInfo`/`MultiFileInfo` (#47) 
@@ -135,7 +145,8 @@ and generally better usability; albeit a bit more complex.
 ## [1.0.0] - 2015-09-19
 
 
-[Unreleased]: ../../compare/v3.1.0...HEAD
+[Unreleased]: ../../compare/v3.1.3...HEAD
+[3.1.3]: ../../compare/v3.1.0...v3.1.3
 [3.1.0]: ../../compare/v3.0.1...v3.1.0
 [3.0.1]: ../../compare/v3.0.0...v3.0.1
 [3.0.0]: ../../compare/v2.3.0...v3.0.0
