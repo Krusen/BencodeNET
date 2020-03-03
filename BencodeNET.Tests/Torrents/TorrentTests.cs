@@ -192,15 +192,12 @@ namespace BencodeNET.Tests.Torrents
 
         [Theory]
         [AutoMockedData]
-        public void NumberOfPieces_ShouldBePiecesLengthDividedByPieceSizeRoundedUp(int piecesByteCount, long pieceSize)
+        public void NumberOfPieces_ShouldBePiecesLengthDividedBy20(int piecesByteCount)
         {
-            var expected = (int)Math.Ceiling((double) piecesByteCount/pieceSize);
+            while (piecesByteCount % 20 != 0) piecesByteCount--;
+            var expected = piecesByteCount / 20;
 
-            var torrent = new Torrent
-            {
-                Pieces = new byte[piecesByteCount],
-                PieceSize = pieceSize
-            };
+            var torrent = new Torrent {Pieces = new byte[piecesByteCount]};
 
             torrent.Pieces.Length.Should().Be(piecesByteCount);
             torrent.NumberOfPieces.Should().Be(expected);

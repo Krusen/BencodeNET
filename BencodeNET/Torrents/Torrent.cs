@@ -219,7 +219,7 @@ namespace BencodeNET.Torrents
         /// The total number of file pieces.
         /// </summary>
         public virtual int NumberOfPieces => Pieces != null
-            ? (int) Math.Ceiling((double) Pieces.Length / PieceSize)
+            ? (int) Math.Ceiling((double) Pieces.Length / 20)
             : 0;
 
         /// <summary>
