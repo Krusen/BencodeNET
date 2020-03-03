@@ -92,6 +92,49 @@ namespace BencodeNET.Tests.Torrents
             act.Should().Throw<BencodeException>();
         }
 
+        [Theory]
+        [AutoMockedData]
+        public void DisplayNameUtf8_SingleFile_IsFileName(string fileName)
+        {
+            var torrent = new Torrent
+            {
+                File = new SingleFileInfo
+                {
+                    FileNameUtf8 = fileName
+                }
+            };
+
+            torrent.FileMode.Should().Be(TorrentFileMode.Single);
+            torrent.DisplayNameUtf8.Should().Be(fileName);
+        }
+
+        [Theory]
+        [AutoMockedData]
+        public void DisplayNameUtf8_MultiFile_IsDirectoryName(string directoryNameUtf8)
+        {
+            var torrent = new Torrent
+            {
+                Files = new MultiFileInfoList(default, directoryNameUtf8)
+                {
+                    new MultiFileInfo()
+                }
+            };
+
+            torrent.FileMode.Should().Be(TorrentFileMode.Multi);
+            torrent.DisplayNameUtf8.Should().Be(directoryNameUtf8);
+        }
+
+        [Fact]
+        public void DisplayNameUtf8_UnknownFileMode_ThrowsBencodeException()
+        {
+            var torrent = new Torrent();
+
+            Func<string> act = () => torrent.DisplayNameUtf8;
+
+            torrent.FileMode.Should().Be(TorrentFileMode.Unknown);
+            act.Should().Throw<BencodeException>();
+        }
+
         [Fact]
         public void PiecesAsHexString_Get_ReturnsHexUppercaseWithoutDashes()
         {

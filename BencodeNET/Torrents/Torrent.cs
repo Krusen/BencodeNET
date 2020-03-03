@@ -133,6 +133,20 @@ namespace BencodeNET.Torrents
             }
         }
 
+        public virtual string DisplayNameUtf8
+        {
+            get
+            {
+                if (FileMode == TorrentFileMode.Single)
+                    return File.FileNameUtf8;
+
+                if (FileMode == TorrentFileMode.Multi)
+                    return Files.DirectoryNameUtf8;
+
+                throw new BencodeException("Cannot get torrent display name. Unknown torrent file mode.");
+            }
+        }
+
         /// <summary>
         /// [optional] The creation date of the torrent.
         /// </summary>
