@@ -418,7 +418,7 @@ namespace BencodeNET.Tests.Torrents
 
         [Theory]
         [AutoMockedData]
-        public void ToBDictionary_Info_SingleFile_AddsNameAndLength(long fileSize, string fileName)
+        public void ToBDictionary_Info_SingleFile_AddsNameAndLength(long fileSize, string fileName, string fileNameUtf8)
         {
             // Arrange
             var torrent = new Torrent
@@ -426,7 +426,8 @@ namespace BencodeNET.Tests.Torrents
                 File = new SingleFileInfo
                 {
                     FileSize = fileSize,
-                    FileName = fileName
+                    FileName = fileName,
+                    FileNameUtf8 = fileNameUtf8
                 }
             };
 
@@ -436,11 +437,12 @@ namespace BencodeNET.Tests.Torrents
             // Assert
             info.Should().Contain(TorrentInfoFields.Length, (BNumber)fileSize);
             info.Should().Contain(TorrentInfoFields.Name, (BString)fileName);
+            info.Should().Contain(TorrentInfoFields.NameUtf8, (BString)fileNameUtf8);
         }
 
         [Theory]
         [AutoMockedData]
-        public void ToBDictionary_Info_MultiFile_AddsFiles(string directoryName, long fileSize, IList<string> path)
+        public void ToBDictionary_Info_MultiFile_AddsFiles(string directoryName, long fileSize, IList<string> path, IList<string> pathUtf8)
         {
             // Arrange
             var torrent = new Torrent
@@ -450,7 +452,8 @@ namespace BencodeNET.Tests.Torrents
                     new MultiFileInfo
                     {
                         FileSize = fileSize,
-                        Path = path
+                        Path = path,
+                        PathUtf8 = pathUtf8
                     }
                 }
             };
@@ -463,10 +466,27 @@ namespace BencodeNET.Tests.Torrents
             info.Should().Contain(TorrentInfoFields.Name, (BString) directoryName);
             info.Should().ContainKey(TorrentInfoFields.Files);
             info[TorrentInfoFields.Files].Should().BeOfType<BList<BDictionary>>();
-            files[0].Should().BeOfType<BDictionary>();
-            files[0].Should().Contain(TorrentFilesFields.Length, (BNumber) fileSize);
-            files[0].Should().ContainKey(TorrentFilesFields.Path);
-            files[0].Get<BList>(TorrentFilesFields.Path).Should().HaveCount(path.Count);
+
+            var file = files[0];
+            file.Should().BeOfType<BDictionary>();
+            file.Should().Contain(TorrentFilesFields.Length, (BNumber) fileSize);
+            file.Should().ContainKey(TorrentFilesFields.Path);
+            file.Should().ContainKey(TorrentFilesFields.PathUtf8);
+
+            var list = file.Get<BList>(TorrentFilesFields.Path);
+            var listUtf8 = file.Get<BList>(TorrentFilesFields.PathUtf8);
+            list.Should().HaveCount(path.Count);
+            listUtf8.Should().HaveCount(pathUtf8.Count);
+
+            for (var i = 0; i < list.Count; i++)
+            {
+                list[i].ToString().Should().Be(path[i]);
+            }
+
+            for (var i = 0; i < listUtf8.Count; i++)
+            {
+                listUtf8[i].ToString().Should().Be(pathUtf8[i]);
+            }
         }
 
         [Theory]

@@ -295,6 +295,10 @@ namespace BencodeNET.Torrents
             if (FileMode == TorrentFileMode.Single)
             {
                 info[TorrentInfoFields.Name] = new BString(File.FileName, encoding);
+
+                if (File.FileNameUtf8 != null)
+                    info[TorrentInfoFields.NameUtf8] = new BString(File.FileNameUtf8, Encoding.UTF8);
+
                 info[TorrentInfoFields.Length] = (BNumber)File.FileSize;
 
                 if (File.Md5Sum != null)
@@ -305,6 +309,9 @@ namespace BencodeNET.Torrents
             {
                 info[TorrentInfoFields.Name] = new BString(Files.DirectoryName, encoding);
 
+                if (Files.DirectoryNameUtf8 != null)
+                    info[TorrentInfoFields.NameUtf8] = new BString(Files.DirectoryNameUtf8, Encoding.UTF8);
+
                 var files = new BList<BDictionary>();
                 foreach (var file in Files)
                 {
@@ -313,6 +320,9 @@ namespace BencodeNET.Torrents
                         [TorrentFilesFields.Length] = (BNumber)file.FileSize,
                         [TorrentFilesFields.Path] = new BList(file.Path)
                     };
+
+                    if (file.PathUtf8 != null && file.PathUtf8.Any())
+                        fileDictionary[TorrentFilesFields.PathUtf8] = new BList(file.PathUtf8, Encoding.UTF8);
 
                     if (file.Md5Sum != null)
                         fileDictionary[TorrentFilesFields.Md5Sum] = new BString(file.Md5Sum, encoding);
