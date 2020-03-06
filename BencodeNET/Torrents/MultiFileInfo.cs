@@ -51,7 +51,7 @@ namespace BencodeNET.Torrents
         /// </summary>
         public string FullPath
         {
-            get => string.Join(System.IO.Path.DirectorySeparatorChar.ToString(), Path);
+            get => Path != null ? string.Join(System.IO.Path.DirectorySeparatorChar.ToString(), Path) : null;
             set => Path = value.Split(new[] { System.IO.Path.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
         }
 
@@ -60,7 +60,7 @@ namespace BencodeNET.Torrents
         /// </summary>
         public string FullPathUtf8
         {
-            get => string.Join(System.IO.Path.DirectorySeparatorChar.ToString(), PathUtf8);
+            get => PathUtf8 != null ? string.Join(System.IO.Path.DirectorySeparatorChar.ToString(), PathUtf8) : null;
             set => PathUtf8 = value.Split(new[] { System.IO.Path.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
         }
     }

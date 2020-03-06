@@ -236,8 +236,8 @@ namespace BencodeNET.Torrents
 
             var list = new MultiFileInfoList
             {
-                DirectoryName = info.Get<BString>(TorrentInfoFields.Name).ToString(encoding),
-                DirectoryNameUtf8 = info.Get<BString>(TorrentInfoFields.NameUtf8).ToString(encoding)
+                DirectoryName = info.Get<BString>(TorrentInfoFields.Name)?.ToString(encoding),
+                DirectoryNameUtf8 = info.Get<BString>(TorrentInfoFields.NameUtf8)?.ToString(encoding)
             };
 
             var fileInfos = info.Get<BList>(TorrentInfoFields.Files).Cast<BDictionary>()

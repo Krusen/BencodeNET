@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ...
 
+## [3.1.4] - 2020-03-06
+### Fixed
+- Issue parsing torrents without both `name` and `name.utf-8` field ([#47])
+- Exception when accessing properties `FullPath` and `FullPathUtf8` on `MultiFileInfo` if `Path`/`PathUtf8` is null ([#47])
+
 ## [3.1.3] - 2020-03-03
 ### Added
 - Added `Torrent.DisplayNameUtf8` and `MultiFileInfoList.DirectoryNameUtf8`, both mapped to the `name.utf-8` field
@@ -16,19 +21,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New UTF-8 fields are now also added to `BDictionary` created by `Torrent.ToBDictionary` (and used by encode methods)
 
 ### Fixed
-- `Torrent.NumberOfPieces` is now correctly calculated by dividing by 20 instead of `Pieces.Length` (introduced in 3.1.0) (#48)
+- `Torrent.NumberOfPieces` is now correctly calculated by dividing by 20 instead of `Pieces.Length` (introduced in 3.1.0) ([#48])
 
 ## [3.1.0] - 2020-02-28
 ### Added
-- Added `FileNameUtf8` and `PathUtf8` and `FullPathUtf8` properties to `SingleFileInfo`/`MultiFileInfo` (#47) 
+- Added `FileNameUtf8` and `PathUtf8` and `FullPathUtf8` properties to `SingleFileInfo`/`MultiFileInfo` ([#47]) 
   - These properties reads from the `name.utf-8` and `path.utf-8` fields.
 
 ### Changed
-- `Torrent.NumberOfPieces` now uses `Pieces.Length` instead of `TotalSize` for the calculation (#48)
+- `Torrent.NumberOfPieces` now uses `Pieces.Length` instead of `TotalSize` for the calculation ([#48])
 
 ## [3.0.1] - 2019-10-17
 ### Fixed
-- Fixed missing parser for `Torrent` (#44)
+- Fixed missing parser for `Torrent` ([#44])
 
 
 ## [3.0.0] - 2019-10-13
@@ -74,7 +79,7 @@ Lowest supported versions are now .NET Framework 4.6.1 (4.7.2 highly recommended
 
 ### Fixed
 - Parsing from non-seekable `Stream`s is now possible
-- Fixed issue parsing torrent files with non-standard 'announce-list' (#39)
+- Fixed issue parsing torrent files with non-standard 'announce-list' ([#39])
 
 
 ## [2.3.0] - 2019-02-11
@@ -145,7 +150,8 @@ and generally better usability; albeit a bit more complex.
 ## [1.0.0] - 2015-09-19
 
 
-[Unreleased]: ../../compare/v3.1.3...HEAD
+[Unreleased]: ../../compare/v3.1.4...HEAD
+[3.1.4]: ../../compare/v3.1.4...v3.1.4
 [3.1.3]: ../../compare/v3.1.0...v3.1.3
 [3.1.0]: ../../compare/v3.0.1...v3.1.0
 [3.0.1]: ../../compare/v3.0.0...v3.0.1
@@ -160,3 +166,8 @@ and generally better usability; albeit a bit more complex.
 [1.2.0]: ../../compare/v1.1.0...v1.2.0
 [1.1.0]: ../../compare/v1.0.0...v1.1.0
 [1.0.0]: ../../releases/tag/v1.0.0
+
+[#48]: https://github.com/Krusen/BencodeNET/issues/48
+[#47]: https://github.com/Krusen/BencodeNET/issues/47
+[#44]: https://github.com/Krusen/BencodeNET/issues/44
+[#39]: https://github.com/Krusen/BencodeNET/issues/39
