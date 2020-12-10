@@ -176,17 +176,17 @@ namespace BencodeNET.Torrents
 
         /// <summary>
         /// A concatenation of all 20-byte SHA1 hash values (one for each piece).
-        /// Use <see cref="PiecesAsHexString"/> to get/set this value as a hex string instead.
+        /// Use <see cref="PiecesConcatenatedAsHexString"/> to get/set this value as a hex string instead.
         /// </summary>
-        public virtual byte[] Pieces { get; set; } = new byte[0];
+        public virtual byte[] PiecesConcatenated { get; set; } = new byte[0];
 
         /// <summary>
-        /// Gets or sets <see cref="Pieces"/> from/to a hex string (without dashes), e.g. 1C115D26444AEF2A5E936133DCF8789A552BBE9F[...].
+        /// Gets or sets <see cref="PiecesConcatenated"/> from/to a hex string (without dashes), e.g. 1C115D26444AEF2A5E936133DCF8789A552BBE9F[...].
         /// The length of the string must be a multiple of 40.
         /// </summary>
-        public virtual string PiecesAsHexString
+        public virtual string PiecesConcatenatedAsHexString
         {
-            get => BitConverter.ToString(Pieces).Replace("-", "");
+            get => BitConverter.ToString(PiecesConcatenated).Replace("-", "");
             set
             {
                 if (value?.Length % 40 != 0)
@@ -202,7 +202,7 @@ namespace BencodeNET.Torrents
                     bytes[i] = Convert.ToByte(str, 16);
                 }
 
-                Pieces = bytes;
+                PiecesConcatenated = bytes;
             }
         }
 
@@ -232,8 +232,8 @@ namespace BencodeNET.Torrents
         /// <summary>
         /// The total number of file pieces.
         /// </summary>
-        public virtual int NumberOfPieces => Pieces != null
-            ? (int) Math.Ceiling((double) Pieces.Length / 20)
+        public virtual int NumberOfPieces => PiecesConcatenated != null
+            ? (int) Math.Ceiling((double) PiecesConcatenated.Length / 20)
             : 0;
 
         /// <summary>
@@ -286,8 +286,8 @@ namespace BencodeNET.Torrents
             if (PieceSize > 0)
                 info[TorrentInfoFields.PieceLength] = (BNumber) PieceSize;
 
-            if (Pieces?.Length > 0)
-                info[TorrentInfoFields.Pieces] = new BString(Pieces, encoding);
+            if (PiecesConcatenated?.Length > 0)
+                info[TorrentInfoFields.Pieces] = new BString(PiecesConcatenated, encoding);
 
             if (IsPrivate)
                 info[TorrentInfoFields.Private] = (BNumber)1;

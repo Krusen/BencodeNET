@@ -112,7 +112,7 @@ namespace BencodeNET.Torrents
             {
                 IsPrivate = info.Get<BNumber>(TorrentInfoFields.Private) == 1,
                 PieceSize = info.Get<BNumber>(TorrentInfoFields.PieceLength),
-                Pieces = info.Get<BString>(TorrentInfoFields.Pieces)?.Value.ToArray() ?? new byte[0],
+                PiecesConcatenated = info.Get<BString>(TorrentInfoFields.Pieces)?.Value.ToArray() ?? new byte[0],
 
                 Comment = data.Get<BString>(TorrentFields.Comment)?.ToString(encoding),
                 CreatedBy = data.Get<BString>(TorrentFields.CreatedBy)?.ToString(encoding),
