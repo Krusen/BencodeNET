@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Pipelines;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -17,7 +18,24 @@ namespace BencodeNET.Torrents
     /// </summary>
     public class Torrent : BObject
     {
+        private struct FileValidation
+        {
+            public bool isValid;
+            public int remainder;
+            public byte[] buffer;
+            public bool validateRemainder;
+
+            public FileValidation(long bufferSize, bool validateReminder)
+            {
+                isValid = false;
+                remainder = 0;
+                buffer = new byte[bufferSize];
+                this.validateRemainder = validateReminder;
+            }
+        }
+
         private const int SHA1_NUMBER_OF_BYTES = 20;
+        private HashAlgorithm sha1 = SHA1.Create();
 
         /// <summary>
         ///
@@ -254,6 +272,112 @@ namespace BencodeNET.Torrents
         public virtual int NumberOfPieces => PiecesConcatenated != null
             ? (int) Math.Ceiling((double) PiecesConcatenated.Length / 20)
             : 0;
+
+        /// <summary>
+        /// Verify integrity of the torrent content versus existing data
+        /// </summary>
+        /// <param name="path">either a folder path in multi mode or a file path in single mode</param>
+        /// <returns></returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "VSTHRD111:Use ConfigureAwait(bool)", Justification = "<Pending>")]
+        public async virtual Task<bool> ValidateExistingDataAsync(string path)
+        {
+            var isDirectory = Directory.Exists(path);
+            var isFile = System.IO.File.Exists(path);
+            if (isDirectory && FileMode != TorrentFileMode.Multi)
+            {
+                throw new BencodeException("The path represents a directory but the torrent is not set as a multi mode");
+            }
+            else if (isFile && FileMode != TorrentFileMode.Single)
+            {
+                throw new BencodeException("The path represents a file but the torrent is not set as a single mode");
+            }
+            else if (!isFile && !isDirectory)
+            {
+                throw new BencodeException("The path does not exist");
+            }
+
+            var validation = new FileValidation(PieceSize, false);
+            if (isFile)
+            {
+                validation = await ValidateExistingFileAsync(new System.IO.FileInfo(path));
+            }
+            else if (isDirectory)
+            {
+                validation.isValid = true;
+                var piecesOffset = 0;
+                for (int i = 0; i < Files.Count && validation.isValid; i++)
+                {
+                    validation.validateRemainder = (i + 1) == Files.Count;
+                    var file = new FileInfo(Path.Combine(path, Files.DirectoryName, Files[i].FullPath));
+                    validation = await ValidateExistingFileAsync(file, piecesOffset, validation);
+                    if (!validation.isValid)
+                    {
+                        break;
+                    }
+
+                    piecesOffset += (file.Exists ? (int)(file.Length / PieceSize) : 0);
+                }
+            }
+
+            return validation.isValid;
+        }
+
+        /// <summary>
+        /// Validate integrity of an existing file
+        /// </summary>
+        /// <param name="file">file to validate</param>
+        /// <returns></returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "VSTHRD111:Use ConfigureAwait(bool)", Justification = "<Pending>")]
+        private async Task<FileValidation> ValidateExistingFileAsync(FileInfo file)
+        {
+            return await ValidateExistingFileAsync(file, 0, new FileValidation(PieceSize, true));
+        }
+
+        /// <summary>
+        /// Validate integrity of an existing file
+        /// </summary>
+        /// <param name="file">file to validate</param>
+        /// <param name="piecesOffset">next piece index to validate</param>
+        /// <param name="validation">current validation data</param>
+        /// <remarks>Based on https://raw.githubusercontent.com/eclipse/ecf/master/protocols/bundles/org.eclipse.ecf.protocol.bittorrent/src/org/eclipse/ecf/protocol/bittorrent/TorrentFile.java</remarks>
+        /// <returns></returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "VSTHRD111:Use ConfigureAwait(bool)", Justification = "<Pending>")]
+        private async Task<FileValidation> ValidateExistingFileAsync(FileInfo file, int piecesOffset, FileValidation validation)
+        {
+            if (!file.Exists)
+            {
+                return validation;
+            }
+
+            int piecesIndex = piecesOffset, bytesRead = validation.remainder;
+            using (var stream = file.OpenRead())
+            {
+                while ((bytesRead += await stream.ReadAsync(validation.buffer, validation.remainder, (int)PieceSize - validation.remainder)) == PieceSize)
+                {
+                    if (!Pieces[piecesIndex].SequenceEqual(sha1.ComputeHash(validation.buffer)))
+                    {
+                        return validation;
+                    }
+                    piecesIndex++;
+                    bytesRead = 0;
+                    validation.remainder = 0;
+                }
+            }
+
+            validation.remainder = bytesRead;
+            if (!validation.validateRemainder || validation.remainder == 0)
+            {
+                validation.isValid = true;
+                return validation;
+            }
+
+            byte[] lastBuffer = new byte[validation.remainder];
+            Array.Copy(validation.buffer, lastBuffer, bytesRead);
+
+            validation.isValid = Pieces[piecesIndex].SequenceEqual(sha1.ComputeHash(lastBuffer));
+
+            return validation;
+        }
 
         /// <summary>
         /// Converts the torrent to a <see cref="BDictionary"/>.
