@@ -17,6 +17,8 @@ namespace BencodeNET.Torrents
     /// </summary>
     public class Torrent : BObject
     {
+        private const int SHA1_NUMBER_OF_BYTES = 20;
+
         /// <summary>
         ///
         /// </summary>
@@ -173,6 +175,23 @@ namespace BencodeNET.Torrents
         public virtual long PieceSize { get; set; }
 
         // TODO: Split into list of 20-byte hashes and rename to something appropriate?
+        /// <summary>
+        /// A list of all 20-byte SHA1 hash values (one for each piece).
+        /// </summary>
+        public List<byte[]> Pieces
+        {
+            get
+            {
+                var pieces = new List<byte[]>();
+                for (int i = 0; i < PiecesConcatenated.Length; i += SHA1_NUMBER_OF_BYTES)
+                {
+                    var piece = new byte[SHA1_NUMBER_OF_BYTES];
+                    Array.Copy(PiecesConcatenated, i, piece, 0, SHA1_NUMBER_OF_BYTES);
+                    pieces.Add(piece);
+                }
+                return pieces;
+            }
+        }
 
         /// <summary>
         /// A concatenation of all 20-byte SHA1 hash values (one for each piece).
