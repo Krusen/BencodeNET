@@ -283,6 +283,11 @@ namespace BencodeNET.Torrents
         {
             var isDirectory = Directory.Exists(path);
             var isFile = System.IO.File.Exists(path);
+            if (String.IsNullOrEmpty(path))
+            {
+                return false;
+            }
+
             if (isDirectory && FileMode != TorrentFileMode.Multi)
             {
                 throw new BencodeException("The path represents a directory but the torrent is not set as a multi mode");
@@ -293,7 +298,7 @@ namespace BencodeNET.Torrents
             }
             else if (!isFile && !isDirectory)
             {
-                throw new BencodeException("The path does not exist");
+                return false;
             }
 
             var validation = new FileValidation(PieceSize, false);
@@ -346,6 +351,7 @@ namespace BencodeNET.Torrents
         {
             if (!file.Exists)
             {
+                validation.isValid = false;
                 return validation;
             }
 
@@ -356,6 +362,7 @@ namespace BencodeNET.Torrents
                 {
                     if (!Pieces[piecesIndex].SequenceEqual(sha1.ComputeHash(validation.buffer)))
                     {
+                        validation.isValid = false;
                         return validation;
                     }
                     piecesIndex++;
