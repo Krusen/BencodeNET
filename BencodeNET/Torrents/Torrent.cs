@@ -21,16 +21,20 @@ namespace BencodeNET.Torrents
         private struct FileValidation
         {
             public bool isValid;
-            public int remainder;
+            public int piecesValidated;
+            public long remainder;
             public byte[] buffer;
             public bool validateRemainder;
+            public double tolerance;
 
-            public FileValidation(long bufferSize, bool validateReminder)
+            public FileValidation(long bufferSize, bool validateReminder, double tolerance)
             {
+                piecesValidated = 0;
                 isValid = false;
                 remainder = 0;
                 buffer = new byte[bufferSize];
                 this.validateRemainder = validateReminder;
+                this.tolerance = tolerance;
             }
         }
 
@@ -277,10 +281,16 @@ namespace BencodeNET.Torrents
         /// Verify integrity of the torrent content versus existing data
         /// </summary>
         /// <param name="path">either a folder path in multi mode or a file path in single mode</param>
+        /// <param name="tolerance">percentage of torrent so it is concidered valid (>=1 = 100%, 0.95 = 95%). Only valid in MultiFile mode.</param>
         /// <returns></returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "VSTHRD111:Use ConfigureAwait(bool)", Justification = "<Pending>")]
-        public async virtual Task<bool> ValidateExistingDataAsync(string path)
+        public async virtual Task<bool> ValidateExistingDataAsync(string path, double tolerance = 1)
         {
+            if (tolerance > 1)
+            {
+                tolerance = 1;
+            }
+
             var isDirectory = Directory.Exists(path);
             var isFile = System.IO.File.Exists(path);
             if (String.IsNullOrEmpty(path))
@@ -301,7 +311,7 @@ namespace BencodeNET.Torrents
                 return false;
             }
 
-            var validation = new FileValidation(PieceSize, false);
+            var validation = new FileValidation(PieceSize, false, tolerance);
             if (isFile)
             {
                 validation = await ValidateExistingFileAsync(new System.IO.FileInfo(path));
@@ -310,21 +320,23 @@ namespace BencodeNET.Torrents
             {
                 validation.isValid = true;
                 var piecesOffset = 0;
-                for (int i = 0; i < Files.Count && validation.isValid; i++)
+                for (int i = 0; i < Files.Count && piecesOffset < NumberOfPieces; i++)
                 {
+                    var previousRemainder = validation.remainder;
                     validation.validateRemainder = (i + 1) == Files.Count;
                     var file = new FileInfo(Path.Combine(path, Files.DirectoryName, Files[i].FullPath));
                     validation = await ValidateExistingFileAsync(file, piecesOffset, validation);
-                    if (!validation.isValid)
+                    if (!validation.isValid && tolerance == 1)
                     {
                         break;
                     }
 
-                    piecesOffset += (file.Exists ? (int)(file.Length / PieceSize) : 0);
+                    validation.remainder = (Files[i].FileSize + previousRemainder) % PieceSize; // Set again the remainder in case the file was not existing or partially good
+                    piecesOffset += (int)((Files[i].FileSize + previousRemainder) / PieceSize);
                 }
             }
 
-            return validation.isValid;
+            return ((double)validation.piecesValidated / (double)NumberOfPieces) >= tolerance;
         }
 
         /// <summary>
@@ -335,7 +347,7 @@ namespace BencodeNET.Torrents
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "VSTHRD111:Use ConfigureAwait(bool)", Justification = "<Pending>")]
         private async Task<FileValidation> ValidateExistingFileAsync(FileInfo file)
         {
-            return await ValidateExistingFileAsync(file, 0, new FileValidation(PieceSize, true));
+            return await ValidateExistingFileAsync(file, 0, new FileValidation(PieceSize, true, 1)); ;
         }
 
         /// <summary>
@@ -355,16 +367,20 @@ namespace BencodeNET.Torrents
                 return validation;
             }
 
-            int piecesIndex = piecesOffset, bytesRead = validation.remainder;
+            int piecesIndex = piecesOffset, bytesRead = (int)validation.remainder;
             using (var stream = file.OpenRead())
             {
-                while ((bytesRead += await stream.ReadAsync(validation.buffer, validation.remainder, (int)PieceSize - validation.remainder)) == PieceSize)
+                while ((bytesRead += await stream.ReadAsync(validation.buffer, (int)validation.remainder, (int)(PieceSize - validation.remainder))) == PieceSize)
                 {
-                    if (!Pieces[piecesIndex].SequenceEqual(sha1.ComputeHash(validation.buffer)))
+                    var isFileTooLarge = piecesIndex >= NumberOfPieces;
+                    var isPieceNotMatching = !isFileTooLarge && !Pieces[piecesIndex].SequenceEqual(sha1.ComputeHash(validation.buffer)) && validation.tolerance == 1;
+                    if (isFileTooLarge || isPieceNotMatching)
                     {
                         validation.isValid = false;
                         return validation;
                     }
+
+                    validation.piecesValidated++;
                     piecesIndex++;
                     bytesRead = 0;
                     validation.remainder = 0;
@@ -382,6 +398,7 @@ namespace BencodeNET.Torrents
             Array.Copy(validation.buffer, lastBuffer, bytesRead);
 
             validation.isValid = Pieces[piecesIndex].SequenceEqual(sha1.ComputeHash(lastBuffer));
+            validation.piecesValidated += (validation.isValid ? 1 : 0);
 
             return validation;
         }
