@@ -96,7 +96,7 @@ namespace BencodeNET.Torrents.Validation
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "VSTHRD111:Use ConfigureAwait(bool)", Justification = "<Pending>")]
         private async Task<ValidationData> ValidateExistingFileAsync(FileInfo file)
         {
-            return await ValidateExistingFileAsync(file, 0, new ValidationData(PieceSize, true)); ;
+            return await ValidateExistingFileAsync(file, 0, new ValidationData(PieceSize, true));
         }
 
         /// <summary>
