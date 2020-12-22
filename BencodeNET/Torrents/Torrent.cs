@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Pipelines;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using BencodeNET.Exceptions;
 using BencodeNET.Objects;
+using BencodeNET.Torrents.Validation;
 
 namespace BencodeNET.Torrents
 {
@@ -18,28 +18,10 @@ namespace BencodeNET.Torrents
     /// </summary>
     public class Torrent : BObject
     {
-        private struct FileValidation
-        {
-            public bool isValid;
-            public int piecesValidated;
-            public long remainder;
-            public byte[] buffer;
-            public bool validateRemainder;
-            public double tolerance;
-
-            public FileValidation(long bufferSize, bool validateReminder, double tolerance)
-            {
-                piecesValidated = 0;
-                isValid = false;
-                remainder = 0;
-                buffer = new byte[bufferSize];
-                this.validateRemainder = validateReminder;
-                this.tolerance = tolerance;
-            }
-        }
-
-        private const int SHA1_NUMBER_OF_BYTES = 20;
-        private HashAlgorithm sha1 = SHA1.Create();
+        /// <summary>
+        /// Number of bytes a piece has
+        /// </summary>
+        private const int PIECE_NUMBER_OF_BYTES = 20;
 
         /// <summary>
         ///
@@ -205,10 +187,10 @@ namespace BencodeNET.Torrents
             get
             {
                 var pieces = new List<byte[]>();
-                for (int i = 0; i < PiecesConcatenated.Length; i += SHA1_NUMBER_OF_BYTES)
+                for (int i = 0; i < PiecesConcatenated.Length; i += PIECE_NUMBER_OF_BYTES)
                 {
-                    var piece = new byte[SHA1_NUMBER_OF_BYTES];
-                    Array.Copy(PiecesConcatenated, i, piece, 0, SHA1_NUMBER_OF_BYTES);
+                    var piece = new byte[PIECE_NUMBER_OF_BYTES];
+                    Array.Copy(PiecesConcatenated, i, piece, 0, PIECE_NUMBER_OF_BYTES);
                     pieces.Add(piece);
                 }
                 return pieces;
@@ -280,127 +262,14 @@ namespace BencodeNET.Torrents
         /// <summary>
         /// Verify integrity of the torrent content versus existing data
         /// </summary>
-        /// <param name="path">either a folder path in multi mode or a file path in single mode</param>
-        /// <param name="tolerance">percentage of torrent so it is concidered valid (>=1 = 100%, 0.95 = 95%). Only valid in MultiFile mode.</param>
+        /// <param name="path">Either a folder path in multi mode or a file path in single mode</param>
+        /// <param name="options">Validation options. Null means the dafault options</param>
         /// <returns></returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "VSTHRD111:Use ConfigureAwait(bool)", Justification = "<Pending>")]
-        public async virtual Task<bool> ValidateExistingDataAsync(string path, double tolerance = 1)
+        public async virtual Task<bool> ValidateExistingDataAsync(string path, ValidationOptions options = null)
         {
-            if (tolerance > 1)
-            {
-                tolerance = 1;
-            }
-
-            var isDirectory = Directory.Exists(path);
-            var isFile = System.IO.File.Exists(path);
-            if (String.IsNullOrEmpty(path))
-            {
-                return false;
-            }
-
-            if (isDirectory && FileMode != TorrentFileMode.Multi)
-            {
-                throw new BencodeException("The path represents a directory but the torrent is not set as a multi mode");
-            }
-            else if (isFile && FileMode != TorrentFileMode.Single)
-            {
-                throw new BencodeException("The path represents a file but the torrent is not set as a single mode");
-            }
-            else if (!isFile && !isDirectory)
-            {
-                return false;
-            }
-
-            var validation = new FileValidation(PieceSize, false, tolerance);
-            if (isFile)
-            {
-                validation = await ValidateExistingFileAsync(new System.IO.FileInfo(path));
-            }
-            else if (isDirectory)
-            {
-                validation.isValid = true;
-                var piecesOffset = 0;
-                for (int i = 0; i < Files.Count && piecesOffset < NumberOfPieces; i++)
-                {
-                    var previousRemainder = validation.remainder;
-                    validation.validateRemainder = (i + 1) == Files.Count;
-                    var file = new FileInfo(Path.Combine(path, Files.DirectoryName, Files[i].FullPath));
-                    validation = await ValidateExistingFileAsync(file, piecesOffset, validation);
-                    if (!validation.isValid && tolerance == 1)
-                    {
-                        break;
-                    }
-
-                    validation.remainder = (Files[i].FileSize + previousRemainder) % PieceSize; // Set again the remainder in case the file was not existing or partially good
-                    piecesOffset += (int)((Files[i].FileSize + previousRemainder) / PieceSize);
-                }
-            }
-
-            return ((double)validation.piecesValidated / (double)NumberOfPieces) >= tolerance;
-        }
-
-        /// <summary>
-        /// Validate integrity of an existing file
-        /// </summary>
-        /// <param name="file">file to validate</param>
-        /// <returns></returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "VSTHRD111:Use ConfigureAwait(bool)", Justification = "<Pending>")]
-        private async Task<FileValidation> ValidateExistingFileAsync(FileInfo file)
-        {
-            return await ValidateExistingFileAsync(file, 0, new FileValidation(PieceSize, true, 1)); ;
-        }
-
-        /// <summary>
-        /// Validate integrity of an existing file
-        /// </summary>
-        /// <param name="file">file to validate</param>
-        /// <param name="piecesOffset">next piece index to validate</param>
-        /// <param name="validation">current validation data</param>
-        /// <remarks>Based on https://raw.githubusercontent.com/eclipse/ecf/master/protocols/bundles/org.eclipse.ecf.protocol.bittorrent/src/org/eclipse/ecf/protocol/bittorrent/TorrentFile.java</remarks>
-        /// <returns></returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "VSTHRD111:Use ConfigureAwait(bool)", Justification = "<Pending>")]
-        private async Task<FileValidation> ValidateExistingFileAsync(FileInfo file, int piecesOffset, FileValidation validation)
-        {
-            if (!file.Exists)
-            {
-                validation.isValid = false;
-                return validation;
-            }
-
-            int piecesIndex = piecesOffset, bytesRead = (int)validation.remainder;
-            using (var stream = file.OpenRead())
-            {
-                while ((bytesRead += await stream.ReadAsync(validation.buffer, (int)validation.remainder, (int)(PieceSize - validation.remainder))) == PieceSize)
-                {
-                    var isFileTooLarge = piecesIndex >= NumberOfPieces;
-                    var isPieceNotMatching = !isFileTooLarge && !Pieces[piecesIndex].SequenceEqual(sha1.ComputeHash(validation.buffer)) && validation.tolerance == 1;
-                    if (isFileTooLarge || isPieceNotMatching)
-                    {
-                        validation.isValid = false;
-                        return validation;
-                    }
-
-                    validation.piecesValidated++;
-                    piecesIndex++;
-                    bytesRead = 0;
-                    validation.remainder = 0;
-                }
-            }
-
-            validation.remainder = bytesRead;
-            if (!validation.validateRemainder || validation.remainder == 0)
-            {
-                validation.isValid = true;
-                return validation;
-            }
-
-            byte[] lastBuffer = new byte[validation.remainder];
-            Array.Copy(validation.buffer, lastBuffer, bytesRead);
-
-            validation.isValid = Pieces[piecesIndex].SequenceEqual(sha1.ComputeHash(lastBuffer));
-            validation.piecesValidated += (validation.isValid ? 1 : 0);
-
-            return validation;
+            var validator = new Validator(this, options);
+            return await validator.ValidateExistingDataAsync(path);
         }
 
         /// <summary>
