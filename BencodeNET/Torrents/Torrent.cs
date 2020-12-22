@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BencodeNET.Exceptions;
 using BencodeNET.Objects;
+using BencodeNET.Torrents.Validation;
 
 namespace BencodeNET.Torrents
 {
@@ -17,6 +18,11 @@ namespace BencodeNET.Torrents
     /// </summary>
     public class Torrent : BObject
     {
+        /// <summary>
+        /// Number of bytes a piece has
+        /// </summary>
+        private const int PIECE_NUMBER_OF_BYTES = 20;
+
         /// <summary>
         ///
         /// </summary>
@@ -173,20 +179,37 @@ namespace BencodeNET.Torrents
         public virtual long PieceSize { get; set; }
 
         // TODO: Split into list of 20-byte hashes and rename to something appropriate?
+        /// <summary>
+        /// A list of all 20-byte SHA1 hash values (one for each piece).
+        /// </summary>
+        public List<byte[]> Pieces
+        {
+            get
+            {
+                var pieces = new List<byte[]>();
+                for (int i = 0; i < PiecesConcatenated.Length; i += PIECE_NUMBER_OF_BYTES)
+                {
+                    var piece = new byte[PIECE_NUMBER_OF_BYTES];
+                    Array.Copy(PiecesConcatenated, i, piece, 0, PIECE_NUMBER_OF_BYTES);
+                    pieces.Add(piece);
+                }
+                return pieces;
+            }
+        }
 
         /// <summary>
         /// A concatenation of all 20-byte SHA1 hash values (one for each piece).
-        /// Use <see cref="PiecesAsHexString"/> to get/set this value as a hex string instead.
+        /// Use <see cref="PiecesConcatenatedAsHexString"/> to get/set this value as a hex string instead.
         /// </summary>
-        public virtual byte[] Pieces { get; set; } = new byte[0];
+        public virtual byte[] PiecesConcatenated { get; set; } = new byte[0];
 
         /// <summary>
-        /// Gets or sets <see cref="Pieces"/> from/to a hex string (without dashes), e.g. 1C115D26444AEF2A5E936133DCF8789A552BBE9F[...].
+        /// Gets or sets <see cref="PiecesConcatenated"/> from/to a hex string (without dashes), e.g. 1C115D26444AEF2A5E936133DCF8789A552BBE9F[...].
         /// The length of the string must be a multiple of 40.
         /// </summary>
-        public virtual string PiecesAsHexString
+        public virtual string PiecesConcatenatedAsHexString
         {
-            get => BitConverter.ToString(Pieces).Replace("-", "");
+            get => BitConverter.ToString(PiecesConcatenated).Replace("-", "");
             set
             {
                 if (value?.Length % 40 != 0)
@@ -195,14 +218,14 @@ namespace BencodeNET.Torrents
                 if (Regex.IsMatch(value, "[^0-9A-F]"))
                     throw new ArgumentException("Value must only contain hex characters (0-9 and A-F) and only uppercase.");
 
-                var bytes = new byte[value.Length/2];
+                var bytes = new byte[value.Length / 2];
                 for (var i = 0; i < bytes.Length; i++)
                 {
-                    var str = $"{value[i*2]}{value[i*2+1]}";
+                    var str = $"{value[i * 2]}{value[i * 2 + 1]}";
                     bytes[i] = Convert.ToByte(str, 16);
                 }
 
-                Pieces = bytes;
+                PiecesConcatenated = bytes;
             }
         }
 
@@ -232,9 +255,22 @@ namespace BencodeNET.Torrents
         /// <summary>
         /// The total number of file pieces.
         /// </summary>
-        public virtual int NumberOfPieces => Pieces != null
-            ? (int) Math.Ceiling((double) Pieces.Length / 20)
+        public virtual int NumberOfPieces => PiecesConcatenated != null
+            ? (int)Math.Ceiling((double)PiecesConcatenated.Length / 20)
             : 0;
+
+        /// <summary>
+        /// Verify integrity of the torrent content versus existing data
+        /// </summary>
+        /// <param name="path">Either a folder path in multi mode or a file path in single mode</param>
+        /// <param name="options">Validation options. Null means the dafault options</param>
+        /// <returns></returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "VSTHRD111:Use ConfigureAwait(bool)", Justification = "<Pending>")]
+        public async virtual Task<bool> ValidateExistingDataAsync(string path, ValidationOptions options = null)
+        {
+            var validator = new Validator(this, options);
+            return await validator.ValidateExistingDataAsync(path);
+        }
 
         /// <summary>
         /// Converts the torrent to a <see cref="BDictionary"/>.
@@ -284,10 +320,10 @@ namespace BencodeNET.Torrents
             var info = new BDictionary();
 
             if (PieceSize > 0)
-                info[TorrentInfoFields.PieceLength] = (BNumber) PieceSize;
+                info[TorrentInfoFields.PieceLength] = (BNumber)PieceSize;
 
-            if (Pieces?.Length > 0)
-                info[TorrentInfoFields.Pieces] = new BString(Pieces, encoding);
+            if (PiecesConcatenated?.Length > 0)
+                info[TorrentInfoFields.Pieces] = new BString(PiecesConcatenated, encoding);
 
             if (IsPrivate)
                 info[TorrentInfoFields.Private] = (BNumber)1;
