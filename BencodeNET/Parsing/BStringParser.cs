@@ -110,29 +110,27 @@ namespace BencodeNET.Parsing
 
             var startPosition = reader.Position;
 
-            using (var memoryOwner = MemoryPool<char>.Shared.Rent(BString.LengthMaxDigits))
+            using var memoryOwner = MemoryPool<char>.Shared.Rent(BString.LengthMaxDigits);
+            var lengthString = memoryOwner.Memory;
+            var lengthStringCount = 0;
+            for (var c = await reader.ReadCharAsync(cancellationToken).ConfigureAwait(false);
+                c != default && c.IsDigit();
+                c = await reader.ReadCharAsync(cancellationToken).ConfigureAwait(false))
             {
-                var lengthString = memoryOwner.Memory;
-                var lengthStringCount = 0;
-                for (var c = await reader.ReadCharAsync(cancellationToken).ConfigureAwait(false);
-                    c != default && c.IsDigit();
-                    c = await reader.ReadCharAsync(cancellationToken).ConfigureAwait(false))
-                {
-                    EnsureLengthStringBelowMaxLength(lengthStringCount, startPosition);
+                EnsureLengthStringBelowMaxLength(lengthStringCount, startPosition);
 
-                    lengthString.Span[lengthStringCount++] = c;
-                }
-
-                EnsurePreviousCharIsColon(reader.PreviousChar, reader.Position);
-
-                var stringLength = ParseStringLength(lengthString.Span, lengthStringCount, startPosition);
-                var bytes = new byte[stringLength];
-                var bytesRead = await reader.ReadAsync(bytes, cancellationToken).ConfigureAwait(false);
-
-                EnsureExpectedBytesRead(bytesRead, stringLength, startPosition);
-
-                return new BString(bytes, Encoding);
+                lengthString.Span[lengthStringCount++] = c;
             }
+
+            EnsurePreviousCharIsColon(reader.PreviousChar, reader.Position);
+
+            var stringLength = ParseStringLength(lengthString.Span, lengthStringCount, startPosition);
+            var bytes = new byte[stringLength];
+            var bytesRead = await reader.ReadAsync(bytes, cancellationToken).ConfigureAwait(false);
+
+            EnsureExpectedBytesRead(bytesRead, stringLength, startPosition);
+
+            return new BString(bytes, Encoding);
         }
 
         /// <summary>

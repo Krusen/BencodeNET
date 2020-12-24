@@ -122,10 +122,7 @@ namespace BencodeNET.Objects
 
         public static bool operator ==(BString first, BString second)
         {
-            if (first is null)
-                return second is null;
-
-            return first.Equals(second);
+            return first?.Equals(second) ?? second is null;
         }
 
         public static bool operator !=(BString first, BString second) => !(first == second);
@@ -173,7 +170,7 @@ namespace BencodeNET.Objects
         /// </returns>
         public string ToString(Encoding encoding)
         {
-            encoding = encoding ?? _encoding;
+            encoding ??= _encoding;
             return encoding.GetString(Value.Span);
         }
     }

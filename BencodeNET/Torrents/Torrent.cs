@@ -395,10 +395,7 @@ namespace BencodeNET.Torrents
 #pragma warning disable 1591
         public static bool operator ==(Torrent first, Torrent second)
         {
-            if (ReferenceEquals(first, null))
-                return ReferenceEquals(second, null);
-
-            return first.Equals(second);
+            return first?.Equals(second) ?? second is null;
         }
 
         public static bool operator !=(Torrent first, Torrent second)
@@ -412,14 +409,12 @@ namespace BencodeNET.Torrents
             if (obj == null)
                 return false;
 
-            using (var ms1 = EncodeTo(new MemoryStream()))
-            using (var ms2 = obj.EncodeTo(new MemoryStream()))
-            {
-                var bytes1 = ms1.ToArray();
-                var bytes2 = ms2.ToArray();
+            using var ms1 = EncodeTo(new MemoryStream());
+            using var ms2 = obj.EncodeTo(new MemoryStream());
+            var bytes1 = ms1.ToArray();
+            var bytes2 = ms2.ToArray();
 
-                return bytes1.SequenceEqual(bytes2);
-            }
+            return bytes1.SequenceEqual(bytes2);
         }
 
         public override int GetHashCode()

@@ -20,10 +20,8 @@ namespace BencodeNET.Parsing
         /// <returns>The parsed object.</returns>
         public static IBObject ParseString(this IBencodeParser parser, string bencodedString)
         {
-            using (var stream = bencodedString.AsStream(parser.Encoding))
-            {
-                return parser.Parse(stream);
-            }
+            using var stream = bencodedString.AsStream(parser.Encoding);
+            return parser.Parse(stream);
         }
 
         /// <summary>
@@ -34,10 +32,8 @@ namespace BencodeNET.Parsing
         /// <returns>The parsed object.</returns>
         public static IBObject Parse(this IBencodeParser parser, byte[] bytes)
         {
-            using (var stream = new MemoryStream(bytes))
-            {
-                return parser.Parse(stream);
-            }
+            using var stream = new MemoryStream(bytes);
+            return parser.Parse(stream);
         }
 
         /// <summary>
@@ -48,10 +44,8 @@ namespace BencodeNET.Parsing
         /// <returns>The parsed object.</returns>
         public static IBObject Parse(this IBencodeParser parser, string filePath)
         {
-            using (var stream = File.OpenRead(filePath))
-            {
-                return parser.Parse(stream);
-            }
+            using var stream = File.OpenRead(filePath);
+            return parser.Parse(stream);
         }
 
         /// <summary>
@@ -63,10 +57,8 @@ namespace BencodeNET.Parsing
         /// <returns>The parsed object.</returns>
         public static T ParseString<T>(this IBencodeParser parser, string bencodedString) where T : class, IBObject
         {
-            using (var stream = bencodedString.AsStream(parser.Encoding))
-            {
-                return parser.Parse<T>(stream);
-            }
+            using var stream = bencodedString.AsStream(parser.Encoding);
+            return parser.Parse<T>(stream);
         }
 
         /// <summary>
@@ -78,10 +70,8 @@ namespace BencodeNET.Parsing
         /// <returns>The parsed object.</returns>
         public static T Parse<T>(this IBencodeParser parser, byte[] bytes) where T : class, IBObject
         {
-            using (var stream = new MemoryStream(bytes))
-            {
-                return parser.Parse<T>(stream);
-            }
+            using var stream = new MemoryStream(bytes);
+            return parser.Parse<T>(stream);
         }
 
         /// <summary>
@@ -92,10 +82,8 @@ namespace BencodeNET.Parsing
         /// <returns>The parsed object.</returns>
         public static T Parse<T>(this IBencodeParser parser, string filePath) where T : class, IBObject
         {
-            using (var stream = File.OpenRead(filePath))
-            {
-                return parser.Parse<T>(stream);
-            }
+            using var stream = File.OpenRead(filePath);
+            return parser.Parse<T>(stream);
         }
 
         /// <summary>
@@ -106,10 +94,8 @@ namespace BencodeNET.Parsing
         /// <returns>The parsed object.</returns>
         public static IBObject Parse(this IBencodeParser parser, Stream stream)
         {
-            using (var reader = new BencodeReader(stream, leaveOpen: true))
-            {
-                return parser.Parse(reader);
-            }
+            using var reader = new BencodeReader(stream, leaveOpen: true);
+            return parser.Parse(reader);
         }
 
         /// <summary>
@@ -121,10 +107,8 @@ namespace BencodeNET.Parsing
         /// <returns>The parsed object.</returns>
         public static T Parse<T>(this IBencodeParser parser, Stream stream) where T : class, IBObject
         {
-            using (var reader = new BencodeReader(stream, leaveOpen: true))
-            {
-                return parser.Parse<T>(reader);
-            }
+            using var reader = new BencodeReader(stream, leaveOpen: true);
+            return parser.Parse<T>(reader);
         }
 
         /// <summary>
