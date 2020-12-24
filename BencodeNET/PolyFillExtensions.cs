@@ -6,7 +6,7 @@ using System.Text;
 
 namespace BencodeNET
 {
-#if !NETCOREAPP3_0
+#if NETSTANDARD2_0
     internal static class PolyFillExtensions
     {
         public static unsafe int GetBytes(this Encoding encoding, ReadOnlySpan<char> chars, Span<byte> bytes)

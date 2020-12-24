@@ -129,7 +129,7 @@ namespace BencodeNET
             bytes[index] = (byte) c;
         }
 
-#if NETCOREAPP
+#if !NETSTANDARD2_0
         public static string AsString(this ReadOnlySpan<char> chars)
         {
             return new string(chars);
