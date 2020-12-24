@@ -133,6 +133,11 @@ namespace BencodeNET.Torrents
             }
         }
 
+        /// <summary>
+        /// Returns the UTF-8 "display name" of the torrent.
+        /// For single-file torrents this is the file name of that file.
+        /// For multi-file torrents this is the directory name.
+        /// </summary>
         public virtual string DisplayNameUtf8
         {
             get
