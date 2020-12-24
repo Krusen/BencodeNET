@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Changed target frameworks to:
+  - .NET Standard 2.0
+  - .NET Standard 2.1
+  - .NET Core App 2.1
+  - .NET 5.0
+
 ...
 
 ## [3.1.4] - 2020-03-06
