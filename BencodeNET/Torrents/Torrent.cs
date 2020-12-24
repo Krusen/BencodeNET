@@ -183,7 +183,7 @@ namespace BencodeNET.Torrents
         /// A concatenation of all 20-byte SHA1 hash values (one for each piece).
         /// Use <see cref="PiecesAsHexString"/> to get/set this value as a hex string instead.
         /// </summary>
-        public virtual byte[] Pieces { get; set; } = new byte[0];
+        public virtual byte[] Pieces { get; set; } = Array.Empty<byte>();
 
         /// <summary>
         /// Gets or sets <see cref="Pieces"/> from/to a hex string (without dashes), e.g. 1C115D26444AEF2A5E936133DCF8789A552BBE9F[...].
