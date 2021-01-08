@@ -5,25 +5,31 @@ using Xunit;
 
 namespace BencodeNET.Tests
 {
-    public class AutoMockedDataAttribute : AutoDataAttribute
+    public class AutoMockedDataAttribute : CompositeDataAttribute
     {
         public AutoMockedDataAttribute()
-            : base(() => new Fixture().Customize(new AutoNSubstituteCustomization {ConfigureMembers = true}))
-        { }
-    }
-
-    public class InlineAutoMockedDataAttribute : CompositeDataAttribute
-    {
-        public InlineAutoMockedDataAttribute()
-            : this(new AutoMockedDataAttribute())
+            : this(new BaseAutoMockedDataAttribute())
         { }
 
-        public InlineAutoMockedDataAttribute(params object[] values)
-            : this(new AutoMockedDataAttribute(), values)
+        public AutoMockedDataAttribute(params object[] values)
+            : this(new BaseAutoMockedDataAttribute(), values)
         { }
 
-        public InlineAutoMockedDataAttribute(AutoMockedDataAttribute autoDataAttributeAttribute, params object[] values)
-            : base(new InlineDataAttribute(values), autoDataAttributeAttribute)
+        private AutoMockedDataAttribute(BaseAutoMockedDataAttribute baseAutoDataAttribute, params object[] values)
+            : base(new InlineDataAttribute(values), baseAutoDataAttribute)
         { }
+
+        private class BaseAutoMockedDataAttribute : AutoDataAttribute
+        {
+            public BaseAutoMockedDataAttribute()
+                : base(Configure)
+            {
+            }
+
+            private static IFixture Configure()
+            {
+                return new Fixture().Customize(new AutoNSubstituteCustomization { ConfigureMembers = true });
+            }
+        }
     }
 }
