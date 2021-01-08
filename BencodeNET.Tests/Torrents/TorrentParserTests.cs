@@ -4,6 +4,7 @@ using System.Text;
 using BencodeNET.IO;
 using BencodeNET.Objects;
 using BencodeNET.Parsing;
+using BencodeNET.Tests.AutoFixture;
 using BencodeNET.Torrents;
 using FluentAssertions;
 using NSubstitute;
@@ -202,16 +203,17 @@ namespace BencodeNET.Tests.Torrents
 
         [Theory]
         [AutoMockedData]
-        public void Info_Pieces_IsParsed(byte[] pieces)
+        public void Info_Pieces_IsParsed([RepeatCount(20)] byte[] pieces)
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
             var info = ParsedData.Get<BDictionary>(TorrentFields.Info);
             info[TorrentInfoFields.Pieces] = new BString(pieces);
+            pieces.Should().HaveCount(20);
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            var torrent = parser.Parse((BencodeReader)null);
+            var torrent = parser.Parse((BencodeReader) null);
 
             // Assert
             torrent.Pieces.Should().Equal(pieces);

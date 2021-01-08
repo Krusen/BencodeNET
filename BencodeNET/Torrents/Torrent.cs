@@ -177,13 +177,26 @@ namespace BencodeNET.Torrents
         /// </summary>
         public virtual long PieceSize { get; set; }
 
-        // TODO: Split into list of 20-byte hashes and rename to something appropriate?
-
         /// <summary>
         /// A concatenation of all 20-byte SHA1 hash values (one for each piece).
         /// Use <see cref="PiecesAsHexString"/> to get/set this value as a hex string instead.
         /// </summary>
-        public virtual byte[] Pieces { get; set; } = Array.Empty<byte>();
+        public virtual byte[] Pieces
+        {
+            get => _pieces;
+            set
+            {
+                if (value is null)
+                    throw new ArgumentNullException(nameof(value), "Pieces array cannot be null.");
+
+                var remainder = value.Length % 20;
+                if (remainder is not 0)
+                    throw new ArgumentException($"Array size has to be a multiple of 20, but length was {value.Length}");
+
+                _pieces = value;
+            }
+        }
+        private byte[] _pieces = Array.Empty<byte>();
 
         /// <summary>
         /// Gets or sets <see cref="Pieces"/> from/to a hex string (without dashes), e.g. 1C115D26444AEF2A5E936133DCF8789A552BBE9F[...].

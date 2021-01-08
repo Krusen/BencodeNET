@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using AutoFixture.Xunit2;
 using BencodeNET.Exceptions;
 using BencodeNET.Objects;
 using BencodeNET.Torrents;
@@ -133,6 +134,27 @@ namespace BencodeNET.Tests.Torrents
 
             torrent.FileMode.Should().Be(TorrentFileMode.Unknown);
             act.Should().Throw<BencodeException>();
+        }
+
+        [Theory]
+        [AutoMockedData]
+        public void Pieces_Setter_NullValue_ThrowsArgumentNullException([NoAutoProperties] Torrent torrent)
+        {
+            Action act = () => torrent.Pieces = null;
+
+            act.Should().ThrowExactly<ArgumentNullException>();
+        }
+
+        [Theory]
+        [AutoMockedData]
+        public void Pieces_Setter_NotMultipleOf20_ThrowsArgumentException([NoAutoProperties] Torrent torrent)
+        {
+            var pieces = new byte[] { 66, 115, 135, 19, 149, 125, 229, 85, 68, 117, 252, 185, 243, 247, 139, 38, 11, 37, 60 };
+            pieces.Should().NotHaveCount(20);
+
+            Action act = () => torrent.Pieces = pieces;
+
+            act.Should().ThrowExactly<ArgumentException>();
         }
 
         [Fact]
