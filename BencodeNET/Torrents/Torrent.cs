@@ -133,6 +133,11 @@ namespace BencodeNET.Torrents
             }
         }
 
+        /// <summary>
+        /// Returns the UTF-8 "display name" of the torrent.
+        /// For single-file torrents this is the file name of that file.
+        /// For multi-file torrents this is the directory name.
+        /// </summary>
         public virtual string DisplayNameUtf8
         {
             get
@@ -172,13 +177,26 @@ namespace BencodeNET.Torrents
         /// </summary>
         public virtual long PieceSize { get; set; }
 
-        // TODO: Split into list of 20-byte hashes and rename to something appropriate?
-
         /// <summary>
         /// A concatenation of all 20-byte SHA1 hash values (one for each piece).
         /// Use <see cref="PiecesAsHexString"/> to get/set this value as a hex string instead.
         /// </summary>
-        public virtual byte[] Pieces { get; set; } = new byte[0];
+        public virtual byte[] Pieces
+        {
+            get => _pieces;
+            set
+            {
+                if (value is null)
+                    throw new ArgumentNullException(nameof(value), "Pieces array cannot be null.");
+
+                var remainder = value.Length % 20;
+                if (remainder is not 0)
+                    throw new ArgumentException($"Array size has to be a multiple of 20, but length was {value.Length}");
+
+                _pieces = value;
+            }
+        }
+        private byte[] _pieces = Array.Empty<byte>();
 
         /// <summary>
         /// Gets or sets <see cref="Pieces"/> from/to a hex string (without dashes), e.g. 1C115D26444AEF2A5E936133DCF8789A552BBE9F[...].
@@ -390,10 +408,7 @@ namespace BencodeNET.Torrents
 #pragma warning disable 1591
         public static bool operator ==(Torrent first, Torrent second)
         {
-            if (ReferenceEquals(first, null))
-                return ReferenceEquals(second, null);
-
-            return first.Equals(second);
+            return first?.Equals(second) ?? second is null;
         }
 
         public static bool operator !=(Torrent first, Torrent second)
@@ -407,14 +422,12 @@ namespace BencodeNET.Torrents
             if (obj == null)
                 return false;
 
-            using (var ms1 = EncodeTo(new MemoryStream()))
-            using (var ms2 = obj.EncodeTo(new MemoryStream()))
-            {
-                var bytes1 = ms1.ToArray();
-                var bytes2 = ms2.ToArray();
+            using var ms1 = EncodeTo(new MemoryStream());
+            using var ms2 = obj.EncodeTo(new MemoryStream());
+            var bytes1 = ms1.ToArray();
+            var bytes2 = ms2.ToArray();
 
-                return bytes1.SequenceEqual(bytes2);
-            }
+            return bytes1.SequenceEqual(bytes2);
         }
 
         public override int GetHashCode()

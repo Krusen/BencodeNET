@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ...
 
+## [4.0.0] - 2021-01-23
+### Changed
+- Changed supported frameworks to:
+  - .NET Standard 2.0
+  - .NET Standard 2.1
+  - .NET Core App 2.1
+  - .NET 5.0
+- `Torrent.Pieces` can now only be set to an array with a length which is a multiple of 20.
+
 ## [3.1.4] - 2020-03-06
 ### Fixed
 - Issue parsing torrents without both `name` and `name.utf-8` field ([#47])
@@ -150,8 +159,9 @@ and generally better usability; albeit a bit more complex.
 ## [1.0.0] - 2015-09-19
 
 
-[Unreleased]: ../../compare/v3.1.4...HEAD
-[3.1.4]: ../../compare/v3.1.4...v3.1.4
+[Unreleased]: ../../compare/v4.0.0...HEAD
+[4.0.0]: ../../compare/v3.1.4...v4.0.0
+[3.1.4]: ../../compare/v3.1.3...v3.1.4
 [3.1.3]: ../../compare/v3.1.0...v3.1.3
 [3.1.0]: ../../compare/v3.0.1...v3.1.0
 [3.0.1]: ../../compare/v3.0.0...v3.0.1

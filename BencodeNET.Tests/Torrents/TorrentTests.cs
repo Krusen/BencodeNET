@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using AutoFixture.Xunit2;
 using BencodeNET.Exceptions;
 using BencodeNET.Objects;
 using BencodeNET.Torrents;
@@ -135,6 +136,27 @@ namespace BencodeNET.Tests.Torrents
             act.Should().Throw<BencodeException>();
         }
 
+        [Theory]
+        [AutoMockedData]
+        public void Pieces_Setter_NullValue_ThrowsArgumentNullException([NoAutoProperties] Torrent torrent)
+        {
+            Action act = () => torrent.Pieces = null;
+
+            act.Should().ThrowExactly<ArgumentNullException>();
+        }
+
+        [Theory]
+        [AutoMockedData]
+        public void Pieces_Setter_NotMultipleOf20_ThrowsArgumentException([NoAutoProperties] Torrent torrent)
+        {
+            var pieces = new byte[] { 66, 115, 135, 19, 149, 125, 229, 85, 68, 117, 252, 185, 243, 247, 139, 38, 11, 37, 60 };
+            pieces.Should().NotHaveCount(20);
+
+            Action act = () => torrent.Pieces = pieces;
+
+            act.Should().ThrowExactly<ArgumentException>();
+        }
+
         [Fact]
         public void PiecesAsHexString_Get_ReturnsHexUppercaseWithoutDashes()
         {
@@ -167,9 +189,9 @@ namespace BencodeNET.Tests.Torrents
         }
 
         [Theory]
-        [InlineAutoMockedData("qwer")]
-        [InlineAutoMockedData("123456789012345678901234567890123456789")]
-        [InlineAutoMockedData("12345678901234567890123456789012345678901")]
+        [AutoMockedData("qwer")]
+        [AutoMockedData("123456789012345678901234567890123456789")]
+        [AutoMockedData("12345678901234567890123456789012345678901")]
         public void PiecesAsHexString_Set_LengthNotMultipleOf40ShouldThrowArgumentException(string value)
         {
             var torrent = new Torrent();
@@ -178,15 +200,15 @@ namespace BencodeNET.Tests.Torrents
         }
 
         [Theory]
-        [InlineAutoMockedData("a")]
-        [InlineAutoMockedData("b")]
-        [InlineAutoMockedData("c")]
-        [InlineAutoMockedData("G")]
-        [InlineAutoMockedData("H")]
-        [InlineAutoMockedData("T")]
-        [InlineAutoMockedData(".")]
-        [InlineAutoMockedData("*")]
-        [InlineAutoMockedData("[")]
+        [AutoMockedData("a")]
+        [AutoMockedData("b")]
+        [AutoMockedData("c")]
+        [AutoMockedData("G")]
+        [AutoMockedData("H")]
+        [AutoMockedData("T")]
+        [AutoMockedData(".")]
+        [AutoMockedData("*")]
+        [AutoMockedData("[")]
         public void PiecesAsHexString_Set_ValueWithNonUppercaseHexCharacterShouldThrowArgumentException(string value)
         {
             var torrent = new Torrent();

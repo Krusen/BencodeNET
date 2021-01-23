@@ -4,6 +4,7 @@ using System.Text;
 using BencodeNET.IO;
 using BencodeNET.Objects;
 using BencodeNET.Parsing;
+using BencodeNET.Tests.AutoFixture;
 using BencodeNET.Torrents;
 using FluentAssertions;
 using NSubstitute;
@@ -129,10 +130,10 @@ namespace BencodeNET.Tests.Torrents
         }
 
         [Theory]
-        [InlineAutoMockedData("utf8")]
-        [InlineAutoMockedData("UTF8")]
-        [InlineAutoMockedData("utf-8")]
-        [InlineAutoMockedData("UTF-8")]
+        [AutoMockedData("utf8")]
+        [AutoMockedData("UTF8")]
+        [AutoMockedData("utf-8")]
+        [AutoMockedData("UTF-8")]
         public void Encoding_UTF8_CanBeParsed(string encoding)
         {
             // Arrange
@@ -148,8 +149,8 @@ namespace BencodeNET.Tests.Torrents
         }
 
         [Theory]
-        [InlineAutoMockedData("ascii")]
-        [InlineAutoMockedData("ASCII")]
+        [AutoMockedData("ascii")]
+        [AutoMockedData("ASCII")]
         public void Encoding_ASCII_CanBeParsed(string encoding)
         {
             // Arrange
@@ -165,10 +166,10 @@ namespace BencodeNET.Tests.Torrents
         }
 
         [Theory]
-        [InlineAutoMockedData("")]
-        [InlineAutoMockedData("asdf")]
-        [InlineAutoMockedData("1")]
-        [InlineAutoMockedData("UTF 8")]
+        [AutoMockedData("")]
+        [AutoMockedData("asdf")]
+        [AutoMockedData("1")]
+        [AutoMockedData("UTF 8")]
         public void Encoding_InvalidValidAsNull(string encoding)
         {
             // Arrange
@@ -202,27 +203,28 @@ namespace BencodeNET.Tests.Torrents
 
         [Theory]
         [AutoMockedData]
-        public void Info_Pieces_IsParsed(byte[] pieces)
+        public void Info_Pieces_IsParsed([RepeatCount(20)] byte[] pieces)
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
             var info = ParsedData.Get<BDictionary>(TorrentFields.Info);
             info[TorrentInfoFields.Pieces] = new BString(pieces);
+            pieces.Should().HaveCount(20);
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            var torrent = parser.Parse((BencodeReader)null);
+            var torrent = parser.Parse((BencodeReader) null);
 
             // Assert
             torrent.Pieces.Should().Equal(pieces);
         }
 
         [Theory]
-        [InlineAutoMockedData(-1, false)]
-        [InlineAutoMockedData(0, false)]
-        [InlineAutoMockedData(1, true)]
-        [InlineAutoMockedData(42, false)]
-        [InlineAutoMockedData(12345, false)]
+        [AutoMockedData(-1, false)]
+        [AutoMockedData(0, false)]
+        [AutoMockedData(1, true)]
+        [AutoMockedData(42, false)]
+        [AutoMockedData(12345, false)]
         public void Info_Private_ShouldBeTrueOnlyIfValueIsOne(int value, bool expectedResult)
         {
             // Arrange

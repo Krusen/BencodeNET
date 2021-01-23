@@ -182,7 +182,7 @@ namespace BencodeNET.Torrents
 
         private static void EnsureFields(IList<string> requiredFields, BDictionary data, string message = null)
         {
-            message = message ?? "Torrent is missing required field.";
+            message ??= "Torrent is missing required field.";
 
             foreach (var field in requiredFields.Where(field => !data.ContainsKey(field)))
             {
@@ -192,7 +192,7 @@ namespace BencodeNET.Torrents
 
         private static void EnsureFields(IList<string> requiredFields, IEnumerable<BDictionary> list, string message = null)
         {
-            message = message ?? "Torrent is missing required field.";
+            message ??= "Torrent is missing required field.";
 
             foreach (var data in list)
             {
