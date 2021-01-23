@@ -1,14 +1,14 @@
 // For inspiration see: https://github.com/Jericho/Picton/blob/develop/build.cake
 
 // Install addins.
-#addin "nuget:?package=Cake.Coveralls&version=0.5.0"
-#addin "nuget:?package=Cake.Json&version=1.0.2.13"
+#addin "nuget:?package=Cake.Coveralls&version=0.10.2"
+#addin "nuget:?package=Cake.Json&version=5.2.0"
 
 // Install tools.
-#tool "nuget:?package=GitVersion.CommandLine&version=4.0.0-beta0012"
-#tool "nuget:?package=OpenCover&version=4.6.519"
-#tool "nuget:?package=coveralls.io&version=1.3.4"
-#tool "nuget:?package=xunit.runner.console&version=2.2.0"
+#tool "nuget:?package=GitVersion.CommandLine&version=5.6.4"
+#tool "nuget:?package=OpenCover&version=4.7.922"
+#tool "nuget:?package=coveralls.io&version=1.4.2"
+#tool "nuget:?package=xunit.runner.console&version=2.4.1"
 
 
 ///////////////////////////////////////////////////////////////////////////////

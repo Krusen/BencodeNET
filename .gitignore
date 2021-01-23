@@ -291,3 +291,4 @@ tools/**
 
 
 /coverage.xml
+BencodeNET.Tests/xunit.runner.json
