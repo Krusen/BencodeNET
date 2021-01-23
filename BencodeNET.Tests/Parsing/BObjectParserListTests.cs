@@ -9,7 +9,7 @@ namespace BencodeNET.Tests.Parsing
     public class BObjectParserListTests
     {
         [Theory]
-        [InlineAutoMockedData]
+        [AutoMockedData]
         public void Add_GenericParser_ContainsOnlyThatParser(IBObjectParser<IBObject> parser)
         {
             var list = new BObjectParserList();
@@ -20,7 +20,7 @@ namespace BencodeNET.Tests.Parsing
         }
 
         [Theory]
-        [InlineAutoMockedData]
+        [AutoMockedData]
         public void Add_GenericParser_AddedWithGenericTypeAsKey(IBObjectParser<IBObject> parser)
         {
             var list = new BObjectParserList();
@@ -31,7 +31,7 @@ namespace BencodeNET.Tests.Parsing
         }
 
         [Theory]
-        [InlineAutoMockedData]
+        [AutoMockedData]
         public void Add_GenericParser_ReplacesExistingOfSameGenericType(IBObjectParser<IBObject> parser)
         {
             var list = new BObjectParserList();
@@ -43,7 +43,7 @@ namespace BencodeNET.Tests.Parsing
         }
 
         [Theory]
-        [InlineAutoMockedData()]
+        [AutoMockedData()]
         public void Add_ParserWithType_ReplacesExistingOfSameGenericType(IBObjectParser parser)
         {
             var list = new BObjectParserList();
@@ -55,9 +55,9 @@ namespace BencodeNET.Tests.Parsing
         }
 
         [Theory]
-        [InlineAutoMockedData(typeof(object))]
-        [InlineAutoMockedData(typeof(string))]
-        [InlineAutoMockedData(typeof(int))]
+        [AutoMockedData(typeof(object))]
+        [AutoMockedData(typeof(string))]
+        [AutoMockedData(typeof(int))]
         public void Add_ParserWithNonIBObjectType_ThrowsArgumentException(Type type, IBObjectParser parser)
         {
             var list = new BObjectParserList();
@@ -67,7 +67,7 @@ namespace BencodeNET.Tests.Parsing
         }
 
         [Theory]
-        [InlineAutoMockedData]
+        [AutoMockedData]
         public void Add_WithMultipleTypes_AddsParserForEachType(IBObjectParser parser)
         {
             var types = new[] {typeof (BString), typeof (BNumber), typeof (BList)};
@@ -80,7 +80,7 @@ namespace BencodeNET.Tests.Parsing
         }
 
         [Theory]
-        [InlineAutoMockedData]
+        [AutoMockedData]
         public void Clear_EmptiesList(IBObjectParser<BString> parser1, IBObjectParser<BNumber> parser2)
         {
             var list = new BObjectParserList {parser1, parser2};

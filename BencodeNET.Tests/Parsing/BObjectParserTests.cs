@@ -13,7 +13,7 @@ namespace BencodeNET.Tests.Parsing
     public class BObjectParserTests
     {
         [Theory]
-        [InlineAutoMockedData]
+        [AutoMockedData]
         public void Parse_String_CallsOverriddenParse(IBObjectParser<IBObject> parserMock)
         {
             var parser = new MockBObjectParser(parserMock);
@@ -24,7 +24,7 @@ namespace BencodeNET.Tests.Parsing
         }
 
         [Theory]
-        [InlineAutoMockedData]
+        [AutoMockedData]
         public void Parse_Stream_CallsOverriddenParse(IBObjectParser<IBObject> parserMock)
         {
             var parser = new MockBObjectParser(parserMock);

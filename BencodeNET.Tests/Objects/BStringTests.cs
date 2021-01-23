@@ -27,10 +27,10 @@ namespace BencodeNET.Tests.Objects
         #region Equals
 
         [Theory]
-        [InlineAutoMockedData("hello world", "hello world")]
-        [InlineAutoMockedData("a", "a")]
-        [InlineAutoMockedData(" ", " ")]
-        [InlineAutoMockedData("", "")]
+        [AutoMockedData("hello world", "hello world")]
+        [AutoMockedData("a", "a")]
+        [AutoMockedData(" ", " ")]
+        [AutoMockedData("", "")]
         public void Equals_SameContentShouldBeEqual(string str1, string str2)
         {
             var bstring1 = new BString(str1);
@@ -41,9 +41,9 @@ namespace BencodeNET.Tests.Objects
         }
 
         [Theory]
-        [InlineAutoMockedData("hello", "world")]
-        [InlineAutoMockedData(" ", "")]
-        [InlineAutoMockedData("1", "2")]
+        [AutoMockedData("hello", "world")]
+        [AutoMockedData(" ", "")]
+        [AutoMockedData("1", "2")]
         public void Equals_DifferentContentShouldNotBeEqual(string str1, string str2)
         {
             var bstring1 = new BString(str1);
@@ -64,10 +64,10 @@ namespace BencodeNET.Tests.Objects
         }
 
         [Theory]
-        [InlineAutoMockedData("hello world", "hello world")]
-        [InlineAutoMockedData("a", "a")]
-        [InlineAutoMockedData(" ", " ")]
-        [InlineAutoMockedData("", "")]
+        [AutoMockedData("hello world", "hello world")]
+        [AutoMockedData("a", "a")]
+        [AutoMockedData(" ", " ")]
+        [AutoMockedData("", "")]
         public void EqualsOperator_BString_WithSameContentShouldBeEqual(string str1, string str2)
         {
             var bstring1 = new BString(str1);
@@ -77,9 +77,9 @@ namespace BencodeNET.Tests.Objects
         }
 
         [Theory]
-        [InlineAutoMockedData("hello", "world")]
-        [InlineAutoMockedData(" ", "")]
-        [InlineAutoMockedData("1", "2")]
+        [AutoMockedData("hello", "world")]
+        [AutoMockedData(" ", "")]
+        [AutoMockedData("1", "2")]
         public void EqualsOperator_BString_WithDifferentContentShouldNotBeEqual(string str1, string str2)
         {
             var bstring1 = new BString(str1);
@@ -98,10 +98,10 @@ namespace BencodeNET.Tests.Objects
         }
 
         [Theory]
-        [InlineAutoMockedData("hello world", "hello world")]
-        [InlineAutoMockedData("a", "a")]
-        [InlineAutoMockedData(" ", " ")]
-        [InlineAutoMockedData("", "")]
+        [AutoMockedData("hello world", "hello world")]
+        [AutoMockedData("a", "a")]
+        [AutoMockedData(" ", " ")]
+        [AutoMockedData("", "")]
         public void EqualsOperator_String_WithSameContentAreEqual(string str1, string str2)
         {
             var bstring = new BString(str1);
@@ -109,9 +109,9 @@ namespace BencodeNET.Tests.Objects
         }
 
         [Theory]
-        [InlineAutoMockedData("hello", "world")]
-        [InlineAutoMockedData(" ", "")]
-        [InlineAutoMockedData("1", "2")]
+        [AutoMockedData("hello", "world")]
+        [AutoMockedData(" ", "")]
+        [AutoMockedData("1", "2")]
         public void EqualsOperator_String_WithDifferentContentAreNotEqual(string str1, string str2)
         {
             var bstring = new BString(str1);
@@ -119,8 +119,8 @@ namespace BencodeNET.Tests.Objects
         }
 
         [Theory]
-        [InlineAutoMockedData("test", "test")]
-        [InlineAutoMockedData("TEST", "TEST")]
+        [AutoMockedData("test", "test")]
+        [AutoMockedData("TEST", "TEST")]
         public void GetHashCode_AreEqualWithSameContent(string str1, string str2)
         {
             var bstring1 = new BString(str1);
@@ -133,14 +133,14 @@ namespace BencodeNET.Tests.Objects
         }
 
         [Theory]
-        [InlineAutoMockedData("Test Strin")]
-        [InlineAutoMockedData("Test Strin ")]
-        [InlineAutoMockedData("Test String ")]
-        [InlineAutoMockedData("Test String2")]
-        [InlineAutoMockedData("Test StrinG")]
-        [InlineAutoMockedData("test string")]
-        [InlineAutoMockedData("TestString")]
-        [InlineAutoMockedData("teststring")]
+        [AutoMockedData("Test Strin")]
+        [AutoMockedData("Test Strin ")]
+        [AutoMockedData("Test String ")]
+        [AutoMockedData("Test String2")]
+        [AutoMockedData("Test StrinG")]
+        [AutoMockedData("test string")]
+        [AutoMockedData("TestString")]
+        [AutoMockedData("teststring")]
         public void GetHashCode_AreNotEqualWithDifferentValues(string other)
         {
             var bstring = new BString("Test String");
@@ -160,9 +160,9 @@ namespace BencodeNET.Tests.Objects
         #region Encode
 
         [Theory]
-        [InlineAutoMockedData("some string", 11)]
-        [InlineAutoMockedData("spam", 4)]
-        [InlineAutoMockedData("1234567890", 10)]
+        [AutoMockedData("some string", 11)]
+        [AutoMockedData("spam", 4)]
+        [AutoMockedData("1234567890", 10)]
         public void CanEncode(string str, int length)
         {
             var bstring = new BString(str);

@@ -12,9 +12,9 @@ namespace BencodeNET.Tests.Parsing
     public partial class BListParserTests
     {
         [Theory]
-        [InlineAutoMockedData("l-something-e")]
-        [InlineAutoMockedData("l4:spame")]
-        [InlineAutoMockedData("l4:spami42ee")]
+        [AutoMockedData("l-something-e")]
+        [AutoMockedData("l4:spame")]
+        [AutoMockedData("l4:spami42ee")]
         public void CanParseSimple(string bencode, IBencodeParser bparser)
         {
             // Arrange
@@ -35,7 +35,7 @@ namespace BencodeNET.Tests.Parsing
         }
 
         [Theory]
-        [InlineAutoMockedData("le")]
+        [AutoMockedData("le")]
         public void CanParseEmptyList(string bencode, IBencodeParser bparser)
         {
             var parser = new BListParser(bparser);
@@ -46,8 +46,8 @@ namespace BencodeNET.Tests.Parsing
         }
 
         [Theory]
-        [InlineAutoMockedData("")]
-        [InlineAutoMockedData("l")]
+        [AutoMockedData("")]
+        [AutoMockedData("l")]
         public void BelowMinimumLength2_ThrowsInvalidBencodeException(string bencode, IBencodeParser bparser)
         {
             var parser = new BListParser(bparser);
@@ -57,12 +57,12 @@ namespace BencodeNET.Tests.Parsing
         }
 
         [Theory]
-        [InlineAutoMockedData("4")]
-        [InlineAutoMockedData("a")]
-        [InlineAutoMockedData(":")]
-        [InlineAutoMockedData("-")]
-        [InlineAutoMockedData(".")]
-        [InlineAutoMockedData("e")]
+        [AutoMockedData("4")]
+        [AutoMockedData("a")]
+        [AutoMockedData(":")]
+        [AutoMockedData("-")]
+        [AutoMockedData(".")]
+        [AutoMockedData("e")]
         public void BelowMinimumLength2_WhenStreamLengthNotSupported_ThrowsInvalidBencodeException(string bencode, IBencodeParser bparser)
         {
             var stream = new LengthNotSupportedStream(bencode);
@@ -74,12 +74,12 @@ namespace BencodeNET.Tests.Parsing
         }
 
         [Theory]
-        [InlineAutoMockedData("4e")]
-        [InlineAutoMockedData("ae")]
-        [InlineAutoMockedData(":e")]
-        [InlineAutoMockedData("-e")]
-        [InlineAutoMockedData(".e")]
-        [InlineAutoMockedData("ee")]
+        [AutoMockedData("4e")]
+        [AutoMockedData("ae")]
+        [AutoMockedData(":e")]
+        [AutoMockedData("-e")]
+        [AutoMockedData(".e")]
+        [AutoMockedData("ee")]
         public void InvalidFirstChar_ThrowsInvalidBencodeException(string bencode, IBencodeParser bparser)
         {
             var parser = new BListParser(bparser);
@@ -89,9 +89,9 @@ namespace BencodeNET.Tests.Parsing
         }
 
         [Theory]
-        [InlineAutoMockedData("l4:spam")]
-        [InlineAutoMockedData("l ")]
-        [InlineAutoMockedData("l:")]
+        [AutoMockedData("l4:spam")]
+        [AutoMockedData("l ")]
+        [AutoMockedData("l:")]
         public void MissingEndChar_ThrowsInvalidBencodeException(string bencode, IBencodeParser bparser, IBObject something)
         {
             // Arrange

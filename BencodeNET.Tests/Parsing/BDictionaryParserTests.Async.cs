@@ -14,7 +14,7 @@ namespace BencodeNET.Tests.Parsing
     public partial class BDictionaryParserTests
     {
         [Theory]
-        [InlineAutoMockedData("d4:spam3:egge")]
+        [AutoMockedData("d4:spam3:egge")]
         public async Task CanParseSimpleAsync(string bencode, IBencodeParser bparser)
         {
             // Arrange
@@ -39,7 +39,7 @@ namespace BencodeNET.Tests.Parsing
         }
 
         [Theory]
-        [InlineAutoMockedData("de")]
+        [AutoMockedData("de")]
         public async Task CanParseEmptyDictionaryAsync(string bencode, IBencodeParser bparser)
         {
             var parser = new BDictionaryParser(bparser);
@@ -49,8 +49,8 @@ namespace BencodeNET.Tests.Parsing
         }
 
         [Theory]
-        [InlineAutoMockedData("")]
-        [InlineAutoMockedData("d")]
+        [AutoMockedData("")]
+        [AutoMockedData("d")]
         public void BelowMinimumLength2_ThrowsInvalidBencodeExceptionAsync(string bencode, IBencodeParser bparser)
         {
             var parser = new BDictionaryParser(bparser);
@@ -60,10 +60,10 @@ namespace BencodeNET.Tests.Parsing
         }
 
         [Theory]
-        [InlineAutoMockedData("ade")]
-        [InlineAutoMockedData(":de")]
-        [InlineAutoMockedData("-de")]
-        [InlineAutoMockedData("1de")]
+        [AutoMockedData("ade")]
+        [AutoMockedData(":de")]
+        [AutoMockedData("-de")]
+        [AutoMockedData("1de")]
         public void InvalidFirstChar_ThrowsInvalidBencodeExceptionAsync(string bencode, IBencodeParser bparser)
         {
             var parser = new BDictionaryParser(bparser);
@@ -73,9 +73,9 @@ namespace BencodeNET.Tests.Parsing
         }
 
         [Theory]
-        [InlineAutoMockedData("da")]
-        [InlineAutoMockedData("d4:spam3:egg")]
-        [InlineAutoMockedData("d ")]
+        [AutoMockedData("da")]
+        [AutoMockedData("d4:spam3:egg")]
+        [AutoMockedData("d ")]
         public void MissingEndChar_ThrowsInvalidBencodeExceptionAsync(string bencode, IBencodeParser bparser, BString someKey, IBObject someValue)
         {
             // Arrange
@@ -95,7 +95,7 @@ namespace BencodeNET.Tests.Parsing
         }
 
         [Theory]
-        [InlineAutoMockedData]
+        [AutoMockedData]
         public void InvalidKey_ThrowsInvalidBencodeExceptionAsync(IBencodeParser bparser)
         {
             bparser.ParseAsync<BString>(Arg.Any<PipeBencodeReader>()).Throws<BencodeException>();
@@ -108,7 +108,7 @@ namespace BencodeNET.Tests.Parsing
         }
 
         [Theory]
-        [InlineAutoMockedData]
+        [AutoMockedData]
         public void InvalidValue_ThrowsInvalidBencodeExceptionAsync(IBencodeParser bparser, BString someKey)
         {
             bparser.ParseAsync<BString>(Arg.Any<PipeBencodeReader>()).Returns(someKey);
@@ -122,7 +122,7 @@ namespace BencodeNET.Tests.Parsing
         }
 
         [Theory]
-        [InlineAutoMockedData]
+        [AutoMockedData]
         public void DuplicateKey_ThrowsInvalidBencodeExceptionAsync(IBencodeParser bparser, BString someKey, BString someValue)
         {
             bparser.ParseAsync<BString>(Arg.Any<PipeBencodeReader>()).Returns(someKey, someKey);

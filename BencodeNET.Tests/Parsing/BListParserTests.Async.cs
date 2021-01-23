@@ -13,9 +13,9 @@ namespace BencodeNET.Tests.Parsing
     public partial class BListParserTests
     {
         [Theory]
-        [InlineAutoMockedData("l-something-e")]
-        [InlineAutoMockedData("l4:spame")]
-        [InlineAutoMockedData("l4:spami42ee")]
+        [AutoMockedData("l-something-e")]
+        [AutoMockedData("l4:spame")]
+        [AutoMockedData("l4:spami42ee")]
         public async Task CanParseSimpleAsync(string bencode, IBencodeParser bparser)
         {
             // Arrange
@@ -36,7 +36,7 @@ namespace BencodeNET.Tests.Parsing
         }
 
         [Theory]
-        [InlineAutoMockedData("le")]
+        [AutoMockedData("le")]
         public async Task CanParseEmptyListAsync(string bencode, IBencodeParser bparser)
         {
             var parser = new BListParser(bparser);
@@ -47,8 +47,8 @@ namespace BencodeNET.Tests.Parsing
         }
 
         [Theory]
-        [InlineAutoMockedData("")]
-        [InlineAutoMockedData("l")]
+        [AutoMockedData("")]
+        [AutoMockedData("l")]
         public void BelowMinimumLength2_ThrowsInvalidBencodeExceptionAsync(string bencode, IBencodeParser bparser)
         {
             var parser = new BListParser(bparser);
@@ -58,12 +58,12 @@ namespace BencodeNET.Tests.Parsing
         }
 
         [Theory]
-        [InlineAutoMockedData("4e")]
-        [InlineAutoMockedData("ae")]
-        [InlineAutoMockedData(":e")]
-        [InlineAutoMockedData("-e")]
-        [InlineAutoMockedData(".e")]
-        [InlineAutoMockedData("ee")]
+        [AutoMockedData("4e")]
+        [AutoMockedData("ae")]
+        [AutoMockedData(":e")]
+        [AutoMockedData("-e")]
+        [AutoMockedData(".e")]
+        [AutoMockedData("ee")]
         public void InvalidFirstChar_ThrowsInvalidBencodeExceptionAsync(string bencode, IBencodeParser bparser)
         {
             var parser = new BListParser(bparser);
@@ -73,9 +73,9 @@ namespace BencodeNET.Tests.Parsing
         }
 
         [Theory]
-        [InlineAutoMockedData("l4:spam")]
-        [InlineAutoMockedData("l ")]
-        [InlineAutoMockedData("l:")]
+        [AutoMockedData("l4:spam")]
+        [AutoMockedData("l ")]
+        [AutoMockedData("l:")]
         public void MissingEndChar_ThrowsInvalidBencodeExceptionAsync(string bencode, IBencodeParser bparser, IBObject something)
         {
             // Arrange

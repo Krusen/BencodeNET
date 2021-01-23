@@ -45,8 +45,8 @@ namespace BencodeNET.Tests.Torrents
         }
 
         [Theory]
-        [InlineAutoMockedData("")]
-        [InlineAutoMockedData((string)null)]
+        [AutoMockedData("")]
+        [AutoMockedData((string)null)]
         public void CreateMagnetLink_NullOrEmptyInfoHash_ThrowsArgumentException(string infoHash)
         {
             Action action = () => TorrentUtil.CreateMagnetLink(infoHash, null, null, MagnetLinkOptions.None);

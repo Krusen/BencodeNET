@@ -28,9 +28,9 @@ namespace BencodeNET.Tests.Objects
         }
 
         [Theory]
-        [InlineAutoMockedData(0, 0)]
-        [InlineAutoMockedData(42, 42)]
-        [InlineAutoMockedData(-1, -1)]
+        [AutoMockedData(0, 0)]
+        [AutoMockedData(42, 42)]
+        [AutoMockedData(-1, -1)]
         public void Equals_SameNumbersShouldBeEqual(long num1, long num2)
         {
             var bnumber1 = new BNumber(num1);
@@ -40,9 +40,9 @@ namespace BencodeNET.Tests.Objects
         }
 
         [Theory]
-        [InlineAutoMockedData(1, 2)]
-        [InlineAutoMockedData(10, 20)]
-        [InlineAutoMockedData(-1, 1)]
+        [AutoMockedData(1, 2)]
+        [AutoMockedData(10, 20)]
+        [AutoMockedData(-1, 1)]
         public void Equals_DifferentNumbersShouldNotBeEqual(long num1, long num2)
         {
             var bnumber1 = new BNumber(num1);
@@ -52,9 +52,9 @@ namespace BencodeNET.Tests.Objects
         }
 
         [Theory]
-        [InlineAutoMockedData(0, 0)]
-        [InlineAutoMockedData(42, 42)]
-        [InlineAutoMockedData(-1, -1)]
+        [AutoMockedData(0, 0)]
+        [AutoMockedData(42, 42)]
+        [AutoMockedData(-1, -1)]
         public void EqualsOperator_Integer_SameNumberShouldBeEqual(long num1, long num2)
         {
             var bnumber = new BNumber(num1);
@@ -62,10 +62,10 @@ namespace BencodeNET.Tests.Objects
         }
 
         [Theory]
-        [InlineAutoMockedData(1)]
-        [InlineAutoMockedData(10)]
-        [InlineAutoMockedData(42)]
-        [InlineAutoMockedData(long.MaxValue)]
+        [AutoMockedData(1)]
+        [AutoMockedData(10)]
+        [AutoMockedData(42)]
+        [AutoMockedData(long.MaxValue)]
         public void GetHashCode_SameAsInt64HashCode(long number)
         {
             var bnumber = new BNumber(number);
@@ -79,11 +79,11 @@ namespace BencodeNET.Tests.Objects
         #region Encode
 
         [Theory]
-        [InlineAutoMockedData(1)]
-        [InlineAutoMockedData(10)]
-        [InlineAutoMockedData(42)]
-        [InlineAutoMockedData(123)]
-        [InlineAutoMockedData(123456789)]
+        [AutoMockedData(1)]
+        [AutoMockedData(10)]
+        [AutoMockedData(42)]
+        [AutoMockedData(123)]
+        [AutoMockedData(123456789)]
         public void CanEncode(long value)
         {
             var bnumber = new BNumber(value);
@@ -92,11 +92,11 @@ namespace BencodeNET.Tests.Objects
         }
 
         [Theory]
-        [InlineAutoMockedData(-1)]
-        [InlineAutoMockedData(-10)]
-        [InlineAutoMockedData(-42)]
-        [InlineAutoMockedData(-123)]
-        [InlineAutoMockedData(-123456789)]
+        [AutoMockedData(-1)]
+        [AutoMockedData(-10)]
+        [AutoMockedData(-42)]
+        [AutoMockedData(-123)]
+        [AutoMockedData(-123456789)]
         public void CanEncode_Negative(long value)
         {
             var bnumber = new BNumber(value);
@@ -305,10 +305,10 @@ namespace BencodeNET.Tests.Objects
         }
 
         [Theory]
-        [InlineAutoMockedData(0)]
-        [InlineAutoMockedData(-1)]
-        [InlineAutoMockedData(-42)]
-        [InlineAutoMockedData(-123456)]
+        [AutoMockedData(0)]
+        [AutoMockedData(-1)]
+        [AutoMockedData(-42)]
+        [AutoMockedData(-123456)]
         public void CastingToBool_BelowOrEqualToZero_ShouldBeFalse(int number)
         {
             var boolean = (bool) new BNumber(number);
@@ -316,10 +316,10 @@ namespace BencodeNET.Tests.Objects
         }
 
         [Theory]
-        [InlineAutoMockedData(1)]
-        [InlineAutoMockedData(10)]
-        [InlineAutoMockedData(42)]
-        [InlineAutoMockedData(123456)]
+        [AutoMockedData(1)]
+        [AutoMockedData(10)]
+        [AutoMockedData(42)]
+        [AutoMockedData(123456)]
         public void CastingToBool_AboveZero_ShouldBeTrue(int number)
         {
             var boolean = (bool) new BNumber(number);
