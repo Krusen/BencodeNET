@@ -1,0 +1,49 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  # Windows image required for code coverage -> https://github.com/Microsoft/vstest-docs/blob/master/docs/analyze.md#coverage
+  vmImage: 'windows-latest'
+
+steps:
+- task: DotNetCoreCLI@2
+  displayName: dotnet restore
+  inputs:
+    command: 'restore'
+    projects: 'BencodeNET.sln'
+    feedsToUse: 'select'
+    verbosityRestore: 'Normal'
+- task: DotNetCoreCLI@2
+  displayName: dotnet build
+  inputs:
+    command: 'build'
+    projects: 'BencodeNET.sln'
+    arguments: '--configuration Release --no-restore'
+- task: DotNetCoreCLI@2
+  displayName: dotnet test
+  inputs:
+    command: 'test'
+    projects: 'BencodeNET.sln'
+    arguments: '--configuration Release --collect "Code coverage"'
+    testRunTitle: 'BencodeNET.Tests'
+- task: DotNetCoreCLI@2
+  displayName: dotnet pack
+  inputs:
+    command: 'pack'
+    packagesToPack: 'BencodeNET/*.csproj'
+    configuration: 'Release'
+    packDirectory: '$(Pipeline.Workspace)/Packages'
+    nobuild: true
+    versioningScheme: 'off'
+    verbosityPack: 'Normal'
+- task: PublishPipelineArtifact@1
+  displayName: Publish artifacts
+  inputs:
+    targetPath: '$(Pipeline.Workspace)\Packages'
+    artifact: 'Packages'
+    publishLocation: 'pipeline'

@@ -15,7 +15,6 @@
 
   <PropertyGroup>
     <PackageId>BencodeNET</PackageId>
-    <Version>$(SemVer)</Version>
     <Authors>Søren Kruse</Authors>
     <Company />
     <Product>BencodeNET</Product>
@@ -27,7 +26,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageReleaseNotes></PackageReleaseNotes>
     <PackageTags>bencode;torrent;torrents</PackageTags>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <IncludeSource>True</IncludeSource>
     <IncludeSymbols>True</IncludeSymbols>
   </PropertyGroup>
@@ -38,6 +37,7 @@
 
   <!--Dev dependencies -->
   <ItemGroup>
+    <PackageReference Include="GitVersion.MsBuild" Version="5.6.4" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.8.55" PrivateAssets="All" />
   </ItemGroup>
 
