@@ -13,6 +13,7 @@ pool:
 steps:
 
 - task: PowerShell@2
+  displayName: run gitversion
   inputs:
     targetType: 'inline'
     script: |
