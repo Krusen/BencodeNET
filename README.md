@@ -3,7 +3,7 @@
 BencodeNET 
 ==========
 [![license](https://img.shields.io/badge/license-Unlicense-blue.svg)](https://github.com/Krusen/BencodeNET/blob/master/LICENSE.md)
-[![AppVeyor](https://ci.appveyor.com/api/projects/status/pikvrmie3ibsk6pt/branch/master?svg=true)](https://ci.appveyor.com/project/Krusen/bencodenet)
+[![Azure Pipelines](https://krusen.visualstudio.com/BencodeNET/_apis/build/status/BencodeNET?branchName=feature%2Fazure-pipelines)](https://krusen.visualstudio.com/BencodeNET/_build?definitionId=5)
 [![Coverage](https://coveralls.io/repos/github/Krusen/BencodeNET/badge.svg?branch=master)](https://coveralls.io/github/Krusen/BencodeNET?branch=master)
 [![CodeFactor](https://www.codefactor.io/repository/github/krusen/bencodenet/badge)](https://www.codefactor.io/repository/github/krusen/bencodenet)
 [![NuGet](https://buildstats.info/nuget/bencodenet?includePreReleases=false)](https://www.nuget.org/packages/BencodeNET/)
