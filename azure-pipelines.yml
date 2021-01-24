@@ -11,26 +11,25 @@ pool:
   vmImage: 'windows-latest'
 
 steps:
-- task: DotNetCoreCLI@2
-  displayName: dotnet restore
+
+- task: PowerShell@2
+  displayName: run gitversion
   inputs:
-    command: 'restore'
-    projects: 'BencodeNET.sln'
-    feedsToUse: 'select'
-    verbosityRestore: 'Normal'
-- task: DotNetCoreCLI@2
-  displayName: dotnet build
-  inputs:
-    command: 'build'
-    projects: 'BencodeNET.sln'
-    arguments: '--configuration Release --no-restore'
+    targetType: 'inline'
+    script: |
+      Write-Host "Executing GitVersion..."
+      $Env:SemVer = gitversion /showvariable SemVer
+      Write-Host "SemVer: $Env:Semver"
+      echo "##vso[task.setvariable variable=SemVer;isOutput=true]$Env:SemVer"
+
 - task: DotNetCoreCLI@2
   displayName: dotnet test
   inputs:
     command: 'test'
     projects: 'BencodeNET.sln'
-    arguments: '--configuration Release --no-build --collect "Code coverage"'
+    arguments: '--configuration Release --collect "Code coverage"'
     testRunTitle: 'BencodeNET.Tests'
+
 - task: DotNetCoreCLI@2
   displayName: dotnet pack
   inputs:
@@ -41,6 +40,7 @@ steps:
     nobuild: true
     versioningScheme: 'off'
     verbosityPack: 'Normal'
+
 - task: PublishPipelineArtifact@1
   displayName: Publish artifacts
   inputs:
