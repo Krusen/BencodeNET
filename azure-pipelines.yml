@@ -17,10 +17,9 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
-      choco install gitversion.portable
+      Write-Host "Executing GitVersion..."
       $Env:SemVer = gitversion /showvariable SemVer
-
-      echo "##vso[task.setvariable variable=SemVer;isOutput=true]$Env:SemVer"
+      Write-Host "SemVer: $Env:Semver"
 
 - task: DotNetCoreCLI@2
   displayName: dotnet test
