@@ -11,6 +11,16 @@ pool:
   vmImage: 'windows-latest'
 
 steps:
+
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: |
+      choco install gitversion.portable
+      $Env:SemVer = gitversion /showvariable SemVer
+
+      echo "##vso[task.setvariable variable=SemVer;isOutput=true]$Env:SemVer"
+
 - task: DotNetCoreCLI@2
   displayName: dotnet restore
   inputs:
