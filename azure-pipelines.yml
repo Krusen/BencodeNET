@@ -29,7 +29,7 @@ steps:
   inputs:
     command: 'test'
     projects: 'BencodeNET.sln'
-    arguments: '--configuration Release --collect "Code coverage"'
+    arguments: '--configuration Release --no-build --collect "Code coverage"'
     testRunTitle: 'BencodeNET.Tests'
 - task: DotNetCoreCLI@2
   displayName: dotnet pack
