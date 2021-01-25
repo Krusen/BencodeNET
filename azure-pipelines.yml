@@ -22,6 +22,7 @@ steps:
       $Env:SemVer = gitversion /showvariable SemVer
       Write-Host "SemVer: $Env:Semver"
       echo "##vso[task.setvariable variable=SemVer;isOutput=true]$Env:SemVer"
+      echo "##vso[build.updatebuildnumber]$Env:SemVer+$(Build.BuildId)"
 
 - task: DotNetCoreCLI@2
   displayName: dotnet test
