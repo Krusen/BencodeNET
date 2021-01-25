@@ -27,8 +27,7 @@
     <PackageReleaseNotes></PackageReleaseNotes>
     <PackageTags>bencode;torrent;torrents</PackageTags>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-    <SemVer Condition="'$(SemVer)' == ''">1.0.0</SemVer>
-    <Version>$(SemVer)</Version>
+    <Version Condition="'$(SemVer)' != ''">$(SemVer)</Version>
     <IncludeSource>True</IncludeSource>
     <IncludeSymbols>True</IncludeSymbols>
   </PropertyGroup>

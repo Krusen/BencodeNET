@@ -13,6 +13,7 @@ pool:
 steps:
 
 - task: PowerShell@2
+  name: GitVersion
   displayName: run gitversion
   inputs:
     targetType: 'inline'
@@ -39,6 +40,7 @@ steps:
     packDirectory: '$(Pipeline.Workspace)/Packages'
     nobuild: true
     versioningScheme: 'off'
+    buildProperties: 'SemVer=$(GitVersion.SemVer)'
     verbosityPack: 'Normal'
 
 - task: PublishPipelineArtifact@1
