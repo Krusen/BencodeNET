@@ -262,7 +262,7 @@ namespace BencodeNET.Tests.Torrents
             while (piecesByteCount % 20 != 0) piecesByteCount--;
             var expected = piecesByteCount / 20;
 
-            var torrent = new Torrent {Pieces = new byte[piecesByteCount]};
+            var torrent = new Torrent { Pieces = new byte[piecesByteCount] };
 
             torrent.Pieces.Length.Should().Be(piecesByteCount);
             torrent.NumberOfPieces.Should().Be(expected);
@@ -281,7 +281,7 @@ namespace BencodeNET.Tests.Torrents
         [Fact]
         public void ToBDictionary_Encoding_AddsToCorrectField()
         {
-            var torrent = new Torrent {Encoding = Encoding.UTF8};
+            var torrent = new Torrent { Encoding = Encoding.UTF8 };
 
             var result = torrent.ToBDictionary();
 
@@ -291,7 +291,7 @@ namespace BencodeNET.Tests.Torrents
         [Fact]
         public void ToBDictionary_Encoding_DoesNotAddNull()
         {
-            var torrent = new Torrent {Encoding = null};
+            var torrent = new Torrent { Encoding = null };
 
             var result = torrent.ToBDictionary();
 
@@ -378,7 +378,9 @@ namespace BencodeNET.Tests.Torrents
         [AutoMockedData]
         public void ToBDictionary_Comment_AddsToCorrectField(string comment)
         {
-            var torrent = new Torrent {Comment = comment
+            var torrent = new Torrent
+            {
+                Comment = comment
             };
 
             var result = torrent.ToBDictionary();
@@ -389,7 +391,7 @@ namespace BencodeNET.Tests.Torrents
         [Fact]
         public void ToBDictionary_Comment_DoesNotAddNull()
         {
-            var torrent = new Torrent {Comment = null};
+            var torrent = new Torrent { Comment = null };
 
             var result = torrent.ToBDictionary();
 
@@ -400,7 +402,7 @@ namespace BencodeNET.Tests.Torrents
         [AutoMockedData]
         public void ToBDictionary_CreatedBy_AddsToCorrectField(string createdBy)
         {
-            var torrent = new Torrent {CreatedBy = createdBy};
+            var torrent = new Torrent { CreatedBy = createdBy };
 
             var result = torrent.ToBDictionary();
 
@@ -410,7 +412,7 @@ namespace BencodeNET.Tests.Torrents
         [Fact]
         public void ToBDictionary_CreatedBy_DoesNotAddNull()
         {
-            var torrent = new Torrent {CreatedBy = null};
+            var torrent = new Torrent { CreatedBy = null };
 
             var result = torrent.ToBDictionary();
 
@@ -421,7 +423,7 @@ namespace BencodeNET.Tests.Torrents
         [AutoMockedData]
         public void ToBDictionary_CreationDate_AddsToCorrectField(DateTime creationDate)
         {
-            var torrent = new Torrent {CreationDate = creationDate};
+            var torrent = new Torrent { CreationDate = creationDate };
 
             var result = torrent.ToBDictionary();
 
@@ -431,7 +433,7 @@ namespace BencodeNET.Tests.Torrents
         [Fact]
         public void ToBDictionary_CreationDate_DoesNotAddNull()
         {
-            var torrent = new Torrent {CreationDate = null};
+            var torrent = new Torrent { CreationDate = null };
 
             var result = torrent.ToBDictionary();
 
@@ -485,13 +487,13 @@ namespace BencodeNET.Tests.Torrents
             var files = info.Get<BList>(TorrentInfoFields.Files).AsType<BDictionary>();
 
             // Assert
-            info.Should().Contain(TorrentInfoFields.Name, (BString) directoryName);
+            info.Should().Contain(TorrentInfoFields.Name, (BString)directoryName);
             info.Should().ContainKey(TorrentInfoFields.Files);
             info[TorrentInfoFields.Files].Should().BeOfType<BList<BDictionary>>();
 
             var file = files[0];
             file.Should().BeOfType<BDictionary>();
-            file.Should().Contain(TorrentFilesFields.Length, (BNumber) fileSize);
+            file.Should().Contain(TorrentFilesFields.Length, (BNumber)fileSize);
             file.Should().ContainKey(TorrentFilesFields.Path);
             file.Should().ContainKey(TorrentFilesFields.PathUtf8);
 

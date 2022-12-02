@@ -66,7 +66,7 @@ namespace BencodeNET.Parsing
             }
 
             if (reader.ReadChar() != 'e')
-                 throw InvalidBencodeException<BList>.MissingEndChar(startPosition);
+                throw InvalidBencodeException<BList>.MissingEndChar(startPosition);
 
             return list;
         }

@@ -278,7 +278,7 @@ namespace BencodeNET.Tests.Objects
         [Fact]
         public void CanCastFromDateTime()
         {
-            var bnumber = (BNumber) new DateTime(2016, 1, 1);
+            var bnumber = (BNumber)new DateTime(2016, 1, 1);
             bnumber.Should().Be(1451606400);
         }
 
@@ -286,14 +286,14 @@ namespace BencodeNET.Tests.Objects
         public void CanCastToDateTime()
         {
             var bnumber = new BNumber(1451606400);
-            var datetime = (DateTime) bnumber;
+            var datetime = (DateTime)bnumber;
             datetime.Should().Be(new DateTime(2016, 1, 1));
         }
 
         [Fact]
         public void CastingFromBool_False_IsZero()
         {
-            var bnumber = (BNumber) false;
+            var bnumber = (BNumber)false;
             bnumber.Should().Be(0);
         }
 
@@ -311,7 +311,7 @@ namespace BencodeNET.Tests.Objects
         [AutoMockedData(-123456)]
         public void CastingToBool_BelowOrEqualToZero_ShouldBeFalse(int number)
         {
-            var boolean = (bool) new BNumber(number);
+            var boolean = (bool)new BNumber(number);
             boolean.Should().BeFalse();
         }
 
@@ -322,7 +322,7 @@ namespace BencodeNET.Tests.Objects
         [AutoMockedData(123456)]
         public void CastingToBool_AboveZero_ShouldBeTrue(int number)
         {
-            var boolean = (bool) new BNumber(number);
+            var boolean = (bool)new BNumber(number);
             boolean.Should().BeTrue();
         }
 
@@ -330,7 +330,7 @@ namespace BencodeNET.Tests.Objects
         public void CastingToBool_Null_ThrowsInvalidCastException()
         {
             BNumber bnumber = null;
-            Action action = () => { var b = (bool) bnumber; };
+            Action action = () => { var b = (bool)bnumber; };
             action.Should().Throw<InvalidCastException>();
         }
 

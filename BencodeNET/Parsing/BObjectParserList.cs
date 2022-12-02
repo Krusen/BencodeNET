@@ -142,7 +142,7 @@ namespace BencodeNET.Parsing
         /// </summary>
         /// <typeparam name="T">The type to remove the parser for.</typeparam>
         /// <returns>True if successful, false otherwise.</returns>
-        public bool Remove<T>() => Remove(typeof (T));
+        public bool Remove<T>() => Remove(typeof(T));
 
         /// <summary>
         /// Empties the collection.

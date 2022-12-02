@@ -4,7 +4,7 @@ namespace BencodeNET.Tests.AutoFixture
 {
     public class RepeatCountCustomization : ICustomization
     {
-        private int Count { get;  }
+        private int Count { get; }
 
         public RepeatCountCustomization(int count)
         {

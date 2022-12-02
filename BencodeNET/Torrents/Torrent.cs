@@ -213,10 +213,10 @@ namespace BencodeNET.Torrents
                 if (Regex.IsMatch(value, "[^0-9A-F]"))
                     throw new ArgumentException("Value must only contain hex characters (0-9 and A-F) and only uppercase.");
 
-                var bytes = new byte[value.Length/2];
+                var bytes = new byte[value.Length / 2];
                 for (var i = 0; i < bytes.Length; i++)
                 {
-                    var str = $"{value[i*2]}{value[i*2+1]}";
+                    var str = $"{value[i * 2]}{value[i * 2 + 1]}";
                     bytes[i] = Convert.ToByte(str, 16);
                 }
 
@@ -251,7 +251,7 @@ namespace BencodeNET.Torrents
         /// The total number of file pieces.
         /// </summary>
         public virtual int NumberOfPieces => Pieces != null
-            ? (int) Math.Ceiling((double) Pieces.Length / 20)
+            ? (int)Math.Ceiling((double)Pieces.Length / 20)
             : 0;
 
         /// <summary>
@@ -302,7 +302,7 @@ namespace BencodeNET.Torrents
             var info = new BDictionary();
 
             if (PieceSize > 0)
-                info[TorrentInfoFields.PieceLength] = (BNumber) PieceSize;
+                info[TorrentInfoFields.PieceLength] = (BNumber)PieceSize;
 
             if (Pieces?.Length > 0)
                 info[TorrentInfoFields.Pieces] = new BString(Pieces, encoding);

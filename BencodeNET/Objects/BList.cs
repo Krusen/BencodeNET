@@ -76,13 +76,13 @@ namespace BencodeNET.Objects
         /// Adds an integer to the list.
         /// </summary>
         /// <param name="value"></param>
-        public void Add(int value) => Add((IBObject) new BNumber(value));
+        public void Add(int value) => Add((IBObject)new BNumber(value));
 
         /// <summary>
         /// Adds a long to the list.
         /// </summary>
         /// <param name="value"></param>
-        public void Add(long value) => Add((IBObject) new BNumber(value));
+        public void Add(long value) => Add((IBObject)new BNumber(value));
 
         /// <summary>
         /// Appends a list to the end of this instance.
@@ -274,7 +274,7 @@ namespace BencodeNET.Objects
             get
             {
                 var obj = Value[index] as T;
-                if (obj == null) throw new InvalidCastException($"The object at index {index} is not of type {typeof (T).FullName}");
+                if (obj == null) throw new InvalidCastException($"The object at index {index} is not of type {typeof(T).FullName}");
                 return obj;
             }
             set => Value[index] = value ?? throw new ArgumentNullException(nameof(value));
@@ -300,7 +300,7 @@ namespace BencodeNET.Objects
                     var obj = enumerator.Current as T;
                     if (obj == null)
                         throw new InvalidCastException($"The object at index {i} is not of type {typeof(T).FullName}");
-                    yield return (T) enumerator.Current;
+                    yield return (T)enumerator.Current;
                     i++;
                 }
             }

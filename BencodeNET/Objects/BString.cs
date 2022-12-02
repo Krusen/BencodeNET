@@ -108,7 +108,7 @@ namespace BencodeNET.Objects
             var writtenBytes = Encoding.GetBytes(Value.Length.ToString().AsSpan(), buffer);
 
             // Write ':'
-            buffer[writtenBytes] = (byte) ':';
+            buffer[writtenBytes] = (byte)':';
 
             // Write value
             Value.Span.CopyTo(buffer.Slice(writtenBytes + 1));

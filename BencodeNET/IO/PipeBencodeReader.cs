@@ -84,7 +84,7 @@ namespace BencodeNET.IO
                 return default;
             }
 
-            var c = (char) buffer.First.Span[0];
+            var c = (char)buffer.First.Span[0];
 
             if (peek)
             {
@@ -154,7 +154,7 @@ namespace BencodeNET.IO
                 // Copy requested amount of bytes from buffer and advance reader
                 buffer.Slice(0, bytes.Length).CopyTo(bytes);
                 Position += bytes.Length;
-                PreviousChar = (char) bytes[bytes.Length - 1];
+                PreviousChar = (char)bytes[bytes.Length - 1];
                 bytesRead = bytes.Length;
                 Reader.AdvanceTo(buffer.GetPosition(bytes.Length));
                 return true;
@@ -174,7 +174,7 @@ namespace BencodeNET.IO
                 // Copy available bytes and advance reader to the end
                 buffer.CopyTo(bytes);
                 Position += buffer.Length;
-                PreviousChar = (char) buffer.Slice(buffer.Length - 1).First.Span[0];
+                PreviousChar = (char)buffer.Slice(buffer.Length - 1).First.Span[0];
                 bytesRead = buffer.Length;
                 Reader.AdvanceTo(buffer.End);
                 return true;

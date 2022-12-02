@@ -29,7 +29,7 @@ namespace BencodeNET
             return source.SelectMany(x => x);
         }
 
-        public static int DigitCount(this int value) => DigitCount((long) value);
+        public static int DigitCount(this int value) => DigitCount((long)value);
 
         public static int DigitCount(this long value)
         {
@@ -115,18 +115,18 @@ namespace BencodeNET
 
         public static void Write(this Stream stream, char c)
         {
-            stream.WriteByte((byte) c);
+            stream.WriteByte((byte)c);
         }
 
         public static void WriteChar(this PipeWriter writer, char c)
         {
-            writer.GetSpan(1)[0] = (byte) c;
+            writer.GetSpan(1)[0] = (byte)c;
             writer.Advance(1);
         }
 
         public static void WriteCharAt(this Span<byte> bytes, char c, int index)
         {
-            bytes[index] = (byte) c;
+            bytes[index] = (byte)c;
         }
 
 #if !NETSTANDARD2_0

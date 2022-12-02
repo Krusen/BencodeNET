@@ -54,7 +54,7 @@ namespace BencodeNET.Exceptions
         internal static InvalidBencodeException<T> BelowMinimumLength(int minimumLength, long actualLength, long streamPosition)
         {
             var message =
-                $"Invalid length. Minimum valid stream length for parsing '{typeof (T).FullName}' is {minimumLength} but the actual length was only {actualLength}.";
+                $"Invalid length. Minimum valid stream length for parsing '{typeof(T).FullName}' is {minimumLength} but the actual length was only {actualLength}.";
             return new InvalidBencodeException<T>(message, streamPosition);
         }
 

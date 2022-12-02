@@ -16,26 +16,26 @@ namespace BencodeNET.Tests.Objects
         public void Add_Null_ThrowsArgumentNullException()
         {
             var blist = new BList();
-            Action action = () => blist.Add((IBObject) null);
+            Action action = () => blist.Add((IBObject)null);
             action.Should().Throw<ArgumentNullException>();
         }
 
         [Fact]
         public void AddRange_AppendsList()
         {
-            var blist1 = new BList {"item1", "item2"};
-            var blist2 = new BList {"item3", "item4"};
+            var blist1 = new BList { "item1", "item2" };
+            var blist2 = new BList { "item3", "item4" };
 
             blist1.AddRange(blist2);
 
             blist1.Should().HaveCount(4);
-            blist1.Should().ContainInOrder((BString) "item1", (BString) "item2", (BString) "item3", (BString) "item4");
+            blist1.Should().ContainInOrder((BString)"item1", (BString)"item2", (BString)"item3", (BString)"item4");
         }
 
         [Fact]
         public void Indexer_Set_Null_ThrowsArgumentNullException()
         {
-            var blist = new BList {0};
+            var blist = new BList { 0 };
             Action action = () => blist[0] = null;
             action.Should().Throw<ArgumentNullException>();
         }
@@ -81,7 +81,7 @@ namespace BencodeNET.Tests.Objects
         [Fact]
         public void CanEncode_Simple()
         {
-            var blist = new BList {"hello world", 987, "foobar"};
+            var blist = new BList { "hello world", 987, "foobar" };
             var bencode = blist.EncodeAsString();
             bencode.Should().Be("l11:hello worldi987e6:foobare");
         }
@@ -150,7 +150,7 @@ namespace BencodeNET.Tests.Objects
         [Fact]
         public void AsType_ConvertsToListOfType()
         {
-            var blist = new BList {1, 2, 3};
+            var blist = new BList { 1, 2, 3 };
             var bnumbers = blist.AsType<BNumber>();
 
             bnumbers.Cast<object>().Should()
@@ -162,7 +162,7 @@ namespace BencodeNET.Tests.Objects
         [Fact]
         public void AsType_ContainingWrongType_ThrowsInvalidCastException()
         {
-            var blist = new BList {1, "2", 3};
+            var blist = new BList { 1, "2", 3 };
             Action action = () => blist.AsType<BNumber>();
             action.Should().Throw<InvalidCastException>();
         }
@@ -170,7 +170,7 @@ namespace BencodeNET.Tests.Objects
         [Fact]
         public void AsStrings_ConvertsToListOfStrings()
         {
-            var blist = new BList {"a", "b", "c"};
+            var blist = new BList { "a", "b", "c" };
             var strings = blist.AsStrings();
 
             strings.Should().HaveCount(3);
@@ -180,7 +180,7 @@ namespace BencodeNET.Tests.Objects
         [Fact]
         public void AsStrings_ContainingNonBStringType_ThrowsInvalidCastException()
         {
-            var blist = new BList {"a", "b", 3};
+            var blist = new BList { "a", "b", 3 };
             Action action = () => blist.AsStrings();
             action.Should().Throw<InvalidCastException>();
         }
@@ -188,7 +188,7 @@ namespace BencodeNET.Tests.Objects
         [Fact]
         public void AsNumbers_ConvertsToListOfLongs()
         {
-            var blist = new BList {1, 2, 3};
+            var blist = new BList { 1, 2, 3 };
             var numbers = blist.AsNumbers();
 
             numbers.Should().HaveCount(3);
@@ -198,7 +198,7 @@ namespace BencodeNET.Tests.Objects
         [Fact]
         public void AsNumbers_ContainingNonBNumberType_ThrowsInvalidCastException()
         {
-            var blist = new BList {1, 2, "3"};
+            var blist = new BList { 1, 2, "3" };
             Action action = () => blist.AsNumbers();
             action.Should().Throw<InvalidCastException>();
         }
@@ -208,7 +208,7 @@ namespace BencodeNET.Tests.Objects
         [Fact]
         public void GetSizeInBytes()
         {
-            var blist = new BList{1, 2, "abc"};
+            var blist = new BList { 1, 2, "abc" };
             blist.GetSizeInBytes().Should().Be(13);
         }
 

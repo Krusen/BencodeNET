@@ -61,12 +61,12 @@ namespace BencodeNET.Objects
             var size = GetSizeInBytes();
             var buffer = writer.GetSpan(size).Slice(0, size);
 
-            buffer[0] = (byte) 'i';
+            buffer[0] = (byte)'i';
             buffer = buffer.Slice(1);
 
             Encoding.ASCII.GetBytes(Value.ToString().AsSpan(), buffer);
 
-            buffer[buffer.Length - 1] = (byte) 'e';
+            buffer[buffer.Length - 1] = (byte)'e';
 
             writer.Advance(size);
         }

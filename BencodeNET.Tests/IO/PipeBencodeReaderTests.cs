@@ -99,12 +99,12 @@ namespace BencodeNET.Tests.IO
 
             var bencodeReader = new PipeBencodeReader(reader);
 
-            var buffer = new byte[bytes.Length-3];
+            var buffer = new byte[bytes.Length - 3];
             var readTask = bencodeReader.ReadAsync(buffer);
 
             var bytesRead = await readTask;
 
-            bytesRead.Should().Be(bytes.Length-3);
+            bytesRead.Should().Be(bytes.Length - 3);
             buffer[0].Should().Be((byte)'a');
             buffer[1].Should().Be((byte)'b');
             buffer[2].Should().Be((byte)'c');
@@ -165,7 +165,7 @@ namespace BencodeNET.Tests.IO
             var read = await PipeBencodeReader.ReadAsync(bytes);
 
             read.Should().Be(12);
-            Assert.Equal("Hello World!", Encoding.UTF8.GetString(bytes, 0, (int) read));
+            Assert.Equal("Hello World!", Encoding.UTF8.GetString(bytes, 0, (int)read));
         }
 
         [Fact]

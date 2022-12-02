@@ -29,12 +29,12 @@ namespace BencodeNET.Tests.Torrents
         {
             var info = new BDictionary
             {
-                ["key"] = (BString) "value",
-                ["list"] = new BList {1, 2, 3},
+                ["key"] = (BString)"value",
+                ["list"] = new BList { 1, 2, 3 },
                 ["number"] = (BNumber)42,
                 ["dictionary"] = new BDictionary
                 {
-                    ["key"] = (BString) "value"
+                    ["key"] = (BString)"value"
                 }
             };
 
@@ -76,7 +76,7 @@ namespace BencodeNET.Tests.Torrents
         [AutoMockedData]
         public void CreateMagnetLink_NonEmptyTracker_WithoutOptionIncludeTrackers_IsNotIncluded(string infoHash, string displayName, string tracker1)
         {
-            var trackers = new List<string> {tracker1};
+            var trackers = new List<string> { tracker1 };
 
             var magnet = TorrentUtil.CreateMagnetLink(infoHash, displayName, trackers, MagnetLinkOptions.None);
 
@@ -87,7 +87,7 @@ namespace BencodeNET.Tests.Torrents
         [AutoMockedData]
         public void CreateMagnetLink_NonEmptyTracker_WithOptionIncludeTrackers_IsIncluded(string infoHash, string displayName, string tracker1)
         {
-            var trackers = new List<string> {tracker1};
+            var trackers = new List<string> { tracker1 };
 
             var magnet = TorrentUtil.CreateMagnetLink(infoHash, displayName, trackers, MagnetLinkOptions.IncludeTrackers);
 
@@ -98,7 +98,7 @@ namespace BencodeNET.Tests.Torrents
         [AutoMockedData]
         public void CreateMagnetLink_NonEmptyTrackers_WithOptionIncludeTrackers_AreIncluded(string infoHash, string displayName, string tracker1, string tracker2)
         {
-            var trackers = new List<string> {tracker1, tracker2};
+            var trackers = new List<string> { tracker1, tracker2 };
 
             var magnet = TorrentUtil.CreateMagnetLink(infoHash, displayName, trackers, MagnetLinkOptions.IncludeTrackers);
 

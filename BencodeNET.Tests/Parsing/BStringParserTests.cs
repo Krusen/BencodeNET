@@ -25,7 +25,7 @@ namespace BencodeNET.Tests.Parsing
         [InlineData("14:!@#¤%&/()=?$|")]
         public void CanParseSimple(string bencode)
         {
-            var parts = bencode.Split(new[] {':'}, 2);
+            var parts = bencode.Split(new[] { ':' }, 2);
             var length = int.Parse(parts[0]);
             var value = parts[1];
 
@@ -156,7 +156,7 @@ namespace BencodeNET.Tests.Parsing
             var parser = new BStringParser(encoding);
 
             // "3:æøå"
-            var bytes = new byte[] {51, 58, 230, 248, 229};
+            var bytes = new byte[] { 51, 58, 230, 248, 229 };
             var bstring = parser.Parse(bytes);
 
             bstring.Should().Be(expected);

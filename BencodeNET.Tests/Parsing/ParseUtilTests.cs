@@ -16,7 +16,7 @@ namespace BencodeNET.Tests.Parsing
         [Fact]
         public void TryParseLongFast_NullReturnsFalse()
         {
-            var result = ParseUtil.TryParseLongFast((string) null, out _);
+            var result = ParseUtil.TryParseLongFast((string)null, out _);
             result.Should().BeFalse();
         }
 

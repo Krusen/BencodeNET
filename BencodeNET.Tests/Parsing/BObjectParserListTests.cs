@@ -70,7 +70,7 @@ namespace BencodeNET.Tests.Parsing
         [AutoMockedData]
         public void Add_WithMultipleTypes_AddsParserForEachType(IBObjectParser parser)
         {
-            var types = new[] {typeof (BString), typeof (BNumber), typeof (BList)};
+            var types = new[] { typeof(BString), typeof(BNumber), typeof(BList) };
 
             var list = new BObjectParserList();
             list.Add(types, parser);
@@ -83,7 +83,7 @@ namespace BencodeNET.Tests.Parsing
         [AutoMockedData]
         public void Clear_EmptiesList(IBObjectParser<BString> parser1, IBObjectParser<BNumber> parser2)
         {
-            var list = new BObjectParserList {parser1, parser2};
+            var list = new BObjectParserList { parser1, parser2 };
             list.Clear();
 
             list.Should().BeEmpty();
@@ -94,7 +94,7 @@ namespace BencodeNET.Tests.Parsing
         {
             var list = new BObjectParserList();
 
-            var parser = list[typeof (object)];
+            var parser = list[typeof(object)];
 
             parser.Should().BeNull();
         }
@@ -103,7 +103,7 @@ namespace BencodeNET.Tests.Parsing
         public void Indexer_Get_ReturnsMatchingParserForType()
         {
             var stringParser = new BStringParser();
-            var list = new BObjectParserList {stringParser};
+            var list = new BObjectParserList { stringParser };
 
             var parser = list[typeof(BString)];
 
@@ -116,10 +116,10 @@ namespace BencodeNET.Tests.Parsing
             var stringParser = new BStringParser();
 
             var list = new BObjectParserList();
-            list[typeof (BString)] = stringParser;
+            list[typeof(BString)] = stringParser;
 
             list.Should().HaveCount(1);
-            list[typeof (BString)].Should().BeSameAs(stringParser);
+            list[typeof(BString)].Should().BeSameAs(stringParser);
         }
 
         [Fact]
@@ -129,17 +129,17 @@ namespace BencodeNET.Tests.Parsing
             var stringParser2 = new BStringParser();
             var list = new BObjectParserList { stringParser1 };
 
-            list[typeof (BString)] = stringParser2;
+            list[typeof(BString)] = stringParser2;
 
             list.Should().HaveCount(1);
-            list[typeof (BString)].Should().BeSameAs(stringParser2);
+            list[typeof(BString)].Should().BeSameAs(stringParser2);
         }
 
         [Fact]
         public void Get_Generic_ReturnsMatchingParser()
         {
             var stringParser = new BStringParser();
-            var list = new BObjectParserList {stringParser};
+            var list = new BObjectParserList { stringParser };
 
             var parser = list.Get<BString>();
 

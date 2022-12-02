@@ -30,7 +30,7 @@ namespace BencodeNET.IO
         /// <summary>
         /// The length of the stream, or <c>null</c> if the stream doesn't support the feature.
         /// </summary>
-        public long? Length => _supportsLength ? _stream.Length : (long?) null;
+        public long? Length => _supportsLength ? _stream.Length : (long?)null;
 
         /// <summary>
         /// Returns true if the end of the stream has been reached.
@@ -104,7 +104,7 @@ namespace BencodeNET.IO
 
             PreviousChar = read == 0
                 ? default
-                : (char) _tinyBuffer[0];
+                : (char)_tinyBuffer[0];
 
             if (read > 0)
                 Position++;
@@ -123,7 +123,7 @@ namespace BencodeNET.IO
             var totalRead = 0;
             if (_hasPeeked && _peekedChar != default)
             {
-                buffer[0] = (byte) _peekedChar;
+                buffer[0] = (byte)_peekedChar;
                 totalRead = 1;
                 _hasPeeked = false;
 
@@ -143,7 +143,7 @@ namespace BencodeNET.IO
             }
 
             if (totalRead > 0)
-                PreviousChar = (char) buffer[totalRead - 1];
+                PreviousChar = (char)buffer[totalRead - 1];
 
             Position += totalRead;
 

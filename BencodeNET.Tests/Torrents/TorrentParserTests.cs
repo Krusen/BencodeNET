@@ -31,11 +31,11 @@ namespace BencodeNET.Tests.Torrents
             {
                 [TorrentFields.Info] = new BDictionary
                 {
-                    [TorrentInfoFields.Name] = (BString) "",
-                    [TorrentInfoFields.NameUtf8] = (BString) "",
-                    [TorrentInfoFields.Pieces] = (BString) "",
-                    [TorrentInfoFields.PieceLength] = (BNumber) 0,
-                    [TorrentInfoFields.Length] = (BNumber) 0
+                    [TorrentInfoFields.Name] = (BString)"",
+                    [TorrentInfoFields.NameUtf8] = (BString)"",
+                    [TorrentInfoFields.Pieces] = (BString)"",
+                    [TorrentInfoFields.PieceLength] = (BNumber)0,
+                    [TorrentInfoFields.Length] = (BNumber)0
                 },
             };
 
@@ -43,10 +43,10 @@ namespace BencodeNET.Tests.Torrents
             {
                 [TorrentFields.Info] = new BDictionary
                 {
-                    [TorrentInfoFields.Name] = (BString) "",
-                    [TorrentInfoFields.NameUtf8] = (BString) "",
-                    [TorrentInfoFields.Pieces] = (BString) "",
-                    [TorrentInfoFields.PieceLength] = (BNumber) 0,
+                    [TorrentInfoFields.Name] = (BString)"",
+                    [TorrentInfoFields.NameUtf8] = (BString)"",
+                    [TorrentInfoFields.Pieces] = (BString)"",
+                    [TorrentInfoFields.PieceLength] = (BNumber)0,
                     [TorrentInfoFields.Files] = new BList()
                 },
             };
@@ -58,11 +58,11 @@ namespace BencodeNET.Tests.Torrents
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
-            ParsedData[TorrentFields.Comment] = (BString) comment;
+            ParsedData[TorrentFields.Comment] = (BString)comment;
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            var torrent = parser.Parse((BencodeReader) null);
+            var torrent = parser.Parse((BencodeReader)null);
 
             // Assert
             torrent.Comment.Should().Be(comment);
@@ -74,11 +74,11 @@ namespace BencodeNET.Tests.Torrents
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
-            ParsedData[TorrentFields.CreatedBy] = (BString) createdBy;
+            ParsedData[TorrentFields.CreatedBy] = (BString)createdBy;
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            var torrent = parser.Parse((BencodeReader) null);
+            var torrent = parser.Parse((BencodeReader)null);
 
             // Assert
             torrent.CreatedBy.Should().Be(createdBy);
@@ -89,11 +89,11 @@ namespace BencodeNET.Tests.Torrents
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
-            ParsedData[TorrentFields.CreationDate] = (BNumber) 1451606400;
+            ParsedData[TorrentFields.CreationDate] = (BNumber)1451606400;
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            var torrent = parser.Parse((BencodeReader) null);
+            var torrent = parser.Parse((BencodeReader)null);
 
             // Assert
             torrent.CreationDate.Should().Be(new DateTime(2016, 1, 1));
@@ -104,11 +104,11 @@ namespace BencodeNET.Tests.Torrents
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
-            ParsedData[TorrentFields.CreationDate] = (BNumber) 1451606400000;
+            ParsedData[TorrentFields.CreationDate] = (BNumber)1451606400000;
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            var torrent = parser.Parse((BencodeReader) null);
+            var torrent = parser.Parse((BencodeReader)null);
 
             // Assert
             torrent.CreationDate.Should().Be(new DateTime(2016, 1, 1));
@@ -119,11 +119,11 @@ namespace BencodeNET.Tests.Torrents
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
-            ParsedData[TorrentFields.CreationDate] = (BNumber) long.MaxValue;
+            ParsedData[TorrentFields.CreationDate] = (BNumber)long.MaxValue;
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            var torrent = parser.Parse((BencodeReader) null);
+            var torrent = parser.Parse((BencodeReader)null);
 
             // Assert
             torrent.CreationDate.Should().Be(new DateTime(1970, 1, 1));
@@ -138,11 +138,11 @@ namespace BencodeNET.Tests.Torrents
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
-            ParsedData[TorrentFields.Encoding] = (BString) encoding;
+            ParsedData[TorrentFields.Encoding] = (BString)encoding;
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            var torrent = parser.Parse((BencodeReader) null);
+            var torrent = parser.Parse((BencodeReader)null);
 
             // Assert
             torrent.Encoding.Should().Be(Encoding.UTF8);
@@ -155,11 +155,11 @@ namespace BencodeNET.Tests.Torrents
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
-            ParsedData[TorrentFields.Encoding] = (BString) encoding;
+            ParsedData[TorrentFields.Encoding] = (BString)encoding;
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            var torrent = parser.Parse((BencodeReader) null);
+            var torrent = parser.Parse((BencodeReader)null);
 
             // Assert
             torrent.Encoding.Should().Be(Encoding.ASCII);
@@ -174,11 +174,11 @@ namespace BencodeNET.Tests.Torrents
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
-            ParsedData[TorrentFields.Encoding] = (BString) encoding;
+            ParsedData[TorrentFields.Encoding] = (BString)encoding;
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            var torrent = parser.Parse((BencodeReader) null);
+            var torrent = parser.Parse((BencodeReader)null);
 
             // Assert
             torrent.Encoding.Should().Be(null);
@@ -191,7 +191,7 @@ namespace BencodeNET.Tests.Torrents
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
             var info = ParsedData.Get<BDictionary>(TorrentFields.Info);
-            info[TorrentInfoFields.PieceLength] = (BNumber) pieceSize;
+            info[TorrentInfoFields.PieceLength] = (BNumber)pieceSize;
 
             // Act
             var parser = new TorrentParser(BencodeParser);
@@ -213,7 +213,7 @@ namespace BencodeNET.Tests.Torrents
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            var torrent = parser.Parse((BencodeReader) null);
+            var torrent = parser.Parse((BencodeReader)null);
 
             // Assert
             torrent.Pieces.Should().Equal(pieces);
@@ -230,7 +230,7 @@ namespace BencodeNET.Tests.Torrents
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
             var info = ParsedData.Get<BDictionary>(TorrentFields.Info);
-            info[TorrentInfoFields.Private] = (BNumber) value;
+            info[TorrentInfoFields.Private] = (BNumber)value;
 
             // Act
             var parser = new TorrentParser(BencodeParser);
@@ -246,16 +246,16 @@ namespace BencodeNET.Tests.Torrents
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
-            ParsedData[extraKey] = (BString) extraValue;
-            ParsedData.Get<BDictionary>(TorrentFields.Info)[extraInfoKey] = (BString) extraInfoValue;
+            ParsedData[extraKey] = (BString)extraValue;
+            ParsedData.Get<BDictionary>(TorrentFields.Info)[extraInfoKey] = (BString)extraInfoValue;
 
             // Act
             var parser = new TorrentParser(BencodeParser);
             var torrent = parser.Parse((BencodeReader)null);
 
             // Assert
-            torrent.ExtraFields.Should().Contain(extraKey, (BString) extraValue);
-            torrent.ExtraFields.Get<BDictionary>(TorrentFields.Info).Should().Contain(extraInfoKey, (BString) extraInfoValue);
+            torrent.ExtraFields.Should().Contain(extraKey, (BString)extraValue);
+            torrent.ExtraFields.Get<BDictionary>(TorrentFields.Info).Should().Contain(extraInfoKey, (BString)extraInfoValue);
         }
 
         [Theory]
@@ -264,7 +264,7 @@ namespace BencodeNET.Tests.Torrents
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
-            ParsedData[TorrentFields.Announce] = (BString) announceUrl;
+            ParsedData[TorrentFields.Announce] = (BString)announceUrl;
 
             // Act
             var parser = new TorrentParser(BencodeParser);
@@ -352,7 +352,7 @@ namespace BencodeNET.Tests.Torrents
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
-            ParsedData[TorrentFields.Announce] = (BString) announceUrl;
+            ParsedData[TorrentFields.Announce] = (BString)announceUrl;
             ParsedData[TorrentFields.AnnounceList] = new BList
             {
                 new BList(announceList1),
@@ -365,7 +365,7 @@ namespace BencodeNET.Tests.Torrents
 
 
             // Assert
-            var primary = new List<string> {announceUrl};
+            var primary = new List<string> { announceUrl };
             primary.AddRange(announceList1);
             torrent.Trackers.Should().HaveCount(2);
             torrent.Trackers[0].Should().HaveCount(primary.Count);
@@ -380,7 +380,7 @@ namespace BencodeNET.Tests.Torrents
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
-            ParsedData[TorrentFields.Announce] = (BString) announceUrl1;
+            ParsedData[TorrentFields.Announce] = (BString)announceUrl1;
             ParsedData[TorrentFields.AnnounceList] = new BList
             {
                 new BList { announceUrl1, announceUrl2}
@@ -398,15 +398,15 @@ namespace BencodeNET.Tests.Torrents
 
         [Theory]
         [AutoMockedData]
-        public void SingleFileInfo_IsParsed(long length, string fileName,  string fileNameUtf8, string md5Sum)
+        public void SingleFileInfo_IsParsed(long length, string fileName, string fileNameUtf8, string md5Sum)
         {
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
             var info = ParsedData.Get<BDictionary>(TorrentFields.Info);
-            info[TorrentInfoFields.Length] = (BNumber) length;
-            info[TorrentInfoFields.Name] = (BString) fileName;
-            info[TorrentInfoFields.NameUtf8] = (BString) fileNameUtf8;
-            info[TorrentInfoFields.Md5Sum] = (BString) md5Sum;
+            info[TorrentInfoFields.Length] = (BNumber)length;
+            info[TorrentInfoFields.Name] = (BString)fileName;
+            info[TorrentInfoFields.NameUtf8] = (BString)fileNameUtf8;
+            info[TorrentInfoFields.Md5Sum] = (BString)md5Sum;
 
             // Act
             var parser = new TorrentParser(BencodeParser);
@@ -430,7 +430,7 @@ namespace BencodeNET.Tests.Torrents
             var fileName = "øæå"; // Use characters with different byte values for UTF8 and ISO-8859-1
 
             ParsedData = ValidSingleFileTorrentData;
-            ParsedData[TorrentFields.Encoding] = (BString) encoding;
+            ParsedData[TorrentFields.Encoding] = (BString)encoding;
             var info = ParsedData.Get<BDictionary>(TorrentFields.Info);
             info[TorrentInfoFields.Name] = new BString(fileName, Encoding.GetEncoding(encoding));
             info[TorrentInfoFields.NameUtf8] = new BString(fileName, Encoding.UTF8);
@@ -451,7 +451,7 @@ namespace BencodeNET.Tests.Torrents
             // Arrange
             ParsedData = ValidMultiFileTorrentData;
             var info = ParsedData.Get<BDictionary>(TorrentFields.Info);
-            info[TorrentInfoFields.Name] = (BString) directoryName;
+            info[TorrentInfoFields.Name] = (BString)directoryName;
             info[TorrentInfoFields.Files] = new BList<BDictionary>
             {
                 new BDictionary
@@ -512,7 +512,7 @@ namespace BencodeNET.Tests.Torrents
             // Arrange
             ParsedData = ValidSingleFileTorrentData;
             var info = ParsedData.Get<BDictionary>(TorrentFields.Info);
-            info[TorrentInfoFields.Length] = (BNumber) 1;
+            info[TorrentInfoFields.Length] = (BNumber)1;
             info[TorrentInfoFields.Files] = new BList();
 
             // Act
@@ -648,7 +648,7 @@ namespace BencodeNET.Tests.Torrents
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            var torrent = parser.Parse((BencodeReader) null);
+            var torrent = parser.Parse((BencodeReader)null);
 
             // Assert
             torrent.OriginalInfoHash.Should().Be(expectedInfoHash);
@@ -663,7 +663,7 @@ namespace BencodeNET.Tests.Torrents
 
             // Act
             var parser = new TorrentParser(BencodeParser);
-            var torrent = parser.Parse((BencodeReader) null);
+            var torrent = parser.Parse((BencodeReader)null);
 
             // Assert
             torrent.OriginalInfoHashBytes.Should().Equal(expectedInfoHashBytes);

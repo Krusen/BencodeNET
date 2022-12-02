@@ -20,7 +20,7 @@ namespace BencodeNET.Tests.Parsing
         [InlineData("14:!@#¤%&/()=?$|")]
         public async Task CanParseSimpleAsync(string bencode)
         {
-            var parts = bencode.Split(new[] {':'}, 2);
+            var parts = bencode.Split(new[] { ':' }, 2);
             var length = int.Parse(parts[0]);
             var value = parts[1];
 
@@ -140,7 +140,7 @@ namespace BencodeNET.Tests.Parsing
             var parser = new BStringParser(encoding);
 
             // "3:æøå"
-            var bytes = new byte[] {51, 58, 230, 248, 229};
+            var bytes = new byte[] { 51, 58, 230, 248, 229 };
             var (reader, writer) = new Pipe();
             await writer.WriteAsync(bytes);
 

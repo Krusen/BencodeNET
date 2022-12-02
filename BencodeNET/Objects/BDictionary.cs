@@ -106,29 +106,29 @@ namespace BencodeNET.Objects
 
                     // Append list to existing list or replace other types
                     case BList newList:
-                    {
-                        var existingList = Get<BList>(field.Key);
-                        if (existingList == null || existingKeyAction == ExistingKeyAction.Replace)
                         {
-                            this[field.Key] = field.Value;
+                            var existingList = Get<BList>(field.Key);
+                            if (existingList == null || existingKeyAction == ExistingKeyAction.Replace)
+                            {
+                                this[field.Key] = field.Value;
+                                continue;
+                            }
+                            existingList.AddRange(newList);
                             continue;
                         }
-                        existingList.AddRange(newList);
-                        continue;
-                    }
 
                     // Merge dictionary with existing or replace other types
                     case BDictionary newDictionary:
-                    {
-                        var existingDictionary = Get<BDictionary>(field.Key);
-                        if (existingDictionary == null || existingKeyAction == ExistingKeyAction.Replace)
                         {
-                            this[field.Key] = field.Value;
-                            continue;
+                            var existingDictionary = Get<BDictionary>(field.Key);
+                            if (existingDictionary == null || existingKeyAction == ExistingKeyAction.Replace)
+                            {
+                                this[field.Key] = field.Value;
+                                continue;
+                            }
+                            existingDictionary.MergeWith(newDictionary);
+                            break;
                         }
-                        existingDictionary.MergeWith(newDictionary);
-                        break;
-                    }
                 }
             }
         }

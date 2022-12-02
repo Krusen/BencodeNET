@@ -119,10 +119,10 @@ namespace BencodeNET.Tests.Parsing
             bdictionary.Should().HaveCount(2);
             bdictionary.Should().ContainKey("spam");
             bdictionary.Should().ContainKey("foo");
-            bdictionary["spam"].Should().BeOfType(typeof (BString));
-            bdictionary["spam"].Should().Be((BString) "egg");
-            bdictionary["foo"].Should().BeOfType(typeof (BNumber));
-            bdictionary["foo"].Should().Be((BNumber) 42);
+            bdictionary["spam"].Should().BeOfType(typeof(BString));
+            bdictionary["spam"].Should().Be((BString)"egg");
+            bdictionary["foo"].Should().BeOfType(typeof(BNumber));
+            bdictionary["foo"].Should().Be((BNumber)42);
         }
     }
 }
