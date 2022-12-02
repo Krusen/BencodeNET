@@ -56,7 +56,7 @@ namespace BencodeNET.Tests.Parsing
             var parser = new BDictionaryParser(bparser);
             Func<Task> action = async () => await parser.ParseStringAsync(bencode);
 
-            action.Should().Throw<InvalidBencodeException<BDictionary>>().WithMessage("*reached end of stream*");
+            action.Should().ThrowAsync<InvalidBencodeException<BDictionary>>().WithMessage("*reached end of stream*");
         }
 
         [Theory]
@@ -69,7 +69,7 @@ namespace BencodeNET.Tests.Parsing
             var parser = new BDictionaryParser(bparser);
             Func<Task> action = async () => await parser.ParseStringAsync(bencode);
 
-            action.Should().Throw<InvalidBencodeException<BDictionary>>().WithMessage("*Unexpected character*");
+            action.Should().ThrowAsync<InvalidBencodeException<BDictionary>>().WithMessage("*Unexpected character*");
         }
 
         [Theory]
@@ -91,7 +91,7 @@ namespace BencodeNET.Tests.Parsing
             Func<Task> action = async () => await parser.ParseStringAsync(bencode);
 
             // Assert
-            action.Should().Throw<InvalidBencodeException<BDictionary>>().WithMessage("*Missing end character of object*");
+            action.Should().ThrowAsync<InvalidBencodeException<BDictionary>>().WithMessage("*Missing end character of object*");
         }
 
         [Theory]
@@ -104,7 +104,7 @@ namespace BencodeNET.Tests.Parsing
 
             Func<Task> action = async () => await parser.ParseStringAsync("di42ee");
 
-            action.Should().Throw<InvalidBencodeException<BDictionary>>().WithMessage("*Could not parse dictionary key*");
+            action.Should().ThrowAsync<InvalidBencodeException<BDictionary>>().WithMessage("*Could not parse dictionary key*");
         }
 
         [Theory]
@@ -118,7 +118,7 @@ namespace BencodeNET.Tests.Parsing
 
             Func<Task> action = async () => await parser.ParseStringAsync("di42ee");
 
-            action.Should().Throw<InvalidBencodeException<BDictionary>>().WithMessage("*Could not parse dictionary value*");
+            action.Should().ThrowAsync<InvalidBencodeException<BDictionary>>().WithMessage("*Could not parse dictionary value*");
         }
 
         [Theory]
@@ -132,7 +132,7 @@ namespace BencodeNET.Tests.Parsing
 
             Func<Task> action = async () => await parser.ParseStringAsync("di42ee");
 
-            action.Should().Throw<InvalidBencodeException<BDictionary>>().WithMessage("*The dictionary already contains the key*");
+            action.Should().ThrowAsync<InvalidBencodeException<BDictionary>>().WithMessage("*The dictionary already contains the key*");
         }
     }
 }

@@ -46,8 +46,8 @@ namespace BencodeNET.Tests.Parsing
         public void LessCharsThanSpecified_ThrowsInvalidBencodeExceptionAsync(string bencode)
         {
             Func<Task> action = async () => await Parser.ParseStringAsync(bencode);
-            action.Should().Throw<InvalidBencodeException<BString>>()
-                .WithMessage("*but could only read * bytes*")
+            action.Should().ThrowAsync<InvalidBencodeException<BString>>()
+                .WithMessage("*but could only read * bytes*").Result
                 .Which.StreamPosition.Should().Be(0);
         }
 
@@ -62,8 +62,8 @@ namespace BencodeNET.Tests.Parsing
         public void MissingDelimiter_ThrowsInvalidBencodeExceptionAsync(string bencode, int errorIndex)
         {
             Func<Task> action = async () => await Parser.ParseStringAsync(bencode);
-            action.Should().Throw<InvalidBencodeException<BString>>()
-                .WithMessage("*Unexpected character. Expected ':'*")
+            action.Should().ThrowAsync<InvalidBencodeException<BString>>()
+                .WithMessage("*Unexpected character. Expected ':'*").Result
                 .Which.StreamPosition.Should().Be(errorIndex);
         }
 
@@ -79,8 +79,8 @@ namespace BencodeNET.Tests.Parsing
         public void NonDigitFirstChar_ThrowsInvalidBencodeExceptionAsync(string bencode)
         {
             Func<Task> action = async () => await Parser.ParseStringAsync(bencode);
-            action.Should().Throw<InvalidBencodeException<BString>>()
-                .WithMessage($"*Unexpected character. Expected ':' but found '{bencode[0]}'*")
+            action.Should().ThrowAsync<InvalidBencodeException<BString>>()
+                .WithMessage($"*Unexpected character. Expected ':' but found '{bencode[0]}'*").Result
                 .Which.StreamPosition.Should().Be(0);
         }
 
@@ -92,8 +92,8 @@ namespace BencodeNET.Tests.Parsing
         public void LengthAboveMaxDigits10_ThrowsUnsupportedExceptionAsync(string bencode)
         {
             Func<Task> action = async () => await Parser.ParseStringAsync(bencode);
-            action.Should().Throw<UnsupportedBencodeException<BString>>()
-                .WithMessage("*Length of string is more than * digits*")
+            action.Should().ThrowAsync<UnsupportedBencodeException<BString>>()
+                .WithMessage("*Length of string is more than * digits*").Result
                 .Which.StreamPosition.Should().Be(0);
         }
 
@@ -111,7 +111,7 @@ namespace BencodeNET.Tests.Parsing
         public void LengthAtOrBelowMaxDigits10_DoesNotThrowUnsupportedExceptionAsync(string bencode)
         {
             Func<Task> action = async () => await Parser.ParseStringAsync(bencode);
-            action.Should().NotThrow<UnsupportedBencodeException<BString>>();
+            action.Should().NotThrowAsync<UnsupportedBencodeException<BString>>();
         }
 
         [Fact]
@@ -119,8 +119,8 @@ namespace BencodeNET.Tests.Parsing
         {
             var bencode = "2147483648:spam";
             Func<Task> action = async () => await Parser.ParseStringAsync(bencode);
-            action.Should().Throw<UnsupportedBencodeException<BString>>()
-                .WithMessage("*Length of string is * but maximum supported length is *")
+            action.Should().ThrowAsync<UnsupportedBencodeException<BString>>()
+                .WithMessage("*Length of string is * but maximum supported length is *").Result
                 .Which.StreamPosition.Should().Be(0);
         }
 
@@ -129,7 +129,7 @@ namespace BencodeNET.Tests.Parsing
         {
             var bencode = "2147483647:spam";
             Func<Task> action = async () => await Parser.ParseStringAsync(bencode);
-            action.Should().NotThrow<UnsupportedBencodeException<BString>>();
+            action.Should().NotThrowAsync<UnsupportedBencodeException<BString>>();
         }
 
         [Fact]
@@ -158,8 +158,8 @@ namespace BencodeNET.Tests.Parsing
         public void InvalidLengthString_ThrowsInvalidExceptionAsync(string bencode, int errorIndex)
         {
             Func<Task> action = async () => await Parser.ParseStringAsync(bencode);
-            action.Should().Throw<InvalidBencodeException<BString>>()
-                .WithMessage("*Unexpected character. Expected ':'*")
+            action.Should().ThrowAsync<InvalidBencodeException<BString>>()
+                .WithMessage("*Unexpected character. Expected ':'*").Result
                 .Which.StreamPosition.Should().Be(errorIndex);
         }
     }

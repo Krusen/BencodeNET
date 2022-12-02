@@ -153,7 +153,7 @@ namespace BencodeNET.Tests.Objects
             var blist = new BList {1, 2, 3};
             var bnumbers = blist.AsType<BNumber>();
 
-            bnumbers.Should()
+            bnumbers.Cast<object>().Should()
                 .HaveCount(3)
                 .And.ContainItemsAssignableTo<BNumber>()
                 .And.ContainInOrder(blist);
