@@ -38,12 +38,12 @@
 
   <!--Dev dependencies -->
   <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.8.55" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.4.27" PrivateAssets="all" />
   </ItemGroup>
 
   <!-- Non .NET 5.0 dependencies -->
   <ItemGroup Condition=" '$(TargetFramework)' != 'net5.0' ">
-    <PackageReference Include="System.IO.Pipelines" Version="4.6.0" />
+    <PackageReference Include="System.IO.Pipelines" Version="7.0.0" />
   </ItemGroup>
 
   <!-- .NET 5.0 dependencies -->
