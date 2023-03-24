@@ -124,7 +124,7 @@ namespace BencodeNET.Torrents
 
             if (options.HasFlag(MagnetLinkOptions.IncludeTrackers) && validTrackers.Any())
             {
-                var trackersString = string.Join("&", validTrackers.Select(x => $"tr={x}"));
+                var trackersString = string.Join("&", validTrackers.Select(x => $"tr={Uri.EscapeDataString(x)}"));
                 magnet += $"&{trackersString}";
             }
 
