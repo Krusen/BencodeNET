@@ -45,21 +45,28 @@ namespace BencodeNET.Parsing
             if (reader.ReadChar() != 'i')
                 throw InvalidBencodeException<BNumber>.UnexpectedChar('i', reader.PreviousChar, startPosition);
 
-            using var digits = MemoryPool<char>.Shared.Rent(BNumber.MaxDigits);
-            var digitCount = 0;
-            for (var c = reader.ReadChar(); c != default && c != 'e'; c = reader.ReadChar())
+            var digits = ArrayPool<char>.Shared.Rent(BNumber.MaxDigits);
+            try
             {
-                digits.Memory.Span[digitCount++] = c;
+                var digitCount = 0;
+                for (var c = reader.ReadChar(); c != default && c != 'e'; c = reader.ReadChar())
+                {
+                    digits[digitCount++] = c;
+                }
+
+                if (digitCount == 0)
+                    throw NoDigitsException(startPosition);
+
+                // Last read character should be 'e'
+                if (reader.PreviousChar != 'e')
+                    throw InvalidBencodeException<BNumber>.MissingEndChar(startPosition);
+
+                return ParseNumber(digits[..digitCount], startPosition);
             }
-
-            if (digitCount == 0)
-                throw NoDigitsException(startPosition);
-
-            // Last read character should be 'e'
-            if (reader.PreviousChar != 'e')
-                throw InvalidBencodeException<BNumber>.MissingEndChar(startPosition);
-
-            return ParseNumber(digits.Memory.Span.Slice(0, digitCount), startPosition);
+            finally
+            {
+                ArrayPool<char>.Shared.Return(digits);
+            }
         }
 
         /// <summary>
@@ -80,24 +87,30 @@ namespace BencodeNET.Parsing
             if (await reader.ReadCharAsync(cancellationToken).ConfigureAwait(false) != 'i')
                 throw InvalidBencodeException<BNumber>.UnexpectedChar('i', reader.PreviousChar, startPosition);
 
-            using var memoryOwner = MemoryPool<char>.Shared.Rent(BNumber.MaxDigits);
-            var digits = memoryOwner.Memory;
-            var digitCount = 0;
-            for (var c = await reader.ReadCharAsync(cancellationToken).ConfigureAwait(false);
-                c != default && c != 'e';
-                c = await reader.ReadCharAsync(cancellationToken).ConfigureAwait(false))
+            var digits = ArrayPool<char>.Shared.Rent(BNumber.MaxDigits);
+            try
             {
-                digits.Span[digitCount++] = c;
+                var digitCount = 0;
+                for (var c = await reader.ReadCharAsync(cancellationToken).ConfigureAwait(false);
+                     c != default && c != 'e';
+                     c = await reader.ReadCharAsync(cancellationToken).ConfigureAwait(false))
+                {
+                    digits[digitCount++] = c;
+                }
+
+                if (digitCount == 0)
+                    throw NoDigitsException(startPosition);
+
+                // Last read character should be 'e'
+                if (reader.PreviousChar != 'e')
+                    throw InvalidBencodeException<BNumber>.MissingEndChar(startPosition);
+
+                return ParseNumber(digits.AsSpan()[..digitCount], startPosition);
             }
-
-            if (digitCount == 0)
-                throw NoDigitsException(startPosition);
-
-            // Last read character should be 'e'
-            if (reader.PreviousChar != 'e')
-                throw InvalidBencodeException<BNumber>.MissingEndChar(startPosition);
-
-            return ParseNumber(digits.Span.Slice(0, digitCount), startPosition);
+            finally
+            {
+                ArrayPool<char>.Shared.Return(digits);
+            }
         }
 
         private BNumber ParseNumber(in ReadOnlySpan<char> digits, long startPosition)

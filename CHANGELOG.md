@@ -8,6 +8,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ...
 
+## [5.0.0] - 2023-03-30
+### Changed
+- Added target framework .NET 6
+- Removed the following target frameworks and any associated conditional code:
+  - .NET Standard 2.0
+  - .NET Standard 2.1
+  - .NET Core App 2.1
+  - .NET 5.0
+- Upgraded dependency System.IO.Pipelines from 5.0.1 to 6.0.3
+- Switched a use of MemoryPool to ArrayPool
+- Merged PR #56
+  - Always set `private` field in torrent. If `IsPrivate` is false then `0` is output instead of `1`
+- Merged PR #60
+  - Escape tracker URLs in magnet links
+
 ## [4.0.0] - 2021-01-23
 ### Changed
 - Changed supported frameworks to:

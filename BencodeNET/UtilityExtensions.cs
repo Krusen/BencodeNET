@@ -129,7 +129,6 @@ namespace BencodeNET
             bytes[index] = (byte) c;
         }
 
-#if !NETSTANDARD2_0
         public static string AsString(this ReadOnlySpan<char> chars)
         {
             return new string(chars);
@@ -144,21 +143,5 @@ namespace BencodeNET
         {
             return new string(chars.Span);
         }
-#else
-        public static string AsString(this ReadOnlySpan<char> chars)
-        {
-            return new string(chars.ToArray());
-        }
-
-        public static string AsString(this Span<char> chars)
-        {
-            return new string(chars.ToArray());
-        }
-
-        public static string AsString(this Memory<char> chars)
-        {
-            return new string(chars.ToArray());
-        }
-#endif
     }
 }

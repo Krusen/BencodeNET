@@ -120,11 +120,13 @@ namespace BencodeNET.Torrents
             if (!string.IsNullOrWhiteSpace(displayName))
                 magnet += $"&dn={displayName}";
 
-            var validTrackers = trackers?.Where(x => !string.IsNullOrWhiteSpace(x)).ToList() ?? new List<string>();
+            var validEscapedTrackers =
+                trackers?.Where(x => !string.IsNullOrWhiteSpace(x)).Select(Uri.EscapeDataString).ToList() ??
+                new List<string>();
 
-            if (options.HasFlag(MagnetLinkOptions.IncludeTrackers) && validTrackers.Any())
+            if (options.HasFlag(MagnetLinkOptions.IncludeTrackers) && validEscapedTrackers.Any())
             {
-                var trackersString = string.Join("&", validTrackers.Select(x => $"tr={x}"));
+                var trackersString = string.Join("&", validEscapedTrackers.Select(x => $"tr={x}"));
                 magnet += $"&{trackersString}";
             }
 

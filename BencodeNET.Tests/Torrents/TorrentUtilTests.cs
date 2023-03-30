@@ -106,6 +106,17 @@ namespace BencodeNET.Tests.Torrents
         }
 
         [Theory]
+        [AutoMockedData("https://en.wikipedia.org/wiki/Bencode", "https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FBencode")]
+        public void CreateMagnetLink_Tracker_IsEscapedWhenEscapingEnabled(string tracker, string expected, string infoHash, string displayName)
+        {
+            var trackers = new List<string> { tracker };
+
+            var magnet = TorrentUtil.CreateMagnetLink(infoHash, displayName, trackers, MagnetLinkOptions.IncludeTrackers);
+
+            magnet.Should().Be($"magnet:?xt=urn:btih:{infoHash}&dn={displayName}&tr={expected}");
+        }
+
+        [Theory]
         [AutoMockedData]
         public void CreateMagnetLink_Torrent_UsesInfoHashDisplayNameAndTrackersFromTorrent(string infoHash, string displayName, IList<IList<string>> trackers)
         {

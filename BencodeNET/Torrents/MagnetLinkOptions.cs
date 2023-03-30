@@ -16,6 +16,6 @@ namespace BencodeNET.Torrents
         /// <summary>
         /// Includes trackers in the magnet link.
         /// </summary>
-        IncludeTrackers = 1
+        IncludeTrackers = 1 << 0,
     }
 }
