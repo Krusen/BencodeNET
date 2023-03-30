@@ -49,12 +49,12 @@ namespace BencodeNET.Tests.Parsing
         [Theory]
         [AutoMockedData("")]
         [AutoMockedData("l")]
-        public void BelowMinimumLength2_ThrowsInvalidBencodeExceptionAsync(string bencode, IBencodeParser bparser)
+        public async Task BelowMinimumLength2_ThrowsInvalidBencodeExceptionAsync(string bencode, IBencodeParser bparser)
         {
             var parser = new BListParser(bparser);
-            Func<Task> action = async () => await parser.ParseStringAsync(bencode);
+            var action = async () => await parser.ParseStringAsync(bencode);
 
-            action.Should().Throw<InvalidBencodeException<BList>>().WithMessage("*reached end of stream*");
+            await action.Should().ThrowAsync<InvalidBencodeException<BList>>().WithMessage("*reached end of stream*");
         }
 
         [Theory]
@@ -64,19 +64,19 @@ namespace BencodeNET.Tests.Parsing
         [AutoMockedData("-e")]
         [AutoMockedData(".e")]
         [AutoMockedData("ee")]
-        public void InvalidFirstChar_ThrowsInvalidBencodeExceptionAsync(string bencode, IBencodeParser bparser)
+        public async Task InvalidFirstChar_ThrowsInvalidBencodeExceptionAsync(string bencode, IBencodeParser bparser)
         {
             var parser = new BListParser(bparser);
-            Func<Task> action = async () => await parser.ParseStringAsync(bencode);
+            var action = async () => await parser.ParseStringAsync(bencode);
 
-            action.Should().Throw<InvalidBencodeException<BList>>().WithMessage("*Unexpected character*");
+            await action.Should().ThrowAsync<InvalidBencodeException<BList>>().WithMessage("*Unexpected character*");
         }
 
         [Theory]
         [AutoMockedData("l4:spam")]
         [AutoMockedData("l ")]
         [AutoMockedData("l:")]
-        public void MissingEndChar_ThrowsInvalidBencodeExceptionAsync(string bencode, IBencodeParser bparser, IBObject something)
+        public async Task MissingEndChar_ThrowsInvalidBencodeExceptionAsync(string bencode, IBencodeParser bparser, IBObject something)
         {
             // Arrange
             bparser.ParseAsync(Arg.Any<PipeBencodeReader>())
@@ -85,10 +85,10 @@ namespace BencodeNET.Tests.Parsing
 
             // Act
             var parser = new BListParser(bparser);
-            Func<Task> action = async () => await parser.ParseStringAsync(bencode);
+            var action = async () => await parser.ParseStringAsync(bencode);
 
             // Assert
-            action.Should().Throw<InvalidBencodeException<BList>>().WithMessage("*Missing end character of object*");
+            await action.Should().ThrowAsync<InvalidBencodeException<BList>>().WithMessage("*Missing end character of object*");
         }
     }
 }

@@ -51,12 +51,12 @@ namespace BencodeNET.Tests.Parsing
         [Theory]
         [AutoMockedData("")]
         [AutoMockedData("d")]
-        public void BelowMinimumLength2_ThrowsInvalidBencodeExceptionAsync(string bencode, IBencodeParser bparser)
+        public async Task BelowMinimumLength2_ThrowsInvalidBencodeExceptionAsync(string bencode, IBencodeParser bparser)
         {
             var parser = new BDictionaryParser(bparser);
-            Func<Task> action = async () => await parser.ParseStringAsync(bencode);
+            var action = async () => await parser.ParseStringAsync(bencode);
 
-            action.Should().Throw<InvalidBencodeException<BDictionary>>().WithMessage("*reached end of stream*");
+            await action.Should().ThrowAsync<InvalidBencodeException<BDictionary>>().WithMessage("*reached end of stream*");
         }
 
         [Theory]
@@ -64,19 +64,19 @@ namespace BencodeNET.Tests.Parsing
         [AutoMockedData(":de")]
         [AutoMockedData("-de")]
         [AutoMockedData("1de")]
-        public void InvalidFirstChar_ThrowsInvalidBencodeExceptionAsync(string bencode, IBencodeParser bparser)
+        public async Task InvalidFirstChar_ThrowsInvalidBencodeExceptionAsync(string bencode, IBencodeParser bparser)
         {
             var parser = new BDictionaryParser(bparser);
-            Func<Task> action = async () => await parser.ParseStringAsync(bencode);
+            var action = async () => await parser.ParseStringAsync(bencode);
 
-            action.Should().Throw<InvalidBencodeException<BDictionary>>().WithMessage("*Unexpected character*");
+            await action.Should().ThrowAsync<InvalidBencodeException<BDictionary>>().WithMessage("*Unexpected character*");
         }
 
         [Theory]
         [AutoMockedData("da")]
         [AutoMockedData("d4:spam3:egg")]
         [AutoMockedData("d ")]
-        public void MissingEndChar_ThrowsInvalidBencodeExceptionAsync(string bencode, IBencodeParser bparser, BString someKey, IBObject someValue)
+        public async Task MissingEndChar_ThrowsInvalidBencodeExceptionAsync(string bencode, IBencodeParser bparser, BString someKey, IBObject someValue)
         {
             // Arrange
             bparser.ParseAsync<BString>(Arg.Any<PipeBencodeReader>())
@@ -88,51 +88,51 @@ namespace BencodeNET.Tests.Parsing
 
             // Act
             var parser = new BDictionaryParser(bparser);
-            Func<Task> action = async () => await parser.ParseStringAsync(bencode);
+            var action = async () => await parser.ParseStringAsync(bencode);
 
             // Assert
-            action.Should().Throw<InvalidBencodeException<BDictionary>>().WithMessage("*Missing end character of object*");
+            await action.Should().ThrowAsync<InvalidBencodeException<BDictionary>>().WithMessage("*Missing end character of object*");
         }
 
         [Theory]
         [AutoMockedData]
-        public void InvalidKey_ThrowsInvalidBencodeExceptionAsync(IBencodeParser bparser)
+        public async Task InvalidKey_ThrowsInvalidBencodeExceptionAsync(IBencodeParser bparser)
         {
             bparser.ParseAsync<BString>(Arg.Any<PipeBencodeReader>()).Throws<BencodeException>();
 
             var parser = new BDictionaryParser(bparser);
 
-            Func<Task> action = async () => await parser.ParseStringAsync("di42ee");
+            var action = async () => await parser.ParseStringAsync("di42ee");
 
-            action.Should().Throw<InvalidBencodeException<BDictionary>>().WithMessage("*Could not parse dictionary key*");
+            await action.Should().ThrowAsync<InvalidBencodeException<BDictionary>>().WithMessage("*Could not parse dictionary key*");
         }
 
         [Theory]
         [AutoMockedData]
-        public void InvalidValue_ThrowsInvalidBencodeExceptionAsync(IBencodeParser bparser, BString someKey)
+        public async Task InvalidValue_ThrowsInvalidBencodeExceptionAsync(IBencodeParser bparser, BString someKey)
         {
             bparser.ParseAsync<BString>(Arg.Any<PipeBencodeReader>()).Returns(someKey);
             bparser.ParseAsync(Arg.Any<PipeBencodeReader>()).Throws<BencodeException>();
 
             var parser = new BDictionaryParser(bparser);
 
-            Func<Task> action = async () => await parser.ParseStringAsync("di42ee");
+            var action = async () => await parser.ParseStringAsync("di42ee");
 
-            action.Should().Throw<InvalidBencodeException<BDictionary>>().WithMessage("*Could not parse dictionary value*");
+            await action.Should().ThrowAsync<InvalidBencodeException<BDictionary>>().WithMessage("*Could not parse dictionary value*");
         }
 
         [Theory]
         [AutoMockedData]
-        public void DuplicateKey_ThrowsInvalidBencodeExceptionAsync(IBencodeParser bparser, BString someKey, BString someValue)
+        public async Task DuplicateKey_ThrowsInvalidBencodeExceptionAsync(IBencodeParser bparser, BString someKey, BString someValue)
         {
             bparser.ParseAsync<BString>(Arg.Any<PipeBencodeReader>()).Returns(someKey, someKey);
             bparser.ParseAsync(Arg.Any<PipeBencodeReader>()).Returns(someValue);
 
             var parser = new BDictionaryParser(bparser);
 
-            Func<Task> action = async () => await parser.ParseStringAsync("di42ee");
+            var action = async () => await parser.ParseStringAsync("di42ee");
 
-            action.Should().Throw<InvalidBencodeException<BDictionary>>().WithMessage("*The dictionary already contains the key*");
+            await action.Should().ThrowAsync<InvalidBencodeException<BDictionary>>().WithMessage("*The dictionary already contains the key*");
         }
     }
 }
