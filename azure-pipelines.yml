@@ -18,8 +18,12 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
+      Write-Host "Installing GitVersion..."
+      choco install gitversion.portable --no-progress
+
       Write-Host "Executing GitVersion..."
       $Env:SemVer = gitversion /showvariable SemVer
+
       Write-Host "SemVer: $Env:Semver"
       echo "##vso[task.setvariable variable=SemVer;isOutput=true]$Env:SemVer"
       echo "##vso[build.updatebuildnumber]$Env:SemVer+$(Build.BuildId)"
