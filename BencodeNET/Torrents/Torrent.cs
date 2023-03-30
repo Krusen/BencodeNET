@@ -307,8 +307,7 @@ namespace BencodeNET.Torrents
             if (Pieces?.Length > 0)
                 info[TorrentInfoFields.Pieces] = new BString(Pieces, encoding);
 
-            if (IsPrivate)
-                info[TorrentInfoFields.Private] = (BNumber)1;
+            info[TorrentInfoFields.Private] = (BNumber)(IsPrivate ? 1 : 0);
 
             if (FileMode == TorrentFileMode.Single)
             {
