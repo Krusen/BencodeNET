@@ -553,12 +553,18 @@ namespace BencodeNET.Tests.Torrents
         }
 
         [Fact]
-        public void ToBDictionary_EqualsEmptyBDictionaryForEmptyTorrent()
+        public void ToBDictionary_EmptyTorrent_ContainsOnlyInfoPrivateField()
         {
             var torrent = new Torrent();
             var result = torrent.ToBDictionary();
-            result.Should().HaveCount(0);
-            result.Should().BeEquivalentTo(new BDictionary());
+            result.Should().HaveCount(1);
+            result.Should().BeEquivalentTo(new BDictionary
+            {
+                [TorrentFields.Info] = new BDictionary
+                {
+                    [TorrentInfoFields.Private] = (BNumber)0,
+                },
+            });
         }
 
         [Theory]
